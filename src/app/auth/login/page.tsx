@@ -13,6 +13,7 @@ function LoginPage() {
     setMounted(true);
   }, []);
 
+  // Si el LUIS no tiene estas lineas sale un error
   if (!mounted) {
     return null; // Mientras no esté montado, no se renderiza nada.
   }
