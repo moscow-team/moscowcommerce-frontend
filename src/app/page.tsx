@@ -1,6 +1,7 @@
 
 export default function Home() {
   return (
-    <main className=""></main>
+    <main className="w-full min-h-screen">
+    </main>
   );
 }
