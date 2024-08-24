@@ -2,20 +2,10 @@
 
 import { Button, Card, Link } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function LoginPage() {
   const [credientials, setCredientials] = useState({ email: "", password: "" });
-  const [mounted, setMounted] = useState(false);
-
-  // Este useEffect asegura que el componente solo se renderiza en el cliente.
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null; // Mientras no esté montado, no se renderiza nada.
-  }
 
   const onSubmit = (data: any) => {
     alert(JSON.stringify(data));
