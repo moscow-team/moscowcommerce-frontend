@@ -4,27 +4,34 @@ import { Button, Card, Link } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { useState } from "react";
 
-function LoginPage() {
-  const [credientials, setCredientials] = useState({ email: "", password: "" });
 
-  const onSubmit = (data: any) => {
+interface Crediantials {
+  email: string;
+  password: string;
+}
+
+
+function LoginPage() {
+  const [credientials, setCredientials] = useState<Crediantials>({ email: "", password: "" });
+
+  const onSubmit = (data: Crediantials) => {
     alert(JSON.stringify(data));
   }
 
-  const handleChange = (name: any, e: any) => {
+  const handleChange = (name: string, e: string) => {
     setCredientials({ ...credientials, [name]: e });
   }
 
   return (
     <div className="flex justify-center items-center w-screen h-full min-h-screen">
-      <Card className="w-max flex flex-col h-max items-center justify-center mb-32">
+      <Card className="w-max flex flex-col h-max items-center justify-center mb-32 p-10">
+      <div className="flex flex-col justify-center items-center h-full w-full py-5">
+        <h1 className="font-semibold text-4xl mb-4">Iniciar Sesion</h1>
+      </div>
         <form
-          onSubmit={onSubmit}
-          className="w-80 flex flex-col h-max items-center justify-center px-10 gap-5 shadow-md"
+          // onSubmit={onSubmit(credientials)}
+          className="w-80 flex flex-col h-max items-center justify-center px-10 gap-5"
         >
-          <div className="flex flex-col justify-center items-center h-full w-full py-5">
-            <h1 className="font-semibold text-4xl mb-4">Iniciar Sesion</h1>
-          </div>
           <div className="h-20 w-full">
             <Input
               type="email"

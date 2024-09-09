@@ -18,8 +18,8 @@ export default function Header() {
                         Categorias
                     </Link>
                 </NavbarItem>
-                <NavbarItem isActive>
-                    <Link href="#" aria-current="page">
+                <NavbarItem>
+                    <Link href="#" color="foreground">
                         Productos
                     </Link>
                 </NavbarItem>
@@ -30,11 +30,13 @@ export default function Header() {
                 </NavbarItem>
             </NavbarContent>
             <NavbarContent justify="end">
-                <NavbarItem className="hidden lg:flex">
-                    <Link href="#">Login</Link>
+                <NavbarItem>
+                    <Button as={Link} color="primary" href="/auth/login" variant="solid">
+                        Log In
+                    </Button>
                 </NavbarItem>
                 <NavbarItem>
-                    <Button as={Link} color="primary" href="#" variant="flat">
+                    <Button as={Link} color="danger" href="/auth/register" variant="solid">
                         Sign Up
                     </Button>
                 </NavbarItem>
