@@ -4,22 +4,6 @@ import { Button, Card, Link } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 
-<<<<<<< HEAD
-=======
-function LoginPage() {
-  const [credientials, setCredientials] = useState({ email: "", password: "" });
-  const [mounted, setMounted] = useState(false);
-
-  // Este useEffect asegura que el componente solo se renderiza en el cliente.
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Si el LUIS no tiene estas lineas sale un error
-  if (!mounted) {
-    return null; // Mientras no esté montado, no se renderiza nada.
-  }
->>>>>>> a231e49d18f041d489fa4b074216c8f07b236217
 
 interface Crediantials {
   email: string;
