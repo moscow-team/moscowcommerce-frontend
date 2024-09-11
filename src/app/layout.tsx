@@ -7,6 +7,7 @@ import { NextUIProvider } from "@nextui-org/react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { usePathname } from "next/navigation";
+import { Toaster } from "sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 /* Esto puede ubicarse en los Pages */
@@ -27,7 +28,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
       <NextUIProvider>
-          {/* el "isDashboard" chequea si la ruta actual es "/dashboard", para solucionar es posible que haya que hacer un refolding o usar la sintaxis () en las carpetas */}
+      <Toaster richColors  />          {/* el "isDashboard" chequea si la ruta actual es "/dashboard", para solucionar es posible que haya que hacer un refolding o usar la sintaxis () en las carpetas */}
           {!isDashboard && <Header />}
           {children}
           {!isDashboard && <Footer />}
