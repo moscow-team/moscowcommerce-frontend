@@ -1,3 +1,7 @@
+export const metadata = {
+  title: "Dashboard - Moskow Commerce",
+  description: "Admin Panel",
+};
 export default function DashboardPage() {
   return (
     <div className="px-4 py-6 sm:px-0">
