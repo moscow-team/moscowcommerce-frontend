@@ -1,9 +1,13 @@
+"use client"
+import { useSession } from "next-auth/react";
+
 // app/dashboard/page.tsx
-export const metadata = {
-  title: "Dashboard - Moskow Commerce",
-  description: "Admin Panel",
-};
+// export const metadata = {
+//   title: "Dashboard - Moskow Commerce",
+//   description: "Admin Panel",
+// };
 export default function DashboardPage() {
+  const session = useSession();
   return (
     <div>
       <header className="bg-white shadow-sm">

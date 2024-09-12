@@ -2,7 +2,10 @@
 
 import { Button, Card, Link } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 // interface Crediantials {
 //   email: string;
@@ -10,6 +13,7 @@ import { useForm } from "react-hook-form";
 // }
 
 function LoginPage() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -18,9 +22,19 @@ function LoginPage() {
   //Remplazmos el useState de credenciales, por el el hook que nos otorga useForm
   // const [credientials, setCredientials] = useState<Crediantials>({ email: "", password: "" });
 
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = handleSubmit(async (data) => {
     //Enviar peticon al NextAuth o Servidor para realizar la autenticacion (Hacerlo Hook)
-    console.log(data);
+      const session = await signIn("credentials", {
+        username: data.email,
+        password: data.password,
+        redirect: false,
+      });
+      // console.log(session);
+      if (session?.ok) {
+        router.push("/dashboard");
+        toast.success("Sesion iniciada");
+      }
+
   });
 
   // const handleChange = (name: string, e: string) => {

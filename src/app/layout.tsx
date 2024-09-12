@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { usePathname } from "next/navigation";
 import { Toaster } from "sonner";
+import { SessionProvider } from "next-auth/react";
 const inter = Inter({ subsets: ["latin"] });
 
 /* Esto puede ubicarse en los Pages */
@@ -27,12 +28,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-      <NextUIProvider>
-      <Toaster richColors  />          {/* el "isDashboard" chequea si la ruta actual es "/dashboard", para solucionar es posible que haya que hacer un refolding o usar la sintaxis () en las carpetas */}
-          {!isDashboard && <Header />}
-          {children}
-          {!isDashboard && <Footer />}
-        </NextUIProvider>
+        <SessionProvider>
+          <NextUIProvider>
+            <Toaster richColors />          {/* el "isDashboard" chequea si la ruta actual es "/dashboard", para solucionar es posible que haya que hacer un refolding o usar la sintaxis () en las carpetas */}
+            {!isDashboard && <Header />}
+            {children}
+            {!isDashboard && <Footer />}
+          </NextUIProvider>
+        </SessionProvider>
       </body>
     </html>
   );
