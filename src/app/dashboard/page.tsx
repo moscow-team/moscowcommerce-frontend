@@ -1,5 +1,6 @@
 // app/dashboard/page.tsx
-import Link from "next/link";
+
+import { Link } from "@nextui-org/react";
 
 export const metadata = {
   title: "Dashboard - Moskow Commerce",

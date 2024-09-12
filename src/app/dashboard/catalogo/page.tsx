@@ -1,10 +1,12 @@
-// app/dashboard/catalogo/page.tsx
+"use client";
+
 import { useState } from "react";
 
-export const metadata = {
-  title: "Catálogo - Moskow Commerce",
-  description: "Admin Panel",
-};
+// export const metadata = {
+//   title: "Catálogo - Moskow Commerce",
+//   description: "Admin Panel",
+// };
+
 export default function CatalogoPage() {
   const [categoryName, setCategoryName] = useState("");
   const [existingCategoryName, setExistingCategoryName] =
