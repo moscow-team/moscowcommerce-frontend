@@ -1,4 +1,6 @@
-// app/dashboard/layout.tsx
+"use client"
+import { Button } from "@nextui-org/react";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 
 export default function DashboardLayout({
@@ -35,6 +37,8 @@ export default function DashboardLayout({
               Catálogo
             </button>
           </Link>
+
+          <Button onClick={()=>signOut()}>Cerrar Sesion</Button>
         </nav>
       </div>
 

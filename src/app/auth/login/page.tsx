@@ -29,9 +29,10 @@ function LoginPage() {
         password: data.password,
         redirect: false,
       });
+      // console.log(session);
       if (session?.ok) {
         router.push("/dashboard");
-        toast.success("Credenciales correctas");
+        toast.success("Sesion iniciada");
       }
 
   });

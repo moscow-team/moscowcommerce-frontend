@@ -6,16 +6,22 @@ export const authOptions = {
         CredentialsProvider({
             name: 'Credentials',
             credentials: {
-                username: { label: "Username", type: "text", placeholder: "jsmith" },
+                email: { label: "Email", type: "text"},
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials, req) {
                 const session = await logIn(credentials)
                 //Debemos retornar un objeto con la información del usuario
-                return session
+                return session.data
             }
         })
     ],
+    callbacks: {
+        async session({ session, token }) {
+          session.user = token;
+          return session;
+        },
+      },
     pages: {
         signIn: "/auth/login",
     },
