@@ -5,34 +5,12 @@ import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-// interface Form {
-//     email: string;
-//     password: string;
-//     name: string;
-//     lastName: string;
-//     confirmPassword: string;
-// }
-
 export default function () {
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm();
-
-    //Quitamos el useState para manejar el formulario de logue, para delegarlo al useForm 
-    // const [form, setForm] = useState<Form>(
-    //     {
-    //         email: "",
-    //         password: "",
-    //         name: "",
-    //         lastName: "",
-    //         confirmPassword: ""
-    //     });
-
-    // const handleChange = (name: string, e: string) => {
-    //     setForm({ ...form, [name]: e });
-    // }
 
     const onSubmit = handleSubmit((data) => {
         //Enviar peticon al NextAuth o Servidor para realizar la autenticacion (Hacerlo Hook)
@@ -46,7 +24,7 @@ export default function () {
             return;
         }
 
-        //Funcion para loguearnos
+        //Funcion para registrarnos
         console.log(data);
     });
 
