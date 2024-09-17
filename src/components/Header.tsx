@@ -43,6 +43,18 @@ export default function Header() {
                         Sign Up
                     </Button>
                 </NavbarItem>
+                <NavbarItem>
+                <div className="home-container flex justify-center items-center h-screen">
+                    <a
+                        className="w-10 h-10 rounded-full bg-cover bg-center cursor-pointer"
+                        style={{ backgroundImage: 'url(/perfil.png)' }} // Foto de perfil
+                        href="/perfil"
+                    ></a>
+                </div>
+
+                </NavbarItem>
+                
+
             </NavbarContent>
         </Navbar>
     )
