@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function Header() {
     return (
-        <Navbar className="bg-primary">
+        <Navbar className="bg-orange-400">
             <Image src={"/Moscow.png"} alt={""} width={40} height={40}></Image> 
 
             <NavbarBrand>
