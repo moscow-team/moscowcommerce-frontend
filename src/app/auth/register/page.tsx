@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-export default function () {
+export default function Register() {
     const {
         register,
         handleSubmit,

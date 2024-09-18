@@ -19,6 +19,7 @@ function LoginPage() {
 
   const onSubmit = handleSubmit(async (data) => {
     //Enviar peticon al NextAuth o Servidor para realizar la autenticacion (Hacerlo Hook)
+    try {
       const session  = await signIn("credentials", {
         username: data.email,
         password: data.password,
@@ -28,7 +29,14 @@ function LoginPage() {
       if (session?.ok) {
         router.push("/dashboard");
         toast.success("Session iniciada ");
+      }else{
+        toast.error(session?.error || "Credenciales incorrectas");
       }
+    } catch (error:any) {
+      toast.error(error.message || error.error || "Credenciales incorrectas");
+
+    }
+
 
   });
 

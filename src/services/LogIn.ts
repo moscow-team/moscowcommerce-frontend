@@ -15,6 +15,9 @@ export async function logIn(credentials: any) {
       },
     });
     const data: BackendResponse = await response.json();
+    if (data.data == null) {
+      throw new Error(data.message);
+    }
     return data;
   } catch (error) {
     throw error;
