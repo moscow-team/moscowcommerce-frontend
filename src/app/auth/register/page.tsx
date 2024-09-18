@@ -1,18 +1,19 @@
 "use client"
 
+import { registerUser } from "@/services/Register";
 import { Button, Card, Input } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
 export default function () {
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm();
-
-    const onSubmit = handleSubmit((data) => {
+    const router = useRouter();
+    const onSubmit = handleSubmit(async (data) => {
         //Enviar peticon al NextAuth o Servidor para realizar la autenticacion (Hacerlo Hook)
         if (data.password !== data.confirmPassword) {
             toast.error("Las contraseñas no coinciden");
@@ -23,9 +24,14 @@ export default function () {
             toast.error("Por favor, ingrese todos los campos correctamente");
             return;
         }
-
         //Funcion para registrarnos
-        console.log(data);
+        const newUser = await registerUser(data as any);
+        if (newUser?.success) {
+            router.push("/auth/login");
+            toast.success(newUser.message);
+          }else{
+            toast.error(newUser.message);
+          }
     });
 
     const [valueEmail, setValueEmail] = useState("");
@@ -69,7 +75,7 @@ export default function () {
                     <h1 className="font-semibold text-4xl mb-4">Registro de Usuario</h1>
                 </div>
                 <form
-                    // onSubmit={onSubmit} 
+                    onSubmit={onSubmit} 
                     className="w-80 flex flex-col h-max items-center justify-center px-10 gap-5">
                     <div className="h-20 w-full">
                         <Input

@@ -1,7 +1,7 @@
-import { ILogIn } from "./interfaces/ILogIn";
+import { BackendResponse } from "./interfaces/BackendResponse";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
-
+//Falta definir el tipo de credentials
 export async function logIn(credentials: any) {
   try {
     const response = await fetch(apiUrl + "auth/login", {
@@ -14,10 +14,7 @@ export async function logIn(credentials: any) {
         "Content-Type": "application/json",
       },
     });
-    if (!response.ok) {
-      throw new Error("Error al iniciar sesion");
-    }
-    const data: ILogIn = await response.json();
+    const data: BackendResponse = await response.json();
     return data;
   } catch (error) {
     throw error;
