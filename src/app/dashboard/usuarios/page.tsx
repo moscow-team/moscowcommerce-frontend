@@ -1,5 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableHeader,
@@ -8,7 +18,7 @@ import {
   TableCell,
   TableHead,
 } from "@/components/ui/table";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export default function UsersList() {
   /* 
@@ -80,6 +90,20 @@ export default function UsersList() {
   ];
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Form submitted");
+    if (formRef.current) {
+      const formData = new FormData(formRef.current);
+      const data = Object.fromEntries(formData.entries());
+      console.log(data);
+    }
+    closeModal();
+  };
+
   return (
     <div className="container mx-auto">
       <div className="flex justify-between items-center mb-6">
@@ -112,9 +136,9 @@ export default function UsersList() {
                   <span key={permission.id}>_{permission.name}</span>
                 ))}
               </TableCell>
-                <TableCell>
-                    <div className="flex space-x-4">
-                    <Button variant="outline" size="icon">
+              <TableCell>
+                <div className="flex space-x-4">
+                  <Button variant="outline" size="icon">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -152,12 +176,68 @@ export default function UsersList() {
                     </svg>
                     <span className="sr-only">Delete</span>
                   </Button>
-                    </div>
-                </TableCell>
+                </div>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Añadir Nuevo Usuario</DialogTitle>
+          </DialogHeader>
+          <form ref={formRef} className="space-y-4" onSubmit={handleSubmit}>
+            <div>
+              <Label htmlFor="name">Nombre Completo</Label>
+              <Input
+                name="fullName"
+                id="name"
+                placeholder="Nombre del usuario"
+              />
+            </div>
+            <div>
+              <Label htmlFor="email">Correo electrónico</Label>
+              <Input
+                name="email"
+                type="email"
+                id="email"
+                placeholder="Email del usuario"
+              />
+            </div>
+            <div>
+              <Label htmlFor="permissions">Permisos</Label>
+              <div className="flex space-x-3 items-center text-white">
+                <Checkbox id="user" />
+                <Label htmlFor="user" className="text-gray-900">
+                  Usuario
+                </Label>
+                <Checkbox id="admin" />
+                <Label htmlFor="admin" className="text-gray-900">
+                  Administrador
+                </Label>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="password">Contraseña</Label>
+              <Input
+                name="password"
+                id="password"
+                type="password"
+                placeholder="Contraseña"
+              />
+            </div>
+            <DialogFooter>
+              <Button onClick={closeModal} variant="outline">
+                Cancelar
+              </Button>
+              <Button onClick={closeModal} style={{ color: "white" }}>
+                Guardar
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

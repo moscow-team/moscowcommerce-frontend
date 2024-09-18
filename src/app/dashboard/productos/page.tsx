@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,14 +18,12 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -120,6 +119,20 @@ export default function ProductList() {
       ],
     },
   ];
+
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Form submitted");
+    if (formRef.current) {
+      const formData = new FormData(formRef.current);
+      const data = Object.fromEntries(formData.entries());
+      console.log(data);
+    }
+    closeModal();
+  };
+
   return (
     <div className="container mx-auto">
       <div className="flex justify-between items-center mb-6">
@@ -209,19 +222,24 @@ export default function ProductList() {
           <DialogHeader>
             <DialogTitle>Añadir Nuevo Producto</DialogTitle>
           </DialogHeader>
-          <form className="space-y-4">
+          <form ref={formRef} className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <Label htmlFor="name">Nombre</Label>
-              <Input id="name" placeholder="Nombre del producto" />
+              <Input id="name" name="name" placeholder="Nombre del producto" />
             </div>
             <div>
               <Label htmlFor="description">Descripción</Label>
-              <Input id="description" placeholder="Descripción del producto" />
+              <Input
+                id="description"
+                name="description"
+                placeholder="Descripción del producto"
+              />
             </div>
             <div>
               <Label htmlFor="price">Precio</Label>
               <Input
                 id="price"
+                name="price"
                 placeholder="Precio del producto"
                 type="number"
                 onInput={(e) => {
@@ -234,6 +252,7 @@ export default function ProductList() {
               <Label htmlFor="stock">Stock</Label>
               <Input
                 id="stock"
+                name="stock"
                 placeholder="Stock del producto"
                 type="number"
                 onInput={(e) => {
@@ -244,7 +263,7 @@ export default function ProductList() {
             </div>
             <div>
               <Label htmlFor="category">Categoría</Label>
-              <Select>
+              <Select name="category">
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecciona una categoría" />
                 </SelectTrigger>
@@ -258,21 +277,17 @@ export default function ProductList() {
             </div>
             <div>
               <Label htmlFor="photos">Fotos</Label>
-              <Input id="photos" type="file" multiple />
+              <Input id="photos" name="photos" type="file" multiple />
             </div>
+            <DialogFooter>
+              <Button onClick={closeModal} variant="outline">
+                Cancelar
+              </Button>
+              <Button type="submit" style={{ color: "white" }}>
+                Guardar
+              </Button>
+            </DialogFooter>
           </form>
-          <DialogFooter>
-            <Button onClick={closeModal} variant="outline">
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              onClick={closeModal}
-              style={{ color: "white" }}
-            >
-              Guardar
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

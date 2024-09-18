@@ -1,10 +1,9 @@
-// app/dashboard/catalogo/page.tsx
 "use client";
 // export const metadata = {
 //   title: "Catálogo - Moskow Commerce",
 //   description: "Admin Panel",
 // };
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -68,6 +67,19 @@ export default function CategoryList() {
   ];
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Form submitted");
+    if (formRef.current) {
+      const formData = new FormData(formRef.current);
+      const data = Object.fromEntries(formData.entries());
+      console.log(data);
+    }
+    closeModal();
+  };
 
   return (
     <div className="container mx-auto">
@@ -152,24 +164,24 @@ export default function CategoryList() {
           <DialogHeader>
             <DialogTitle>Añadir Nueva Categoría</DialogTitle>
           </DialogHeader>
-          <form className="space-y-4">
+          <form ref={formRef} className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <Label htmlFor="name">Nombre</Label>
-              <Input id="name" placeholder="Nombre de la categoría" />
+              <Input name="name" id="name" placeholder="Nombre de la categoría" />
             </div>
             <div>
-              <Label htmlFor="category">Descripción</Label>
-              <Input id="category" placeholder="Descripción de la categoría" />
+              <Label htmlFor="description">Descripción</Label>
+              <Input name="description" id="description" placeholder="Descripción de la categoría" />
             </div>
+            <DialogFooter>
+              <Button onClick={closeModal} variant="outline">
+                Cancelar
+              </Button>
+              <Button type="submit" style={{ color: "white" }}>
+                Guardar
+              </Button>
+            </DialogFooter>
           </form>
-          <DialogFooter>
-            <Button onClick={closeModal} variant="outline">
-              Cancelar
-            </Button>
-            <Button onClick={closeModal} style={{ color: "white" }}>
-              Guardar
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
