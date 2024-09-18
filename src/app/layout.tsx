@@ -28,7 +28,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SessionProvider>
+        <SessionProvider
+        refetchOnWindowFocus={false}
+        refetchWhenOffline={false}
+        >
           <NextUIProvider>
             <Toaster richColors />          {/* el "isDashboard" chequea si la ruta actual es "/dashboard", para solucionar es posible que haya que hacer un refolding o usar la sintaxis () en las carpetas */}
             {!isDashboard && <Header />}

@@ -7,11 +7,6 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-// interface Crediantials {
-//   email: string;
-//   password: string;
-// }
-
 function LoginPage() {
   const router = useRouter();
   const {
@@ -24,16 +19,24 @@ function LoginPage() {
 
   const onSubmit = handleSubmit(async (data) => {
     //Enviar peticon al NextAuth o Servidor para realizar la autenticacion (Hacerlo Hook)
-      const session = await signIn("credentials", {
+    try {
+      const session  = await signIn("credentials", {
         username: data.email,
         password: data.password,
         redirect: false,
       });
-      // console.log(session);
+      console.log(session);
       if (session?.ok) {
         router.push("/dashboard");
-        toast.success("Sesion iniciada");
+        toast.success("Session iniciada ");
+      }else{
+        toast.error(session?.error || "Credenciales incorrectas");
       }
+    } catch (error:any) {
+      toast.error(error.message || error.error || "Credenciales incorrectas");
+
+    }
+
 
   });
 

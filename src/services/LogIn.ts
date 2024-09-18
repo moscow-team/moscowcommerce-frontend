@@ -1,6 +1,7 @@
-// DEUADA TECNICA
-const apiUrl = process.env.NEXT_APUBLIC_API_URL
+import { BackendResponse } from "./interfaces/BackendResponse";
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL
+//Falta definir el tipo de credentials
 export async function logIn(credentials: any) {
   try {
     const response = await fetch(apiUrl + "auth/login", {
@@ -13,22 +14,11 @@ export async function logIn(credentials: any) {
         "Content-Type": "application/json",
       },
     });
-    //Debemos validar lo que nos da como repuesta el backend
-    // const data = await response.json();
-    // if (!response.ok) {
-    //   throw new Error(data.message || "Error en la solicitud");
-    // }
-    // return data;
-    return {
-      data: {
-        name: "Tomi",
-        token: "asdsadvfjdsfhguibgiybwagnwojigfnorawjngfojaengonergnergnoierw"
-      },
-      message: "Session Iniciada",
-      status: "SUCCESS",
-      failure: false,
-      success: true,
-    };
+    const data: BackendResponse = await response.json();
+    if (data.data == null) {
+      throw new Error(data.message);
+    }
+    return data;
   } catch (error) {
     throw error;
   }
