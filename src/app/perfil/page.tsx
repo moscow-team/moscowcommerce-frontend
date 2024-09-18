@@ -13,7 +13,7 @@ import { toast } from "sonner";
 //     confirmPassword: string;
 // }
 
-export default function () {
+export default function Perfil () {
     const {
         register,
         handleSubmit,

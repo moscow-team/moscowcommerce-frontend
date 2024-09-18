@@ -1,7 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { getSession, useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 
 export default function DashboardLayout({
   children,
@@ -9,15 +11,34 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
-  const user = {
+  const [user, setUser] = useState({
     email: "moskow@admin.com",
     name: "Admin",
     status: "Online",
-  };
+  })
+  const session = useSession();
 
   const pathname = usePathname();
-
+  const validate = async () => {
+    if (session.data) {
+      setUser({
+        email: session.data.user?.email ?? "moskow@admin.com",
+        name: session.data.user?.name ?? "Admin",
+        status: "Online",
+      });
+    } else {
+      const data = await getSession();
+      if (data && data.user) {
+        setUser({
+          email: data.user.email ?? "moskow@admin.com",
+          name: data.user.name ?? "Admin",
+        status: "Online",
+      });
+    }
+  }
+  useEffect(() => {
+    validate()
+  }, [])
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -71,14 +92,12 @@ export default function DashboardLayout({
             </div>
             <div className="flex items-center">
               <div
-                className={`w-2 h-2 rounded-full ${
-                  user.status === "Online" ? "bg-green-400" : "bg-gray-400"
-                }`}
+                className={`w-2 h-2 rounded-full ${user.status === "Online" ? "bg-green-400" : "bg-gray-400"
+                  }`}
               ></div>
               <span
-                className={`ml-2 font-semibold text-sm ${
-                  user.status === "Online" ? "text-green-400" : "text-gray-400"
-                }`}
+                className={`ml-2 font-semibold text-sm ${user.status === "Online" ? "text-green-400" : "text-gray-400"
+                  }`}
               >
                 {user.status}
               </span>
@@ -89,9 +108,8 @@ export default function DashboardLayout({
           <nav className="pt-5">
             <Link href="/dashboard">
               <button
-                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
-                  pathname === "/dashboard" ? "text-orange-200" : ""
-                } ${sidebarOpen ? "justify-start" : "justify-center"}
+                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${pathname === "/dashboard" ? "text-orange-200" : ""
+                  } ${sidebarOpen ? "justify-start" : "justify-center"}
                 }`}
               >
                 <svg
@@ -114,9 +132,8 @@ export default function DashboardLayout({
             </Link>
             <Link href="/dashboard/productos">
               <button
-                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
-                  pathname === "/dashboard/productos" ? "text-orange-200" : ""
-                } ${sidebarOpen ? "justify-start" : "justify-center"}
+                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${pathname === "/dashboard/productos" ? "text-orange-200" : ""
+                  } ${sidebarOpen ? "justify-start" : "justify-center"}
                 }`}
               >
                 <svg
@@ -142,9 +159,8 @@ export default function DashboardLayout({
             </Link>
             <Link href="/dashboard/categorias">
               <button
-                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
-                  pathname === "/dashboard/categorias" ? "text-orange-200" : ""
-                } ${sidebarOpen ? "justify-start" : "justify-center"}
+                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${pathname === "/dashboard/categorias" ? "text-orange-200" : ""
+                  } ${sidebarOpen ? "justify-start" : "justify-center"}
                 }`}
               >
                 <svg
@@ -167,9 +183,8 @@ export default function DashboardLayout({
             </Link>
             <Link href="/dashboard/usuarios">
               <button
-                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
-                  pathname === "/dashboard/usuarios" ? "text-orange-200" : ""
-                } ${sidebarOpen ? "justify-start" : "justify-center"}
+                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${pathname === "/dashboard/usuarios" ? "text-orange-200" : ""
+                  } ${sidebarOpen ? "justify-start" : "justify-center"}
                 }`}
               >
                 <svg
@@ -193,43 +208,19 @@ export default function DashboardLayout({
                 </span>
               </button>
             </Link>
+            <div className="w-full flex justify-center">
+              {sidebarOpen ? (
+                <Button className="bg-slate-100 hover:bg-slate-400">Cerrar Sesion</Button>
+              ) : null}
+            </div>
           </nav>
         </div>
-<<<<<<< HEAD
-        <nav className="mt-8">
-          <Link href="/dashboard">
-            <button 
-              className="flex items-center w-full px-6 py-3 text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
-            >
-              <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-              </svg>
-              Dashboard
-            </button>
-          </Link>
-          
-          <Link href="/dashboard/catalogo">
-            <button 
-              className="flex items-center w-full px-6 py-3 text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
-            >
-              <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-              </svg>
-              Catálogo
-            </button>
-          </Link>
-
-          <Button onClick={()=>signOut()}>Cerrar Sesion</Button>
-        </nav>
-=======
->>>>>>> resp-dashboard
       </div>
 
       {/* Contenido principal */}
       <div
-        className={`flex-1 transition-all duration-300 ease-in-out ${
-          sidebarOpen ? "ml-64" : "ml-16"
-        }`}
+        className={`flex-1 transition-all duration-300 ease-in-out ${sidebarOpen ? "ml-64" : "ml-16"
+          }`}
       >
         <header className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
