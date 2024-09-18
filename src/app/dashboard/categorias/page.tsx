@@ -24,7 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default function ProductList() {
+export default function CategoryList() {
   /*
   @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,7 +72,7 @@ export default function ProductList() {
   return (
     <div className="container mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Categoría</h1>
+        <h1 className="text-2xl font-bold">Categorías</h1>
         <Button
           onClick={openModal}
           className="bg-blue-950 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded"
@@ -89,6 +89,7 @@ export default function ProductList() {
             <TableHead>Fecha Creación</TableHead>
             <TableHead>Fecha Modificación</TableHead>
             <TableHead>Fecha Eliminación</TableHead>
+            <TableHead>Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -154,11 +155,11 @@ export default function ProductList() {
           <form className="space-y-4">
             <div>
               <Label htmlFor="name">Nombre</Label>
-              <Input id="name" placeholder="Nombre del producto" />
+              <Input id="name" placeholder="Nombre de la categoría" />
             </div>
             <div>
               <Label htmlFor="category">Descripción</Label>
-              <Input id="category" placeholder="Categoría del producto" />
+              <Input id="category" placeholder="Descripción de la categoría" />
             </div>
           </form>
           <DialogFooter>
