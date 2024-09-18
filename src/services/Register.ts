@@ -8,7 +8,6 @@ export async function registerUser(credentials: any) {
     password: credentials.password,
     fullName: credentials.name + " " + credentials.lastName,
   };
-  console.log(user);
   try {
     const response = await fetch(apiUrl + "users", {
       method: "POST",
