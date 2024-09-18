@@ -7,6 +7,7 @@ export async function registerUser(credentials: any) {
     email: credentials.email,
     password: credentials.password,
     fullName: credentials.name + " " + credentials.lastName,
+    role: "ADMIN"
   };
   try {
     const response = await fetch(apiUrl + "users", {
