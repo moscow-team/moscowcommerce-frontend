@@ -4,10 +4,11 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL
 //Falta definir el tipo de credentials
 export async function registerUser(credentials: any) {
   const user = {
-    email: credentials.username,
+    email: credentials.email,
     password: credentials.password,
     fullName: credentials.name + " " + credentials.lastName,
   };
+  console.log(user);
   try {
     const response = await fetch(apiUrl + "users", {
       method: "POST",
@@ -15,8 +16,6 @@ export async function registerUser(credentials: any) {
       headers: {
         "Content-Type": "application/json",
       },
-      //HACK para evitar error del backend
-      mode: "no-cors",
     });
     const data:BackendResponse = await response.json();
     return data;
