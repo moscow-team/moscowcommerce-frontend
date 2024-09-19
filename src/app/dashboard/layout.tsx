@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getSession, useSession } from "next-auth/react";
+import { getSession, signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 
 export default function DashboardLayout({
@@ -15,7 +15,7 @@ export default function DashboardLayout({
     email: "moskow@admin.com",
     name: "Admin",
     status: "Online",
-  })
+  });
   const session = useSession();
 
   const pathname = usePathname();
@@ -32,14 +32,14 @@ export default function DashboardLayout({
         setUser({
           email: data.user.email ?? "moskow@admin.com",
           name: data.user.name ?? "Admin",
-        status: "Online",
-      });
+          status: "Online",
+        });
+      }
     }
-  }
-}
+  };
   useEffect(() => {
-    validate()
-  }, [])
+    validate();
+  }, []);
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -93,12 +93,14 @@ export default function DashboardLayout({
             </div>
             <div className="flex items-center">
               <div
-                className={`w-2 h-2 rounded-full ${user.status === "Online" ? "bg-green-400" : "bg-gray-400"
-                  }`}
+                className={`w-2 h-2 rounded-full ${
+                  user.status === "Online" ? "bg-green-400" : "bg-gray-400"
+                }`}
               ></div>
               <span
-                className={`ml-2 font-semibold text-sm ${user.status === "Online" ? "text-green-400" : "text-gray-400"
-                  }`}
+                className={`ml-2 font-semibold text-sm ${
+                  user.status === "Online" ? "text-green-400" : "text-gray-400"
+                }`}
               >
                 {user.status}
               </span>
@@ -109,8 +111,9 @@ export default function DashboardLayout({
           <nav className="pt-5">
             <Link href="/dashboard">
               <button
-                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${pathname === "/dashboard" ? "text-orange-200" : ""
-                  } ${sidebarOpen ? "justify-start" : "justify-center"}
+                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
+                  pathname === "/dashboard" ? "text-orange-200" : ""
+                } ${sidebarOpen ? "justify-start" : "justify-center"}
                 }`}
               >
                 <svg
@@ -133,8 +136,9 @@ export default function DashboardLayout({
             </Link>
             <Link href="/dashboard/productos">
               <button
-                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${pathname === "/dashboard/productos" ? "text-orange-200" : ""
-                  } ${sidebarOpen ? "justify-start" : "justify-center"}
+                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
+                  pathname === "/dashboard/productos" ? "text-orange-200" : ""
+                } ${sidebarOpen ? "justify-start" : "justify-center"}
                 }`}
               >
                 <svg
@@ -160,8 +164,9 @@ export default function DashboardLayout({
             </Link>
             <Link href="/dashboard/categorias">
               <button
-                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${pathname === "/dashboard/categorias" ? "text-orange-200" : ""
-                  } ${sidebarOpen ? "justify-start" : "justify-center"}
+                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
+                  pathname === "/dashboard/categorias" ? "text-orange-200" : ""
+                } ${sidebarOpen ? "justify-start" : "justify-center"}
                 }`}
               >
                 <svg
@@ -184,8 +189,9 @@ export default function DashboardLayout({
             </Link>
             <Link href="/dashboard/usuarios">
               <button
-                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${pathname === "/dashboard/usuarios" ? "text-orange-200" : ""
-                  } ${sidebarOpen ? "justify-start" : "justify-center"}
+                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
+                  pathname === "/dashboard/usuarios" ? "text-orange-200" : ""
+                } ${sidebarOpen ? "justify-start" : "justify-center"}
                 }`}
               >
                 <svg
@@ -211,7 +217,12 @@ export default function DashboardLayout({
             </Link>
             <div className="w-full flex justify-center">
               {sidebarOpen ? (
-                <Button className="bg-slate-100 hover:bg-slate-400">Cerrar Sesion</Button>
+                <Button
+                  onClick={() => signOut() }
+                  className="bg-slate-100 hover:bg-slate-400"
+                >
+                  Cerrar Sesion
+                </Button>
               ) : null}
             </div>
           </nav>
@@ -220,8 +231,9 @@ export default function DashboardLayout({
 
       {/* Contenido principal */}
       <div
-        className={`flex-1 transition-all duration-300 ease-in-out ${sidebarOpen ? "ml-64" : "ml-16"
-          }`}
+        className={`flex-1 transition-all duration-300 ease-in-out ${
+          sidebarOpen ? "ml-64" : "ml-16"
+        }`}
       >
         <header className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
