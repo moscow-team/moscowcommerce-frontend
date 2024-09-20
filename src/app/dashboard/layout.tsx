@@ -17,8 +17,9 @@ export default function DashboardLayout({
     status: "Online",
   });
   const session = useSession();
-
   const pathname = usePathname();
+  const [currentPath, setCurrentPath] = useState(pathname);
+
   const validate = async () => {
     if (session.data) {
       setUser({
@@ -37,17 +38,23 @@ export default function DashboardLayout({
       }
     }
   };
+
   useEffect(() => {
     validate();
-  }, []);
+  }, [session]);
+
+  useEffect(() => {
+    setCurrentPath(pathname);
+  }, [pathname]);
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <div
         className={`
-        ${sidebarOpen ? "w-64" : "w-16"}
-        bg-white shadow-lg fixed inset-y-0 left-0 z-50 transition-all duration-300 ease-in-out
-      `}
+          ${sidebarOpen ? "w-64" : "w-16"}
+          bg-white shadow-lg fixed inset-y-0 left-0 z-50 transition-all duration-300 ease-in-out flex flex-col justify-between
+        `}
       >
         <div className="bg-gray-800 text-white">
           <div className="flex items-center justify-between h-16 px-4">
@@ -88,7 +95,7 @@ export default function DashboardLayout({
               </div>
               <div className="ml-3">
                 <p className="font-medium">{user.name}</p>
-                <p className="text-sm text-gray-300">@{user.email}</p>
+                <p className="text-sm text-gray-300 truncate w-40">{user.email}</p>
               </div>
             </div>
             <div className="flex items-center">
@@ -108,117 +115,121 @@ export default function DashboardLayout({
           </div>
         </div>
         <div className="bg-gray-900 h-full">
-          <nav className="pt-5">
-            <Link href="/dashboard">
-              <button
-                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
-                  pathname === "/dashboard" ? "text-orange-200" : ""
-                } ${sidebarOpen ? "justify-start" : "justify-center"}
+          <nav className="pt-5 h-full flex flex-col justify-between">
+            <div>
+              <Link href="/dashboard">
+                <button
+                  className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
+                    currentPath === "/dashboard" ? "text-orange-200" : ""
+                  } ${sidebarOpen ? "justify-start" : "justify-center"}
                 }`}
-              >
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
                 >
-                  <path
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                    />
+                  </svg>
+                  <span className={`ml-3 ${sidebarOpen ? "" : "hidden"}`}>
+                    Dashboard
+                  </span>
+                </button>
+              </Link>
+              <Link href="/dashboard/productos">
+                <button
+                  className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
+                    currentPath === "/dashboard/productos" ? "text-orange-200" : ""
+                  } ${sidebarOpen ? "justify-start" : "justify-center"}
+                }`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                  />
-                </svg>
-                <span className={`ml-3 ${sidebarOpen ? "" : "hidden"}`}>
-                  Dashboard
-                </span>
-              </button>
-            </Link>
-            <Link href="/dashboard/productos">
-              <button
-                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
-                  pathname === "/dashboard/productos" ? "text-orange-200" : ""
-                } ${sidebarOpen ? "justify-start" : "justify-center"}
+                    className="icon icon-tabler icons-tabler-outline icon-tabler-shopping-cart h-5 w-5"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                    <path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                    <path d="M17 17h-11v-14h-2" />
+                    <path d="M6 5l14 1l-1 7h-13" />
+                  </svg>
+                  <span className={`ml-3 ${sidebarOpen ? "" : "hidden"}`}>
+                    Productos
+                  </span>
+                </button>
+              </Link>
+              <Link href="/dashboard/categorias">
+                <button
+                  className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
+                    currentPath === "/dashboard/categorias"
+                      ? "text-orange-200"
+                      : ""
+                  } ${sidebarOpen ? "justify-start" : "justify-center"}
                 }`}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="icon icon-tabler icons-tabler-outline icon-tabler-shopping-cart h-5 w-5"
                 >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                  <path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                  <path d="M17 17h-11v-14h-2" />
-                  <path d="M6 5l14 1l-1 7h-13" />
-                </svg>
-                <span className={`ml-3 ${sidebarOpen ? "" : "hidden"}`}>
-                  Productos
-                </span>
-              </button>
-            </Link>
-            <Link href="/dashboard/categorias">
-              <button
-                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
-                  pathname === "/dashboard/categorias" ? "text-orange-200" : ""
-                } ${sidebarOpen ? "justify-start" : "justify-center"}
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                    />
+                  </svg>
+                  <span className={`ml-3 ${sidebarOpen ? "" : "hidden"}`}>
+                    Categorías
+                  </span>
+                </button>
+              </Link>
+              <Link href="/dashboard/usuarios">
+                <button
+                  className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
+                    currentPath === "/dashboard/usuarios" ? "text-orange-200" : ""
+                  } ${sidebarOpen ? "justify-start" : "justify-center"}
                 }`}
-              >
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
                 >
-                  <path
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                  />
-                </svg>
-                <span className={`ml-3 ${sidebarOpen ? "" : "hidden"}`}>
-                  Categorías
-                </span>
-              </button>
-            </Link>
-            <Link href="/dashboard/usuarios">
-              <button
-                className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
-                  pathname === "/dashboard/usuarios" ? "text-orange-200" : ""
-                } ${sidebarOpen ? "justify-start" : "justify-center"}
-                }`}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="icon icon-tabler icons-tabler-outline icon-tabler-user h-5 w-5"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
-                  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-                </svg>
-                <span className={`ml-3 ${sidebarOpen ? "" : "hidden"}`}>
-                  Usuarios
-                </span>
-              </button>
-            </Link>
-            <div className="w-full flex justify-center">
+                    className="icon icon-tabler icons-tabler-outline icon-tabler-user h-5 w-5"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+                    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                  </svg>
+                  <span className={`ml-3 ${sidebarOpen ? "" : "hidden"}`}>
+                    Usuarios
+                  </span>
+                </button>
+              </Link>
+            </div>
+            <div className="w-full flex justify-center pb-5">
               {sidebarOpen ? (
                 <Button
-                  onClick={() => signOut() }
+                  onClick={() => signOut()}
                   className="bg-slate-100 hover:bg-slate-400"
                 >
                   Cerrar Sesion

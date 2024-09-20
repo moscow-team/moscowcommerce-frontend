@@ -18,6 +18,7 @@ export async function registerUser(credentials: any) {
       },
     });
     const data:BackendResponse = await response.json();
+    console.log(data);
     return data;
   } catch (error) {
     console.error("Error en la solicitud:", error);

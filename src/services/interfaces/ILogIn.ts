@@ -4,4 +4,5 @@ export interface ILogIn {
     userId: string;
     email: string;
     fullName: string;
+    role: string;
 }

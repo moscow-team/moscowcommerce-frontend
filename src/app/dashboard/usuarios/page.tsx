@@ -1,101 +1,26 @@
 "use client";
+import { useState, useRef, useEffect } from "react";
+import { getUsers } from "@/services/dashboard/usuarioService";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableHead,
-} from "@/components/ui/table";
-import { useState, useRef } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from "@/components/ui/table";
 
 export default function UsersList() {
-  /* 
-    Backend Entity:
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+  interface User {
+    id: number;
+    email: string;
+    fullName: string;
+    role: string;
+  }
 
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    @Column(nullable = false)
-    private String fullName;
-
-    @Column(nullable = false)
-    private String password;
-
-     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
-
-    public String getPassword() {
-        return this.password;
-    }
-
-    @Override
-    public String getUsername() {
-        return this.email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-    */
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const users = [
-    {
-      id: 1,
-      email: "moskow@admin.com",
-      fullName: "Moskow Admin",
-      permissions: [
-        {
-          id: 1,
-          name: "ADMIN",
-        },
-        {
-          id: 2,
-          name: "USER",
-        },
-      ],
-    },
-  ];
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
+  /* Form */
   const formRef = useRef<HTMLFormElement>(null);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted");
+    console.log("Form enviado");
     if (formRef.current) {
       const formData = new FormData(formRef.current);
       const data = Object.fromEntries(formData.entries());
@@ -103,6 +28,29 @@ export default function UsersList() {
     }
     closeModal();
   };
+  
+  /* Service Call */
+  const [users, setUsers] = useState<User[]>([]);
+  useEffect(() => {
+    const fetchCatalogItems = async () => {
+      try {
+        const response = await getUsers();
+        if (response && Array.isArray(response.data)) {
+          setUsers(response.data);
+        } else {
+          console.error("Fetch Error:", response);
+        }
+      } catch (error) {
+        console.error("Error Fetch: ", error);
+      }
+    };
+    fetchCatalogItems();
+  }, []);
+
+  /* Modal */
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   return (
     <div className="container mx-auto">
@@ -131,11 +79,7 @@ export default function UsersList() {
               <TableCell>{user.id}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.fullName}</TableCell>
-              <TableCell>
-                {user.permissions.map((permission) => (
-                  <span key={permission.id}>_{permission.name}</span>
-                ))}
-              </TableCell>
+              <TableCell>{user.role}</TableCell>
               <TableCell>
                 <div className="flex space-x-4">
                   <Button variant="outline" size="icon">
