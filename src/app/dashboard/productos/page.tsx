@@ -1,6 +1,5 @@
 "use client";
-
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,110 +26,72 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getProducts, createProduct, updateProduct } from "@/services/dashboard/productoService";
 
 export default function ProductList() {
-  /*
-    Backend Entity:
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+  interface Product {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    stock: number;
+    category: {
+      id: number;
+      name: string;
+    };
+    photos: {
+      url: string;
+    }[];
+  }
 
-    @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
-    private String description;
-
-    @Column(nullable = false)
-    private double price;
-
-    @Column(nullable = false)
-    private int stock;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = true)
-    private CategoryEntity category;
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductPhotoEntity> photos;
-
-    public CategoryEntity getCategory() {
-        return category;
-    }
-
-    public void setCategory(CategoryEntity category) {
-        this.category = category;
-    }
-
-    public void addPhoto(ProductPhotoEntity photo) {
-        this.photos.add(photo);
-    }
-
-    public void removePhoto(ProductPhotoEntity photo) {
-        this.photos.remove(photo);
-    } 
-    */
-
+  const [products, setProducts] = useState<Product[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-  // TODO: Se debe tener la lógica para cargar los datos
-  const products = [
-    {
-      id: 1,
-      name: "Mate",
-      description: "Test descripción",
-      price: 100,
-      stock: 10,
-      category: {
-        id: 1,
-        name: "Cocina",
-      },
-      photos: [
-        {
-          id: 1,
-          url: "https://via.placeholder.com/150",
-        },
-        {
-          id: 2,
-          url: "https://via.placeholder.com/150",
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: "Bombilla",
-      description: "Test descripción",
-      price: 50,
-      stock: 20,
-      category: {
-        id: 2,
-        name: "Hogar",
-      },
-      photos: [
-        {
-          id: 3,
-          url: "https://via.placeholder.com/150",
-        },
-        {
-          id: 4,
-          url: "https://via.placeholder.com/150",
-        },
-      ],
-    },
-  ];
-
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    async function fetchProducts() {
+      const response = await getProducts();
+      setProducts(response.data);
+    }
+    fetchProducts();
+  }, []);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  const openEditModal = (product: Product) => {
+    setSelectedProduct(product);
+    setIsEditModalOpen(true);
+  };
+  const closeEditModal = () => {
+    setSelectedProduct(null);
+    setIsEditModalOpen(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted");
     if (formRef.current) {
       const formData = new FormData(formRef.current);
       const data = Object.fromEntries(formData.entries());
-      console.log(data);
+      await createProduct(data);
+      const response = await getProducts();
+      setProducts(response.data);
+      closeModal();
     }
-    closeModal();
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formRef.current && selectedProduct) {
+      const formData = new FormData(formRef.current);
+      const data = Object.fromEntries(formData.entries());
+      await updateProduct(data);
+      const response = await getProducts();
+      setProducts(response.data);
+      closeEditModal();
+    }
   };
 
   return (
@@ -173,7 +134,7 @@ export default function ProductList() {
               </TableCell>
               <TableCell>
                 <div className="flex space-x-4">
-                  <Button variant="outline" size="icon">
+                  <Button variant="outline" size="icon" onClick={() => openEditModal(product)}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -281,6 +242,87 @@ export default function ProductList() {
             </div>
             <DialogFooter>
               <Button onClick={closeModal} variant="outline">
+                Cancelar
+              </Button>
+              <Button type="submit" style={{ color: "white" }}>
+                Guardar
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Producto</DialogTitle>
+          </DialogHeader>
+          <form ref={formRef} className="space-y-4" onSubmit={handleEditSubmit}>
+            <div>
+              <Label htmlFor="name">Nombre</Label>
+              <Input
+                id="name"
+                name="name"
+                defaultValue={selectedProduct?.name}
+                placeholder="Nombre del producto"
+              />
+            </div>
+            <div>
+              <Label htmlFor="description">Descripción</Label>
+              <Input
+                id="description"
+                name="description"
+                defaultValue={selectedProduct?.description}
+                placeholder="Descripción del producto"
+              />
+            </div>
+            <div>
+              <Label htmlFor="price">Precio</Label>
+              <Input
+                id="price"
+                name="price"
+                defaultValue={selectedProduct?.price}
+                placeholder="Precio del producto"
+                type="number"
+                onInput={(e) => {
+                  const target = e.target as HTMLInputElement;
+                  target.value = target.value.replace(/[^0-9]/g, "");
+                }}
+              />
+            </div>
+            <div>
+              <Label htmlFor="stock">Stock</Label>
+              <Input
+                id="stock"
+                name="stock"
+                defaultValue={selectedProduct?.stock}
+                placeholder="Stock del producto"
+                type="number"
+                onInput={(e) => {
+                  const target = e.target as HTMLInputElement;
+                  target.value = target.value.replace(/[^0-9]/g, "");
+                }}
+              />
+            </div>
+            <div>
+              <Label htmlFor="category">Categoría</Label>
+              <Select name="category" defaultValue={selectedProduct?.category.id?.toString()}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecciona una categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="1">Categoría 1</SelectItem>
+                    <SelectItem value="2">Categoría 2</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="photos">Fotos</Label>
+              <Input id="photos" name="photos" type="file" multiple />
+            </div>
+            <DialogFooter>
+              <Button onClick={closeEditModal} variant="outline">
                 Cancelar
               </Button>
               <Button type="submit" style={{ color: "white" }}>
