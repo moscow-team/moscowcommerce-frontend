@@ -1,6 +1,14 @@
 "use client";
+import { useState, useRef, useEffect } from "react";
+import {
+  getUsers,
+  createUser,
+  updateUser,
+} from "@/services/dashboard/usuarioService";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -8,8 +16,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Table,
   TableHeader,
@@ -18,90 +24,100 @@ import {
   TableCell,
   TableHead,
 } from "@/components/ui/table";
-import { useState, useRef } from "react";
+import { toast } from "sonner";
 
 export default function UsersList() {
-  /* 
-    Backend Entity:
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+  interface User {
+    id: number;
+    email: string;
+    fullName: string;
+    role: string;
+  }
 
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    @Column(nullable = false)
-    private String fullName;
-
-    @Column(nullable = false)
-    private String password;
-
-     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
-
-    public String getPassword() {
-        return this.password;
-    }
-
-    @Override
-    public String getUsername() {
-        return this.email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-    */
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const users = [
-    {
-      id: 1,
-      email: "moskow@admin.com",
-      fullName: "Moskow Admin",
-      permissions: [
-        {
-          id: 1,
-          name: "ADMIN",
-        },
-        {
-          id: 2,
-          name: "USER",
-        },
-      ],
-    },
-  ];
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
+  /* Create Form */
   const formRef = useRef<HTMLFormElement>(null);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted");
     if (formRef.current) {
       const formData = new FormData(formRef.current);
       const data = Object.fromEntries(formData.entries());
-      console.log(data);
+      try {
+        const response = await createUser(data);
+        if (response && response.status === "SUCCESS") {
+          setUsers((prevUsers) => [...prevUsers, response.data]);
+          closeModal();
+          console.log("Create User:", response);
+        }
+      } catch (error) {
+        console.error("Error Creating User: ", error);
+      }
     }
-    closeModal();
+  };
+
+  /* Service Call */
+  const [users, setUsers] = useState<User[]>([]);
+  useEffect(() => {
+    const fetchCatalogItems = async () => {
+      try {
+        const response = await getUsers();
+        if (response && Array.isArray(response.data)) {
+          setUsers(response.data);
+        } else {
+          console.error("Fetch Error:", response);
+        }
+      } catch (error) {
+        console.error("Error Fetch: ", error);
+      }
+    };
+    fetchCatalogItems();
+  }, []);
+
+  /* Modal */
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  /* Edit User - Selection and Modal */
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const openEditModal = (user: User) => {
+    setSelectedUser(user);
+    setIsEditModalOpen(true);
+  };
+  const closeEditModal = () => {
+    setSelectedUser(null);
+    setIsEditModalOpen(false);
+  };
+
+  /* Update Form */
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formRef.current && selectedUser) {
+      const formData = new FormData(formRef.current);
+      const data = Object.fromEntries(formData.entries());
+      const dataToSend = {
+        ...selectedUser,
+        ...data,
+      }
+      try {
+        const response = await updateUser(dataToSend);
+        if (response && response.status === "SUCCESS") {
+          setUsers((prevUsers) =>
+            prevUsers.map((user) =>
+              user.id === selectedUser.id ? response.data : user
+            )
+          );
+          closeEditModal();
+          // console.log("Update User:", response);
+          toast.success(response.message);
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error("Error Updating User: ", error.message);
+          toast.error(error.message);
+        }
+      }
+    }
   };
 
   return (
@@ -131,14 +147,14 @@ export default function UsersList() {
               <TableCell>{user.id}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.fullName}</TableCell>
-              <TableCell>
-                {user.permissions.map((permission) => (
-                  <span key={permission.id}>_{permission.name}</span>
-                ))}
-              </TableCell>
+              <TableCell>{user.role}</TableCell>
               <TableCell>
                 <div className="flex space-x-4">
-                  <Button variant="outline" size="icon">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => openEditModal(user)}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -157,6 +173,7 @@ export default function UsersList() {
                     variant="outline"
                     size="icon"
                     className="text-destructive"
+                    disabled
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -208,11 +225,11 @@ export default function UsersList() {
             <div>
               <Label htmlFor="permissions">Permisos</Label>
               <div className="flex space-x-3 items-center text-white">
-                <Checkbox id="user" />
+                <Checkbox id="user" name="role" value="CUSTOMER" />
                 <Label htmlFor="user" className="text-gray-900">
                   Usuario
                 </Label>
-                <Checkbox id="admin" />
+                <Checkbox id="admin" name="role" value="ADMIN" />
                 <Label htmlFor="admin" className="text-gray-900">
                   Administrador
                 </Label>
@@ -231,7 +248,66 @@ export default function UsersList() {
               <Button onClick={closeModal} variant="outline">
                 Cancelar
               </Button>
-              <Button onClick={closeModal} style={{ color: "white" }}>
+              <Button type="submit" style={{ color: "white" }}>
+                Guardar
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Usuario</DialogTitle>
+          </DialogHeader>
+          <form ref={formRef} className="space-y-4" onSubmit={handleEditSubmit}>
+            <div>
+              <Label htmlFor="editName">Nombre Completo</Label>
+              <Input
+                name="fullName"
+                id="editName"
+                defaultValue={selectedUser?.fullName}
+                placeholder="Nombre del usuario"
+              />
+            </div>
+            <div>
+              <Label htmlFor="editEmail">Correo electrónico</Label>
+              <Input
+                name="email"
+                type="email"
+                id="editEmail"
+                defaultValue={selectedUser?.email}
+                placeholder="Email del usuario"
+              />
+            </div>
+            <div>
+              <Label htmlFor="editPermissions">Permisos</Label>
+              <div className="flex space-x-3 items-center text-white">
+                <Checkbox
+                  id="editUser"
+                  name="role"
+                  value="CUSTOMER"
+                  defaultChecked={selectedUser?.role === "CUSTOMER"}
+                />
+                <Label htmlFor="editUser" className="text-gray-900">
+                  Usuario
+                </Label>
+                <Checkbox
+                  id="editAdmin"
+                  name="role"
+                  value="ADMIN"
+                  defaultChecked={selectedUser?.role === "ADMIN"}
+                />
+                <Label htmlFor="editAdmin" className="text-gray-900">
+                  Administrador
+                </Label>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={closeEditModal} variant="outline">
+                Cancelar
+              </Button>
+              <Button type="submit" style={{ color: "white" }}>
                 Guardar
               </Button>
             </DialogFooter>
