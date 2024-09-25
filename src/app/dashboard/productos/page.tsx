@@ -26,7 +26,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getProducts, createProduct, updateProduct } from "@/services/dashboard/productoService";
+import {
+  getProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+} from "@/services/dashboard/productoService";
+import { getCategorias } from "@/services/dashboard/categoriaService";
+import { toast } from "sonner";
 
 export default function ProductList() {
   interface Product {
@@ -42,18 +49,41 @@ export default function ProductList() {
     photos: {
       url: string;
     }[];
+    archived: boolean;
   }
 
   const [products, setProducts] = useState<Product[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [categories, setCategories] = useState<{ id: number; name: string }[]>(
+    []
+  );
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const response = await getCategorias();
+        setCategories(response.data);
+      } catch (error) {
+        console.error("Error fetching categories: ", error);
+      }
+    }
+    fetchCategories();
+
     async function fetchProducts() {
-      const response = await getProducts();
-      setProducts(response.data);
+      try {
+        const response = await getProducts();
+        const filteredProducts = response.data.filter(
+          (product: Product) => !product.archived
+        );
+        setProducts(filteredProducts);
+        // console.log("Products: ", response.data);
+        // console.log("Products: ", filteredProducts);
+      } catch (error) {
+        console.error("Error fetching products: ", error);
+      }
     }
     fetchProducts();
   }, []);
@@ -75,12 +105,30 @@ export default function ProductList() {
     e.preventDefault();
     if (formRef.current) {
       const formData = new FormData(formRef.current);
-      const data = Object.fromEntries(formData.entries());
-      console.log(data);
-      // await createProduct(data);
-      // const response = await getProducts();
-      // setProducts(response.data);
-      // closeModal();
+      const formDataEntries = Array.from(formData.entries());
+      const data: { [key: string]: any } = {};
+
+      formDataEntries.forEach(([key, value]) => {
+        if (key === "photos") {
+          data["urlPhotos"] = [""]; // Esto se debe cambiar luego por el servicio de Cloudinary, para testear estoy envíando un string vacío
+        } else if (key === "category") {
+          data["categoryId"] = parseInt(value as string, 10); // Convertir el categoryId a un número
+        } else {
+          data[key] = value;
+        }
+      });
+
+      try {
+        await createProduct(data);
+        const response = await getProducts();
+        const filteredProducts = response.data.filter(
+          (product: Product) => !product.archived
+        );
+        setProducts(filteredProducts);
+        closeModal();
+      } catch (error) {
+        console.error("Error creating product: ", error);
+      }
     }
   };
 
@@ -89,15 +137,46 @@ export default function ProductList() {
     e.preventDefault();
     if (formRef.current && selectedProduct) {
       const formData = new FormData(formRef.current);
-      const data = Object.fromEntries(formData.entries());
-      await updateProduct(data);
-      const response = await getProducts();
-      setProducts(response.data);
-      closeEditModal();
+      const formDataEntries = Array.from(formData.entries());
+      const data: { [key: string]: any } = {};
+
+      formDataEntries.forEach(([key, value]) => {
+        if (key === "photos") {
+          data["urlPhotos"] = [""]; // Cambiar cuando se implemente Cloudinary
+        } else if (key === "category") {
+          data["categoryId"] = parseInt(value as string, 10);
+        } else {
+          data[key] = value;
+        }
+      });
+      try {
+        await updateProduct(selectedProduct.id, data);
+        const response = await getProducts();
+        setProducts(response.data);
+        closeEditModal();
+        toast.success("Producto actualizado correctamente");
+      } catch (error) {
+        console.error("Error updating product: ", error);
+        toast.error("Error actualizando el producto");
+      }
     }
   };
 
   /* Eliminar producto */
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteProduct(id);
+      const response = await getProducts();
+      const filteredProducts = response.data.filter(
+        (product: Product) => !product.archived
+      );
+      setProducts(filteredProducts);
+      toast.success("Producto eliminado correctamente");
+    } catch (error) {
+      console.error("Error deleting product: ", error);
+      toast.error("Error eliminando el producto");
+    }
+  };
 
   return (
     <div className="container mx-auto">
@@ -131,15 +210,21 @@ export default function ProductList() {
               <TableCell>{product.description}</TableCell>
               <TableCell>{product.price}</TableCell>
               <TableCell>{product.stock}</TableCell>
-              <TableCell>{product.category.name}</TableCell>
               <TableCell>
-                <Button variant="outline" size="icon">
+                {product.category ? product.category.name : "No Category"}
+              </TableCell>
+              <TableCell>
+                <Button variant="outline" size="icon" disabled>
                   ...
                 </Button>
               </TableCell>
               <TableCell>
                 <div className="flex space-x-4">
-                  <Button variant="outline" size="icon" onClick={() => openEditModal(product)}>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => openEditModal(product)}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -158,6 +243,7 @@ export default function ProductList() {
                     variant="outline"
                     size="icon"
                     className="text-destructive"
+                    onClick={() => handleDelete(product.id)}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -207,12 +293,12 @@ export default function ProductList() {
                 id="price"
                 name="price"
                 placeholder="Precio del producto"
-                type="text"
-                inputMode="numeric"
+                type="number"
                 // onInput={(e) => {
                 //   const target = e.target as HTMLInputElement;
                 //   target.value = target.value.replace(/[^0-9]/g, "");
                 // }}
+                /* TODO: En Firefox el type="number" no funciona como es esperado, directamente deshabilitar el botón */
               />
             </div>
             <div>
@@ -236,8 +322,14 @@ export default function ProductList() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="1">Categoría 1</SelectItem>
-                    <SelectItem value="2">Categoría 2</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem
+                        key={category.id}
+                        value={category.id.toString()}
+                      >
+                        {category.name}
+                      </SelectItem>
+                    ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -311,14 +403,23 @@ export default function ProductList() {
             </div>
             <div>
               <Label htmlFor="category">Categoría</Label>
-              <Select name="category" defaultValue={selectedProduct?.category.id?.toString()}>
+              <Select
+                name="category"
+                defaultValue={selectedProduct?.category.id?.toString()}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecciona una categoría" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="1">Categoría 1</SelectItem>
-                    <SelectItem value="2">Categoría 2</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem
+                        key={category.id}
+                        value={category.id.toString()}
+                      >
+                        {category.name}
+                      </SelectItem>
+                    ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>

@@ -38,10 +38,10 @@ export const createProduct = async (data: any) => {
   return response.json();
 }
 
-export const updateProduct = async (data: any) => {
+export const updateProduct = async (id:number, data: any) => {
   const session: any = await getSession();
 
-  const response = await fetch(`${apiUrl}products`, {
+  const response = await fetch(`${apiUrl}products/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -52,6 +52,24 @@ export const updateProduct = async (data: any) => {
 
   if (!response.ok) {
     throw new Error("Failed to update user");
+  }
+
+  return response.json();
+}
+
+export const deleteProduct = async (id: number) => {
+  const session: any = await getSession();
+
+  const response = await fetch(`${apiUrl}products/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${session?.user?.token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete user");
   }
 
   return response.json();

@@ -47,9 +47,13 @@ export default function UsersList() {
           setUsers((prevUsers) => [...prevUsers, response.data]);
           closeModal();
           console.log("Create User:", response);
+          toast.success(response.message);
         }
       } catch (error) {
         console.error("Error Creating User: ", error);
+        if (error instanceof Error) {
+          toast.error(error.message);
+        }
       }
     }
   };

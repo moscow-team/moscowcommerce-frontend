@@ -110,7 +110,7 @@ export default function CategoryList() {
               <TableCell>{product.id}</TableCell>
               <TableCell>{product.name}</TableCell>
               <TableCell>{product.description}</TableCell>
-              <TableCell>${product.creationDate}</TableCell>
+              <TableCell>{product.creationDate}</TableCell>
               <TableCell>{product.modificationDate}</TableCell>
               <TableCell>{product.archivedDate}</TableCell>
               <TableCell>
