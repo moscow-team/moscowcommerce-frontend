@@ -4,6 +4,7 @@ import { Button, Card, Link } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -19,6 +20,11 @@ function LoginPage() {
 
   const onSubmit = handleSubmit(async (data) => {
     //Enviar peticon al NextAuth o Servidor para realizar la autenticacion (Hacerlo Hook)
+
+    if (isInvalidEmail) {
+      toast.error("Por favor, ingrese un email correcto"); 
+      return;
+    }
     try {
       const session  = await signIn("credentials", {
         username: data.email,
@@ -28,7 +34,7 @@ function LoginPage() {
       console.log(session);
       if (session?.ok) {
         router.push("/dashboard");
-        toast.success("Session iniciada ");
+        toast.success("Sesión iniciada ");
       }else{
         toast.error(session?.error || "Credenciales incorrectas");
       }
@@ -39,16 +45,21 @@ function LoginPage() {
 
 
   });
+  const [valueEmail, setValueEmail] = useState("");
 
-  // const handleChange = (name: string, e: string) => {
-  //   setCredientials({ ...credientials, [name]: e });
-  // }
+  const validateEmail = (value: string) => value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
+
+  const isInvalidEmail = useMemo(() => {
+      if (valueEmail === "") return false;
+
+      return validateEmail(valueEmail) ? false : true;
+  }, [valueEmail]);
 
   return (
     <div className="flex justify-center items-center w-screen h-full min-h-screen">
       <Card className="w-max flex flex-col h-max items-center justify-center mb-32 p-10">
-        <div className="flex flex-col justify-center items-center h-full w-full py-5">
-          <h1 className="font-semibold text-4xl mb-4">Iniciar Sesion</h1>
+        <div className="flex flex-col justify-center items-center h-f ull w-full py-5">
+          <h1 className="font-semibold text-4xl mb-4">Iniciar Sesión</h1>
         </div>
         <form
           // onSubmit={onSubmit(credientials)}
@@ -58,10 +69,13 @@ function LoginPage() {
             <Input
               type="email"
               label="Email"
-              // onChange={e => handleChange("email", e.target.value)}
+              value={valueEmail}
               isRequired
-              variant="underlined"
-              {...register("email", { required: { value: true, message: "Debe ingresar un email" } })}
+
+              isInvalid={isInvalidEmail}
+              color={isInvalidEmail ? "danger" : "success"}
+              onValueChange={setValueEmail}              variant="underlined"
+              {...register("email", { required: { value: true, message: "Debe ingresar un email valido" } })}
             />
             {errors.email && (
               // validacion de errores

@@ -15,7 +15,11 @@ export async function logIn(credentials: any) {
       },
     });
     const data: BackendResponse = await response.json();
-    if (data.data == null) {
+    if (data.failure) {
+      if (data.data != null) {
+        const errorKey = Object.keys(data.data)[0];
+        throw new Error(data.data[errorKey] as string);
+      }
       throw new Error(data.message);
     }
     return data;

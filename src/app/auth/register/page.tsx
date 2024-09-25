@@ -14,7 +14,11 @@ export default function Register() {
     } = useForm();
     const router = useRouter();
     const onSubmit = handleSubmit(async (data) => {
-        //Enviar peticon al NextAuth o Servidor para realizar la autenticacion (Hacerlo Hook)
+        //Enviar peticion al NextAuth o Servidor para realizar la autenticacion (Hacerlo Hook)
+        if (isInvalidPassword || isInvalidConfirmPassword) {
+            toast.error("Debe ingresar una contraseña valida (1 letra miniscula, 1 letra mayusucula, 1 numero minimo)");
+            return;
+        }
         if (data.password !== data.confirmPassword) {
             toast.error("Las contraseñas no coinciden");
             return;
@@ -29,9 +33,14 @@ export default function Register() {
         if (newUser?.success) {
             router.push("/auth/login");
             toast.success(newUser.message);
-          }else{
-            toast.error(newUser.message);
-          }
+        } else {
+            if (newUser.data != null) {
+                const errorKey = Object.keys(newUser.data)[0];
+                toast.error(newUser.data[errorKey] as string);
+            }else{
+                toast.error(newUser.message);
+            }
+        }
     });
 
     const [valueEmail, setValueEmail] = useState("");
@@ -68,6 +77,33 @@ export default function Register() {
         return validateLastName(valueLastName) ? false : true;
     }, [valueLastName]);
 
+
+
+    const [valuePassword, setValuePassword] = useState("");
+
+    const validatePassword = (value: string) =>
+        value.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,20}$/);
+
+    const isInvalidPassword = useMemo(() => {
+        if (valuePassword === "") return false;
+
+        return validatePassword(valuePassword) ? false : true;
+    }, [valuePassword]);
+
+
+
+
+    const [valueConfirmPassword, setValueConfirmPassword] = useState("");
+
+    const validateConfirmPassword = (value: string) =>
+        value.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,20}$/);
+
+    const isInvalidConfirmPassword = useMemo(() => {
+        if (valueConfirmPassword === "") return false;
+
+        return validateConfirmPassword(valueConfirmPassword) ? false : true;
+    }, [valueConfirmPassword]);
+
     return (
         <div className="flex justify-center items-center w-screen h-full min-h-screen">
             <Card className="w-max flex flex-col h-max items-center justify-center mb-32 p-10">
@@ -75,7 +111,7 @@ export default function Register() {
                     <h1 className="font-semibold text-4xl mb-4">Registro de Usuario</h1>
                 </div>
                 <form
-                    onSubmit={onSubmit} 
+                    onSubmit={onSubmit}
                     className="w-80 flex flex-col h-max items-center justify-center px-10 gap-5">
                     <div className="h-20 w-full">
                         <Input
@@ -130,7 +166,7 @@ export default function Register() {
                             color={isInvalidEmail ? "danger" : "success"}
                             onValueChange={setValueEmail}
                             // onChange={(e) => handleChange("email", e.target.value)}
-                            {...register("email", { required: { value: true, message: "Debe ingresar un email" } })}
+                            {...register("email", { required: { value: true, message: "Debe ingresar un email valido" } })}
 
                         ></Input>
                         {errors.email && (
@@ -145,8 +181,11 @@ export default function Register() {
                             label="Contraseña"
                             type="password"
                             variant="underlined"
+                            value={valuePassword}
                             isRequired
-
+                            isInvalid={isInvalidPassword}
+                            color={isInvalidPassword ? "danger" : "success"}
+                            onValueChange={setValuePassword}
                             // onChange={(e) => handleChange("password", e.target.value)}
                             {...register("password", { required: { value: true, message: "Debe ingresar una contraseña" } })}
 
@@ -163,8 +202,11 @@ export default function Register() {
                             label="Confirmar Contraseña"
                             type="password"
                             variant="underlined"
+                            value={valueConfirmPassword}
                             isRequired
-
+                            isInvalid={isInvalidConfirmPassword}
+                            color={isInvalidConfirmPassword ? "danger" : "success"}
+                            onValueChange={setValueConfirmPassword}
                             // onChange={(e) => handleChange("confirmPassword", e.target.value)}
                             {...register("confirmPassword", { required: { value: true, message: "Debe ingresar una contraseña" } })}
 
