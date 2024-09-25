@@ -24,6 +24,7 @@ import {
   TableCell,
   TableHead,
 } from "@/components/ui/table";
+import { toast } from "sonner";
 
 export default function UsersList() {
   interface User {
@@ -61,7 +62,6 @@ export default function UsersList() {
         const response = await getUsers();
         if (response && Array.isArray(response.data)) {
           setUsers(response.data);
-          // console.log("Users: ", response.data); // TODO: Role it's still missing
         } else {
           console.error("Fetch Error:", response);
         }
@@ -95,19 +95,27 @@ export default function UsersList() {
     if (formRef.current && selectedUser) {
       const formData = new FormData(formRef.current);
       const data = Object.fromEntries(formData.entries());
+      const dataToSend = {
+        ...selectedUser,
+        ...data,
+      }
       try {
-        const response = await updateUser(data);
-        // if (response && response.status === "SUCCESS") {
-        //   setUsers((prevUsers) =>
-        //     prevUsers.map((user) =>
-        //       user.id === selectedUser.id ? response.data : user
-        //     )
-        //   );
-        //   closeEditModal();
-        //   console.log("Update User:", response);
-        // }
+        const response = await updateUser(dataToSend);
+        if (response && response.status === "SUCCESS") {
+          setUsers((prevUsers) =>
+            prevUsers.map((user) =>
+              user.id === selectedUser.id ? response.data : user
+            )
+          );
+          closeEditModal();
+          // console.log("Update User:", response);
+          toast.success(response.message);
+        }
       } catch (error) {
-        console.error("Error Updating User: ", error);
+        if (error instanceof Error) {
+          console.error("Error Updating User: ", error.message);
+          toast.error(error.message);
+        }
       }
     }
   };
@@ -165,6 +173,7 @@ export default function UsersList() {
                     variant="outline"
                     size="icon"
                     className="text-destructive"
+                    disabled
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

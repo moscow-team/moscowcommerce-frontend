@@ -70,18 +70,21 @@ export default function ProductList() {
     setIsEditModalOpen(false);
   };
 
+  /* Crear producto */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formRef.current) {
       const formData = new FormData(formRef.current);
       const data = Object.fromEntries(formData.entries());
-      await createProduct(data);
-      const response = await getProducts();
-      setProducts(response.data);
-      closeModal();
+      console.log(data);
+      // await createProduct(data);
+      // const response = await getProducts();
+      // setProducts(response.data);
+      // closeModal();
     }
   };
 
+  /* Editar producto */
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formRef.current && selectedProduct) {
@@ -93,6 +96,8 @@ export default function ProductList() {
       closeEditModal();
     }
   };
+
+  /* Eliminar producto */
 
   return (
     <div className="container mx-auto">
@@ -202,11 +207,12 @@ export default function ProductList() {
                 id="price"
                 name="price"
                 placeholder="Precio del producto"
-                type="number"
-                onInput={(e) => {
-                  const target = e.target as HTMLInputElement;
-                  target.value = target.value.replace(/[^0-9]/g, "");
-                }}
+                type="text"
+                inputMode="numeric"
+                // onInput={(e) => {
+                //   const target = e.target as HTMLInputElement;
+                //   target.value = target.value.replace(/[^0-9]/g, "");
+                // }}
               />
             </div>
             <div>

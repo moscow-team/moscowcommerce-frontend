@@ -1,7 +1,7 @@
 import { getSession } from "next-auth/react";
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 export const getProducts = async () => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const session: any = await getSession();
 
   const response = await fetch(`${apiUrl}products`, {
@@ -20,7 +20,6 @@ export const getProducts = async () => {
 };
 
 export const createProduct = async (data: any) => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const session: any = await getSession();
 
   const response = await fetch(`${apiUrl}products`, {
@@ -40,7 +39,6 @@ export const createProduct = async (data: any) => {
 }
 
 export const updateProduct = async (data: any) => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const session: any = await getSession();
 
   const response = await fetch(`${apiUrl}products`, {

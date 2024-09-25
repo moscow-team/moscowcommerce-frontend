@@ -1,7 +1,7 @@
 import { getSession } from "next-auth/react";
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 export const getUsers = async () => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const session: any = await getSession();
 
   const response = await fetch(`${apiUrl}users`, {
@@ -20,7 +20,6 @@ export const getUsers = async () => {
 };
 
 export const createUser = async (data: any) => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const session: any = await getSession();
 
   const response = await fetch(`${apiUrl}users`, {
@@ -40,8 +39,6 @@ export const createUser = async (data: any) => {
 }
 
 export const updateUser = async (data: any) => {
-  /*
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const session: any = await getSession();
 
   const response = await fetch(`${apiUrl}users`, {
@@ -58,6 +55,4 @@ export const updateUser = async (data: any) => {
   }
 
   return response.json();
-  */
-  console.log('Método no implementado en el Backend. Cuando se realice la implementación PUT, se descomenta el código');
 }
