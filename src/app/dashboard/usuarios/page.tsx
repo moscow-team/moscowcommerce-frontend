@@ -249,7 +249,7 @@ export default function UsersList() {
               />
             </div>
             <DialogFooter>
-              <Button onClick={closeModal} variant="outline">
+              <Button onClick={closeModal} variant="outline" type="button">
                 Cancelar
               </Button>
               <Button type="submit" style={{ color: "white" }}>
@@ -308,7 +308,7 @@ export default function UsersList() {
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={closeEditModal} variant="outline">
+              <Button onClick={closeEditModal} variant="outline" type="button">
                 Cancelar
               </Button>
               <Button type="submit" style={{ color: "white" }}>

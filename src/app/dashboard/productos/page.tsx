@@ -31,6 +31,7 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  unarchivedProduct,
 } from "@/services/dashboard/productoService";
 import { getCategorias } from "@/services/dashboard/categoriaService";
 import { toast } from "sonner";
@@ -56,6 +57,8 @@ export default function ProductList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [archivedProducts, setArchivedProducts] = useState<Product[]>([]);
+  const [isArchivedModalOpen, setIsArchivedModalOpen] = useState(false);
   const [categories, setCategories] = useState<{ id: number; name: string }[]>(
     []
   );
@@ -99,6 +102,22 @@ export default function ProductList() {
     setSelectedProduct(null);
     setIsEditModalOpen(false);
   };
+  const openArchivedModal = async () => {
+    try {
+      const response = await getProducts();
+      const archived = response.data.filter(
+        (product: Product) => product.archived
+      );
+      setArchivedProducts(archived);
+      setIsArchivedModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching archived products: ", error);
+      toast.error("Error fetching archived products");
+    }
+  };
+  const closeArchivedModal = () => {
+    setIsArchivedModalOpen(false);
+  };
 
   /* Crear producto */
   const handleSubmit = async (e: React.FormEvent) => {
@@ -106,17 +125,20 @@ export default function ProductList() {
     if (formRef.current) {
       const formData = new FormData(formRef.current);
       const formDataEntries = Array.from(formData.entries());
+      // const data = Object.fromEntries(formDataEntries);
       const data: { [key: string]: any } = {};
 
       formDataEntries.forEach(([key, value]) => {
         if (key === "photos") {
-          data["urlPhotos"] = [""]; // Esto se debe cambiar luego por el servicio de Cloudinary, para testear estoy envíando un string vacío
+          data["image"] = [""]; // Cambiar cuando se implemente Imgur
         } else if (key === "category") {
-          data["categoryId"] = parseInt(value as string, 10); // Convertir el categoryId a un número
+          data["categoryId"] = parseInt(value as string, 10);
         } else {
           data[key] = value;
         }
       });
+
+      console.log("Data: ", data);
 
       try {
         await createProduct(data);
@@ -178,16 +200,45 @@ export default function ProductList() {
     }
   };
 
+  /* Restaurar producto */
+  const handleRestore = async (id: number) => {
+    try {
+      await unarchivedProduct(id);
+      const response = await getProducts();
+      const filteredProducts = response.data.filter(
+        (product: Product) => !product.archived
+      );
+      setProducts(filteredProducts);
+      const archived = response.data.filter(
+        (product: Product) => product.archived
+      );
+      setArchivedProducts(archived);
+      toast.success("Producto restaurado correctamente");
+      closeArchivedModal();
+    } catch (error) {
+      console.error("Error restoring product: ", error);
+      toast.error("Error restaurando el producto");
+    }
+  };
+
   return (
     <div className="container mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Productos</h1>
-        <Button
-          onClick={openModal}
-          className="bg-blue-950 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded"
-        >
-          Añadir
-        </Button>
+        <div>
+          <Button
+            onClick={openArchivedModal}
+            className="bg-gray-800 mr-5 text-white"
+          >
+            Ver archivados
+          </Button>
+          <Button
+            onClick={openModal}
+            className="bg-blue-950 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded"
+          >
+            Añadir
+          </Button>
+        </div>
       </div>
       <Table className="bg-white rounded-md">
         <TableHeader>
@@ -429,7 +480,7 @@ export default function ProductList() {
               <Input id="photos" name="photos" type="file" multiple />
             </div>
             <DialogFooter>
-              <Button onClick={closeEditModal} variant="outline">
+              <Button onClick={closeEditModal} variant="outline" type="button">
                 Cancelar
               </Button>
               <Button type="submit" style={{ color: "white" }}>
@@ -437,6 +488,71 @@ export default function ProductList() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isArchivedModalOpen} onOpenChange={setIsArchivedModalOpen}>
+        <DialogContent className="custom-width">
+          <DialogHeader>
+            <DialogTitle>Productos Archivados</DialogTitle>
+          </DialogHeader>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>Nombre</TableHead>
+                <TableHead>Descripción</TableHead>
+                <TableHead>Precio</TableHead>
+                <TableHead>Stock</TableHead>
+                <TableHead>Categoría</TableHead>
+                <TableHead>Revertir</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {archivedProducts.map((product) => (
+                <TableRow key={product.id}>
+                  <TableCell>{product.id}</TableCell>
+                  <TableCell>{product.name}</TableCell>
+                  <TableCell>{product.description}</TableCell>
+                  <TableCell>{product.price}</TableCell>
+                  <TableCell>{product.stock}</TableCell>
+                  <TableCell>
+                    {product.category ? product.category.name : "No Category"}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="text-success"
+                      onClick={() => handleRestore(product.id)}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="icon icon-tabler icons-tabler-outline icon-tabler-refresh"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
+                        <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
+                      </svg>
+                      <span className="sr-only">Revertir</span>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <DialogFooter>
+            <Button onClick={closeArchivedModal} variant="outline">
+              Cerrar
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

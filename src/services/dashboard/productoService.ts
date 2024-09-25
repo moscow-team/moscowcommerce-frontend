@@ -26,9 +26,11 @@ export const createProduct = async (data: any) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      // "Content-Type": "multipart/form-data",
       "Authorization": `Bearer ${session?.user?.token}`,
     },
     body: JSON.stringify(data),
+    // body: data
   });
 
   if (!response.ok) {
@@ -70,6 +72,24 @@ export const deleteProduct = async (id: number) => {
 
   if (!response.ok) {
     throw new Error("Failed to delete user");
+  }
+
+  return response.json();
+}
+
+export const unarchivedProduct = async (id: number) => {
+  const session: any = await getSession();
+
+  const response = await fetch(`${apiUrl}products/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${session?.user?.token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to unarchive product");
   }
 
   return response.json();
