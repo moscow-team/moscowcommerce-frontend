@@ -23,15 +23,35 @@ export default function Home() {
     archivedDate: string;
   }
 
+  interface Producto {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    stock: number;
+    category: {
+      id: number;
+      name: string;
+    };
+    urlPhotos:string[];
+    archived: boolean;
+  }
+
   const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [productos, setProductos] = useState<Producto[]>([]);
 
   useEffect(() => {
     async function fetchCategorias() {
       const response = await getCategorias();
-      console.log(response);
       setCategorias(response.data);
     }
+    async function fetchProductos() {
+      const response = await getProducts();
+      console.log(response.data);
+      setProductos(response.data);
+    }
     fetchCategorias();
+    fetchProductos();
   }, []);
 
   return (
@@ -75,13 +95,8 @@ export default function Home() {
               {categorias.map((category) => (
                 <div
                   key={category.id}
-                  className="group relative overflow-hidden rounded-lg shadow-md"
+                  className="group relative overflow-hidden rounded-lg shadow-md h-48 w-full  cursor-pointer hover:scale-110 transition-transform duration-200"
                 >
-                  <img
-                    src={`/placeholder.svg?height=300&width=400`}
-                    alt={category.name}
-                    className="w-full h-48 object-cover transition-transform group-hover:scale-105"
-                  />
                   <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
                     <h3 className="text-white text-xl font-semibold">
                       {category.name}
@@ -99,28 +114,27 @@ export default function Home() {
               Productos
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map((product) => (
+              {productos.map((product) => (
                 <div
-                  key={product}
+                  key={product.id}
                   className="bg-white rounded-lg shadow-md overflow-hidden"
                 >
                   <img
-                    src={`/placeholder.svg?height=300&width=400`}
-                    alt={`Product ${product}`}
-                    className="w-full h-48 object-cover"
+                    src={product.urlPhotos[0]}
+                    alt={`Product ${product.name}`}
+                    className="w-full h-48 object-contain p-2 hover:scale-110 transition-transform duration-200 cursor-pointer"
                   />
                   <div className="p-4">
                     <h3 className="text-lg font-semibold mb-2">
-                      Product {product}
+                      {product.name}
                     </h3>
-                    <p className="text-gray-600 mb-4">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    <p className="text-gray-600 mb-4 h-14">
+                      {product.description}
                     </p>
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col h-full gap-2 items-center justify-between">
                       <span className="text-xl font-bold text-primary">
-                        $99.99
-                      </span>
-                      <Button variant="outline">Add to Cart</Button>
+                        ${product.price.toLocaleString("es")}                      </span>
+                      <Button variant="default" className="text-white">Agregar al carrito</Button>
                     </div>
                   </div>
                 </div>
