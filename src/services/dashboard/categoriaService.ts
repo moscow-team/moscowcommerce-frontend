@@ -9,14 +9,13 @@ export const getCategorias = async () => {
         method: "GET",
         headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${session?.user?.token}`,
         },
     });
     
     if (!response.ok) {
         throw new Error("Failed to fetch user items");
     }
-    
+
     return response.json();
 }
 

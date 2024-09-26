@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { getSession, signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 
@@ -17,8 +16,6 @@ export default function DashboardLayout({
     status: "Online",
   });
   const session = useSession();
-  const pathname = usePathname();
-  const [currentPath, setCurrentPath] = useState(pathname);
 
   const validate = async () => {
     if (session.data) {
@@ -43,18 +40,14 @@ export default function DashboardLayout({
     validate();
   }, [session]);
 
-  useEffect(() => {
-    setCurrentPath(pathname);
-  }, [pathname]);
-
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
       <div
         className={`
-          ${sidebarOpen ? "w-64" : "w-16"}
-          bg-white shadow-lg fixed inset-y-0 left-0 z-50 transition-all duration-300 ease-in-out flex flex-col justify-between
-        `}
+         ${sidebarOpen ? "w-64" : "w-16"}
+         bg-white shadow-lg fixed inset-y-0 left-0 z-50 transition-all duration-300 ease-in-out flex flex-col justify-between
+       `}
       >
         <div className="bg-gray-800 text-white">
           <div className="flex items-center justify-between h-16 px-4">
@@ -95,7 +88,9 @@ export default function DashboardLayout({
               </div>
               <div className="ml-3">
                 <p className="font-medium">{user.name}</p>
-                <p className="text-sm text-gray-300 truncate w-40">{user.email}</p>
+                <p className="text-sm text-gray-300 truncate w-40">
+                  {user.email}
+                </p>
               </div>
             </div>
             <div className="flex items-center">
@@ -119,10 +114,8 @@ export default function DashboardLayout({
             <div>
               <Link href="/dashboard">
                 <button
-                  className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
-                    currentPath === "/dashboard" ? "text-orange-200" : ""
-                  } ${sidebarOpen ? "justify-start" : "justify-center"}
-                }`}
+                  className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200
+                  ${sidebarOpen ? "justify-start" : "justify-center"}`}
                 >
                   <svg
                     className="h-5 w-5"
@@ -145,9 +138,9 @@ export default function DashboardLayout({
               <Link href="/dashboard/productos">
                 <button
                   className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
-                    currentPath === "/dashboard/productos" ? "text-orange-200" : ""
-                  } ${sidebarOpen ? "justify-start" : "justify-center"}
-                }`}
+                    sidebarOpen ? "justify-start" : "justify-center"
+                  }
+               }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -173,11 +166,9 @@ export default function DashboardLayout({
               <Link href="/dashboard/categorias">
                 <button
                   className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
-                    currentPath === "/dashboard/categorias"
-                      ? "text-orange-200"
-                      : ""
-                  } ${sidebarOpen ? "justify-start" : "justify-center"}
-                }`}
+                    sidebarOpen ? "justify-start" : "justify-center"
+                  }
+               }`}
                 >
                   <svg
                     className="h-5 w-5"
@@ -200,9 +191,9 @@ export default function DashboardLayout({
               <Link href="/dashboard/usuarios">
                 <button
                   className={`flex items-center w-full px-4 py-3 text-white hover:bg-gray-800 hover:text-orange-100 transition-colors duration-200 ${
-                    currentPath === "/dashboard/usuarios" ? "text-orange-200" : ""
-                  } ${sidebarOpen ? "justify-start" : "justify-center"}
-                }`}
+                    sidebarOpen ? "justify-start" : "justify-center"
+                  }
+               }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
