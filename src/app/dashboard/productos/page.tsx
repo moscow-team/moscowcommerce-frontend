@@ -124,31 +124,30 @@ export default function ProductList() {
     e.preventDefault();
     if (formRef.current) {
       const formData = new FormData(formRef.current);
-      const formDataEntries = Array.from(formData.entries());
-      // const data = Object.fromEntries(formDataEntries);
-      const data: { [key: string]: any } = {};
-
-      formDataEntries.forEach(([key, value]) => {
+      const newFormData = new FormData();
+      formData.forEach((value, key) => {
         if (key === "photos") {
-          data["image"] = [""]; // Cambiar cuando se implemente Imgur
+          newFormData.append("photos", value);
         } else if (key === "category") {
-          data["categoryId"] = parseInt(value as string, 10);
+          newFormData.append("categoryId", value as string);
         } else {
-          data[key] = value;
+          newFormData.append(key, value as string);
         }
       });
-
-      console.log("Data: ", data);
-
+      toast.loading("Creando producto...");
       try {
-        await createProduct(data);
+        await createProduct(newFormData);
         const response = await getProducts();
         const filteredProducts = response.data.filter(
           (product: Product) => !product.archived
         );
         setProducts(filteredProducts);
+        toast.dismiss();
+        toast.success("Producto creado correctamente");
         closeModal();
       } catch (error) {
+        toast.dismiss();
+        toast.error("Error creando el producto");
         console.error("Error creating product: ", error);
       }
     }
@@ -159,27 +158,31 @@ export default function ProductList() {
     e.preventDefault();
     if (formRef.current && selectedProduct) {
       const formData = new FormData(formRef.current);
-      const formDataEntries = Array.from(formData.entries());
-      const data: { [key: string]: any } = {};
-
-      formDataEntries.forEach(([key, value]) => {
+      const newFormData = new FormData();
+      formData.forEach((value, key) => {
         if (key === "photos") {
-          data["urlPhotos"] = [""]; // Cambiar cuando se implemente Cloudinary
+          newFormData.append("photos", value);
         } else if (key === "category") {
-          data["categoryId"] = parseInt(value as string, 10);
+          newFormData.append("categoryId", value as string);
         } else {
-          data[key] = value;
+          newFormData.append(key, value as string);
         }
       });
+      toast.loading("Creando producto...");
       try {
-        await updateProduct(selectedProduct.id, data);
+        await updateProduct(selectedProduct.id, newFormData);
         const response = await getProducts();
-        setProducts(response.data);
+        const filteredProducts = response.data.filter(
+          (product: Product) => !product.archived
+        );
+        setProducts(filteredProducts);
+        toast.dismiss();
+        toast.success("Producto editado correctamente");
         closeEditModal();
-        toast.success("Producto actualizado correctamente");
       } catch (error) {
-        console.error("Error updating product: ", error);
-        toast.error("Error actualizando el producto");
+        toast.dismiss();
+        toast.error("Error creando el producto");
+        console.error("Error creating product: ", error);
       }
     }
   };
@@ -390,7 +393,7 @@ export default function ProductList() {
               <Input id="photos" name="photos" type="file" multiple />
             </div>
             <DialogFooter>
-              <Button onClick={closeModal} variant="outline">
+              <Button onClick={closeModal} variant="outline" type="button">
                 Cancelar
               </Button>
               <Button type="submit" style={{ color: "white" }}>

@@ -19,18 +19,15 @@ export const getProducts = async () => {
   return response.json();
 };
 
-export const createProduct = async (data: any) => {
+export const createProduct = async (data: FormData) => {
   const session: any = await getSession();
 
   const response = await fetch(`${apiUrl}products`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
-      // "Content-Type": "multipart/form-data",
       "Authorization": `Bearer ${session?.user?.token}`,
     },
-    body: JSON.stringify(data),
-    // body: data
+    body: data
   });
 
   if (!response.ok) {
@@ -40,16 +37,15 @@ export const createProduct = async (data: any) => {
   return response.json();
 }
 
-export const updateProduct = async (id:number, data: any) => {
+export const updateProduct = async (id:number, data: FormData) => {
   const session: any = await getSession();
 
   const response = await fetch(`${apiUrl}products/${id}`, {
     method: "PUT",
     headers: {
-      "Content-Type": "application/json",
       "Authorization": `Bearer ${session?.user?.token}`,
     },
-    body: JSON.stringify(data),
+    body: data,
   });
 
   if (!response.ok) {
