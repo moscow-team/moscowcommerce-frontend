@@ -3,9 +3,23 @@
 // import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Header() {
+  const { data: session, status } = useSession(); // Aquí obtienes la sesión de forma segura en un Client Component
+  const [user, setUser] = useState({ email: "", name: "", status: "Offline" });
+
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      setUser({
+        email: session.user.email ?? "moskow@admin.com",
+        name: session.user.name ?? "Admin",
+        status: "Online",
+      });
+    }
+  }, [session, status]); // Escucha los cambios en session y status
   return (
     // <Navbar className="bg-orange-400">
     //     <Image src={"/Moscow.png"} alt={""} width={40} height={40}></Image>
@@ -89,11 +103,29 @@ export default function Header() {
                 alt="Carrito de Compras"
               />
             </Button>
-            <Link href="/auth/login" className="text-white ml-3">
-              <Button>
-                Log In
-              </Button>
-            </Link>
+            <div className="flex justify-end">
+            
+              {!session ? (
+                <Link href="/auth/login" className="text-white ml-3">
+                <Button>
+                  Log In
+                </Button>
+              </Link>
+              ):(
+                <div className="home-container flex justify-center items-center h-screen text-white m-4">
+                  <a
+                    className="w-10 h-10 rounded-full bg-cover bg-center cursor-pointer "
+                    style={{ backgroundImage: 'url(/perfil.png)' }} // Foto de perfil
+                    href="/perfil"
+                  ></a>
+                  <p className="m-2">{user.email}</p>
+                  <Button  color="danger" onClick={() => signOut()} >
+                    Log Out
+                  </Button>
+                </div>
+              )}
+            </div>
+            
             <Button size="icon" className="ml-2 md:hidden">
               <img src="/icons/search.svg" alt="Buscar" />
             </Button>
