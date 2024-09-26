@@ -217,14 +217,21 @@ export default function DashboardLayout({
                 </button>
               </Link>
             </div>
-            <div className="w-full flex justify-center pb-5">
+            <div className="w-full grid justify-center pb-5">
               {sidebarOpen ? (
+                <>
+                <Link  href="/"  className="bg-slate-100 hover:bg-slate-400 text-black py-2 px-4 rounded-md inline-block mb-4 ">
+                  inicio
+                </Link>
                 <Button
                   onClick={() => signOut()}
                   className="bg-slate-100 hover:bg-slate-400"
                 >
                   Cerrar Sesion
                 </Button>
+                
+                </>
+                
               ) : null}
             </div>
           </nav>
