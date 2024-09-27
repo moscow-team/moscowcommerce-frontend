@@ -114,8 +114,8 @@ export default function Header() {
               ):(
                 <div className="home-container flex justify-center items-center h-screen text-white m-4">
                   <a
-                    className="w-10 h-10 rounded-full bg-cover bg-center cursor-pointer "
-                    style={{ backgroundImage: 'url(/perfil.png)' }} // Foto de perfil
+                    className="w-10 h-10 rounded-full bg-cover bg-center bg-white cursor-pointer border"
+                    // style={} // Foto de perfil
                     href="/perfil"
                   ></a>
                   <p className="m-2">{user.email}</p>

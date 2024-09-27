@@ -41,7 +41,7 @@ export const createUser = async (data: any) => {
 export const updateUser = async (data: any) => {
   const session: any = await getSession();
 
-  const response = await fetch(`${apiUrl}users`, {
+  const response = await fetch(`${apiUrl}users/${data.id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -50,9 +50,9 @@ export const updateUser = async (data: any) => {
     body: JSON.stringify(data),
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to update user");
-  }
+  // if (!response.ok) {
+  //   throw new Error("Failed to update user");
+  // }
 
   return response.json();
 }

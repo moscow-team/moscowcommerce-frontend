@@ -2,115 +2,86 @@
 
 import { Button, Card, Input } from "@nextui-org/react";
 import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
     getUsers,
     updateUser,
-  } from "@/services/dashboard/usuarioService";
-  import { useSession } from "next-auth/react";
-import router from "next/router";
-  interface User {
+} from "@/services/dashboard/usuarioService";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+interface User {
     id: number;
     email: string;
     fullName: string;
     role: string;
-  }
+    password: string;
+}
 
-export default function Perfil () {
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm();
-    
-      const [users, setUsers] = useState<User[]>([]);
-      const [dbUser, setDbUser] = useState<User | null>(null); // Estado para guardar el usuario encontrado
-      const { data: session, status } = useSession(); // Obtienes la sesión de forma segura en un Client Component
-    
-      useEffect(() => {
+export default function Perfil() {
+    const router = useRouter();
+    const [users, setUsers] = useState<User[]>([]);
+    const [dbUser, setDbUser] = useState<User | null>(null); // Estado para guardar el usuario encontrado
+    const { data: session, status } = useSession(); // Obtienes la sesión de forma segura en un Client Component
+
+    useEffect(() => {
         const fetchCatalogItems = async () => {
-          try {
-            const response = await getUsers();
-            if (response && Array.isArray(response.data)) {
-              setUsers(response.data); // Guardas los usuarios obtenidos de la base de datos
-            } else {
-              console.error("Fetch Error:", response);
+            try {
+                const response = await getUsers();
+                if (response && Array.isArray(response.data)) {
+                    console.log(response.data);
+                    setUsers(response.data); // Guardas los usuarios obtenidos de la base de datos
+                } else {
+                    console.error("Fetch Error:", response);
+                }
+            } catch (error) {
+                console.error("Error Fetch: ", error);
             }
-          } catch (error) {
-            console.error("Error Fetch: ", error);
-          }
         };
-    
         fetchCatalogItems();
-      }, []);
-    
-      useEffect(() => {
+    }, []);
+
+    useEffect(() => {
         if (status === "authenticated" && session?.user) {
-          const loggedInEmail = session.user.email ?? "moskow@admin.com"; // Email del usuario autenticado
-    
-          // Busca si el email del usuario logueado está en la lista de usuarios
-          const matchedUser = users.find((user) => user.email === loggedInEmail);
-    
-          if (matchedUser) {
-            setDbUser(matchedUser); // Si hay coincidencia, actualizas el estado con el usuario de la base de datos
-          } else {
-            console.log("Usuario no encontrado en la base de datos.");
-          }
+            const loggedInEmail = session.user.email ?? "moskow@admin.com"; // Email del usuario autenticado
+
+            // Busca si el email del usuario logueado está en la lista de usuarios
+            const matchedUser = users.find((user) => user.email === loggedInEmail);
+
+            if (matchedUser) {
+                setValueEmail(matchedUser.email);
+                setValueName(matchedUser.fullName);
+                setDbUser(matchedUser); // Si hay coincidencia, actualizas el estado con el usuario de la base de datos
+            } else {
+                console.log("Usuario no encontrado en la base de datos.");
+            }
         }
-      }, [session, status, users]);
+    }, [session, status, users]);
 
-    //Quitamos el useState para manejar el formulario de logue, para delegarlo al useForm 
-    // const [form, setForm] = useState<Form>(
-    //     {
-    //         email: "",
-    //         password: "",
-    //         name: "",
-    //         lastName: "",
-    //         confirmPassword: ""
-    //     });
-
-    // const handleChange = (name: string, e: string) => {
-    //     setForm({ ...form, [name]: e });
-    // }
-
-    const onSubmit = handleSubmit(async (data) => {
-        //Enviar peticion al NextAuth o Servidor para realizar la autenticacion (Hacerlo Hook)
-        // if (isInvalidPassword || isInvalidConfirmPassword) {
-        //     toast.error("Debe ingresar una contraseña valida (1 letra miniscula, 1 letra mayusucula, 1 numero minimo)");
-        //     return;
-        // }
-        // if (data.password !== data.confirmPassword) {
-        //     toast.error("Las contraseñas no coinciden");
-        //     return;
-        // }
-
-        
-
+    const onSubmit = async () => {
         if (isInvalidEmail || isInvalidName || isInvalidLastName) {
             toast.error("Por favor, ingrese todos los campos correctamente");
             return;
         }
-
         const prevUser: User = {
-            id: 1,                
-            email: valueEmail ,
-            fullName: valueName + valueLastName, 
-            role: "ADMIN"          
-          };
-        //Funcion para registrarnos
+            id: dbUser?.id as number,
+            email: valueEmail,
+            fullName: valueName + valueLastName,
+            role: dbUser?.role as string,
+            password: valuePassword
+        };
         const newUser = await updateUser(prevUser as any);
         if (newUser?.success) {
             toast.success(newUser.message);
+            router.push("/");
         } else {
             if (newUser.data != null) {
                 const errorKey = Object.keys(newUser.data)[0];
                 toast.error(newUser.data[errorKey] as string);
-            }else{
+            } else {
                 toast.error(newUser.message);
             }
         }
-        });
+    };
 
     const [valueEmail, setValueEmail] = useState("");
 
@@ -145,26 +116,9 @@ export default function Perfil () {
 
         return validateLastName(valueLastName) ? false : true;
     }, [valueLastName]);
-    // const [valuePassword, setValuePassword] = useState("");
+    const [valuePassword, setValuePassword] = useState("");
 
-    // const validatePassword = (value: string) =>
-    //     value.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,20}$/);
-
-    // const isInvalidPassword = useMemo(() => {
-    //     if (valuePassword === "") return false;
-
-    //     return validatePassword(valuePassword) ? false : true;
-    // }, [valuePassword]);
-    // const [valueConfirmPassword, setValueConfirmPassword] = useState("");
-
-    // const validateConfirmPassword = (value: string) =>
-    //     value.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,20}$/);
-
-    // const isInvalidConfirmPassword = useMemo(() => {
-    //     if (valueConfirmPassword === "") return false;
-
-    //     return validateConfirmPassword(valueConfirmPassword) ? false : true;
-    // }, [valueConfirmPassword]);
+    const validatePassword = (value: string) => value.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,20}$/);
 
     return (
         <div className="flex justify-center items-center w-screen h-full min-h-screen">
@@ -177,7 +131,7 @@ export default function Perfil () {
                     className="w-80 flex flex-col h-max items-center justify-center px-10 gap-5">
                     <div className="h-20 w-full">
                         <Input
-                            label="Nombre"
+                            label="Nombre y apellido"
                             type="text"
                             variant="underlined"
                             value={dbUser?.fullName}
@@ -185,58 +139,20 @@ export default function Perfil () {
                             isInvalid={isInvalidName}
                             color={isInvalidName ? "danger" : "success"}
                             onValueChange={setValueName}
-                            // onChange={(e) => handleChange("name", e.target.value)}
-                            {...register("name", { required: { value: true, message: "Debe ingresar un nombre" } })}
                         ></Input>
-                        {errors.name && (
-                            // validacion de errores
-                            <span className="text-red-500 text-xs">
-                                {String(errors.name.message)}
-                            </span>
-                        )}
-                    </div>
-                    <div className="h-20 w-full">
-                        <Input
-                            label="Apellido"
-                            type="text"
-                            variant="underlined"
-                            defaultValue={valueLastName}
-                            isRequired
-
-                            isInvalid={isInvalidLastName}
-                            color={isInvalidLastName ? "danger" : "success"}
-                            onValueChange={setValueLastName}
-                            {...register("lastName", { required: { value: true, message: "Debe ingresar un apellido" } })}
-                        // onChange={(e) => handleChange("lastName", e.target.value)}
-                        ></Input>
-                        {errors.lastName && (
-                            // validacion de errores
-                            <span className="text-red-500 text-xs">
-                                {String(errors.lastName.message)}
-                            </span>
-                        )}
                     </div>
                     <div className="h-20 w-full">
                         <Input
                             label="Email"
-                            type="text"
+                            type="email"
                             variant="underlined"
-                            defaultValue={dbUser?.email}
+                            value={dbUser?.email}
                             isRequired
-
                             isInvalid={isInvalidEmail}
                             color={isInvalidEmail ? "danger" : "success"}
                             onValueChange={setValueEmail}
-                            // onChange={(e) => handleChange("email", e.target.value)}
-                            {...register("email", { required: { value: true, message: "Debe ingresar un email" } })}
 
                         ></Input>
-                        {errors.email && (
-                            // validacion de errores
-                            <span className="text-red-500 text-xs">
-                                {String(errors.email.message)}
-                            </span>
-                        )}
                     </div>
                     <div className="h-20 w-full">
                         <Input
@@ -244,20 +160,11 @@ export default function Perfil () {
                             type="password"
                             variant="underlined"
                             isRequired
-
-                            // onChange={(e) => handleChange("password", e.target.value)}
-                            {...register("password", { required: { value: true, message: "Debe ingresar una contraseña" } })}
+                            onValueChange={setValuePassword}
 
                         ></Input>
-                        {errors.password && (
-                            // validacion de errores
-                            <span className="text-red-500 text-xs">
-                                {String(errors.password.message)}
-                            </span>
-                        )}
                     </div>
-                    
-                    <Button color="primary" className="w-full" onClick={onSubmit}>Registrar</Button>
+                    <Button color="primary" className="w-full text-white" onClick={onSubmit}>Registrar</Button>
                 </form>
             </Card>
         </div>

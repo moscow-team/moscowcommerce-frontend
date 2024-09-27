@@ -36,7 +36,7 @@ export default function Register() {
         } else {
             if (newUser.data != null) {
                 const errorKey = Object.keys(newUser.data)[0];
-                toast.error(newUser.data[errorKey] as string);
+                toast.error((newUser.data as Record<string, any>)[errorKey] as string);
             }else{
                 toast.error(newUser.message);
             }
@@ -105,7 +105,7 @@ export default function Register() {
     }, [valueConfirmPassword]);
 
     return (
-        <div className="flex justify-center items-center w-screen h-full min-h-screen">
+        <div className="flex justify-center items-center w-full h-full min-h-screen">
             <Card className="w-max flex flex-col h-max items-center justify-center mb-32 p-10">
                 <div className="flex flex-col justify-center items-center h-full w-full py-5">
                     <h1 className="font-semibold text-4xl mb-4">Registro de Usuario</h1>

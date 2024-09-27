@@ -58,7 +58,7 @@ function LoginPage() {
   }, [valueEmail]);
 
   return (
-    <div className="flex justify-center items-center w-screen h-full min-h-screen">
+    <div className="flex justify-center items-center w-full h-full min-h-screen">
       <Card className="w-max flex flex-col h-max items-center justify-center mb-32 p-10">
         <div className="flex flex-col justify-center items-center h-f ull w-full py-5">
           <h1 className="font-semibold text-4xl mb-4">Iniciar Sesión</h1>
@@ -113,10 +113,9 @@ function LoginPage() {
           </Button>
 
           <Button
-            onClick={onSubmit}
+            onClick={()=>router.push("/auth/register")}
             color="secondary"
             className="w-full"
-            href="/auth/register"
           >
             Registrarse
           </Button>

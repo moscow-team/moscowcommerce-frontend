@@ -2,13 +2,14 @@ import { getSession } from "next-auth/react";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 export const getProducts = async () => {
-  const session: any = await getSession();
+  // Al no necesitar token, no lo mandamos
+  // const session: any = await getSession();
 
   const response = await fetch(`${apiUrl}products`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${session?.user?.token}`,
+      // "Authorization": `Bearer ${session?.user?.token}`,
     },
   });
 

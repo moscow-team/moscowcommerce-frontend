@@ -66,16 +66,6 @@ export default function ProductList() {
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const response = await getCategorias();
-        setCategories(response.data);
-      } catch (error) {
-        console.error("Error fetching categories: ", error);
-      }
-    }
-    fetchCategories();
-
     async function fetchProducts() {
       try {
         const response = await getProducts();
@@ -89,6 +79,18 @@ export default function ProductList() {
         console.error("Error fetching products: ", error);
       }
     }
+    async function fetchCategories() {
+      try {
+        const response = await getCategorias();
+        const filteredCategorys = response.data.filter(
+          (product: any) => !product.archived
+        );
+        setCategories(filteredCategorys);
+      } catch (error) {
+        console.error("Error fetching categories: ", error);
+      }
+    }
+    fetchCategories();
     fetchProducts();
   }, []);
 
