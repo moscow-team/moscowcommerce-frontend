@@ -107,12 +107,21 @@ function LoginPage() {
           <Button
             onClick={onSubmit}
             color="primary"
-            className="w-full"
+            className="w-full text-white"
           >
             Iniciar Sesion
           </Button>
-          <div className="p-10">
-            <Link href="/auth/register">Registrarse</Link>
+
+          <Button
+            onClick={onSubmit}
+            color="secondary"
+            className="w-full"
+            href="/auth/register"
+          >
+            Registrarse
+          </Button>
+          <div className="">
+            <Link href="/auth/register" className="text-blue-500">¿Olvidaste tu contraseña?</Link>
           </div>
         </form>
       </Card>

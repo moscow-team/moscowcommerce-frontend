@@ -47,9 +47,10 @@ export default function ProductList() {
       id: number;
       name: string;
     };
-    photos: {
-      url: string;
-    }[];
+    // photos: {
+    //   url: string;
+    // }[];
+    urlPhotos: string[];
     archived: boolean;
   }
 
@@ -268,9 +269,9 @@ export default function ProductList() {
                 {product.category ? product.category.name : "No Category"}
               </TableCell>
               <TableCell>
-                <Button variant="outline" size="icon" disabled>
-                  ...
-                </Button>
+                <div className="h-11 w-11 aspect-square">
+                  <img src={product.urlPhotos[0]} alt={product.name}/>
+                </div>
               </TableCell>
               <TableCell>
                 <div className="flex space-x-4">
@@ -348,10 +349,8 @@ export default function ProductList() {
                 name="price"
                 placeholder="Precio del producto"
                 type="number"
-                // onInput={(e) => {
-                //   const target = e.target as HTMLInputElement;
-                //   target.value = target.value.replace(/[^0-9]/g, "");
-                // }}
+                min={0}
+                step={0.01}
                 /* TODO: En Firefox el type="number" no funciona como es esperado, directamente deshabilitar el botón */
               />
             </div>
@@ -435,10 +434,8 @@ export default function ProductList() {
                 defaultValue={selectedProduct?.price}
                 placeholder="Precio del producto"
                 type="number"
-                onInput={(e) => {
-                  const target = e.target as HTMLInputElement;
-                  target.value = target.value.replace(/[^0-9]/g, "");
-                }}
+                min={0}
+                step={0.01}
               />
             </div>
             <div>

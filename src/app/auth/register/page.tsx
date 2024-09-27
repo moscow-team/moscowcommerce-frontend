@@ -218,7 +218,7 @@ export default function Register() {
                             </span>
                         )}
                     </div>
-                    <Button color="primary" className="w-full" onClick={onSubmit}>Registrar</Button>
+                    <Button color="primary" className="w-full text-white" onClick={onSubmit}>Registrar</Button>
                 </form>
             </Card>
         </div>

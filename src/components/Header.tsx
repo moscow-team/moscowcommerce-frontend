@@ -81,7 +81,7 @@ export default function Header() {
               <span className="text-2xl font-bold text-white ">Moskow</span>
             </Link>
             <nav className="hidden md:ml-6 md:flex md:space-x-4">
-              <Link href="#" className="text-gray-200 hover:text-orange-300">
+              <Link href="/" className="text-gray-200 hover:text-orange-300">
                 Inicio
               </Link>
               <Link href="#" className="text-gray-200 hover:text-orange-300">
@@ -93,9 +93,9 @@ export default function Header() {
             </nav>
           </div>
           <div className="flex items-center">
-            <div className="hidden md:block">
+            {/* <div className="hidden md:block">
               <input type="search" placeholder="Buscar..." className="custom-input"></input>
-            </div>
+            </div> */}
             <Button size="icon" className="ml-4 bg-transparent hover:bg-transparent">
               <img
                 className="w-6 h-6 hover:scale-110"
@@ -126,9 +126,6 @@ export default function Header() {
               )}
             </div>
             
-            <Button size="icon" className="ml-2 md:hidden">
-              <img src="/icons/search.svg" alt="Buscar" />
-            </Button>
             <Button size="icon" className="ml-2 md:hidden">
               <img src="/icons/menu-2.svg" alt="Menú" />
             </Button>
