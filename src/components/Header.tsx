@@ -1,4 +1,3 @@
-
 // import { Button, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/react";
 // import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -21,63 +20,14 @@ export default function Header() {
     }
   }, [session, status]); // Escucha los cambios en session y status
   return (
-    // <Navbar className="bg-orange-400">
-    //     <Image src={"/Moscow.png"} alt={""} width={40} height={40}></Image>
-
-    //     <NavbarBrand>
-    //         <p className="font-bold text-inherit text-2xl">Moskow</p>
-    //     </NavbarBrand>
-    //     <NavbarContent className="hidden sm:flex gap-4" justify="center">
-    //         <NavbarItem>
-    //             <Link color="foreground" href="/">
-    //                 Inicio
-    //             </Link>
-    //         </NavbarItem>
-    //         <NavbarItem>
-    //             <Link color="foreground" href="/">
-    //                 Categorias
-    //             </Link>
-    //         </NavbarItem>
-    //         <NavbarItem>
-    //             <Link href="/" color="foreground">
-    //                 Productos
-    //             </Link>
-    //         </NavbarItem>
-    //         <NavbarItem>
-    //             <Link color="foreground" href="/">
-    //                 Envios
-    //             </Link>
-    //         </NavbarItem>
-    //     </NavbarContent>
-    //     <NavbarContent justify="end">
-    //         <NavbarItem>
-    //             <Button as={Link} color="secondary" href="/auth/login" variant="solid">
-    //                 Log In
-    //             </Button>
-    //         </NavbarItem>
-    //         <NavbarItem>
-    //             <Button as={Link} color="danger" href="/auth/register" variant="solid">
-    //                 Sign Up
-    //             </Button>
-    //         </NavbarItem>
-    //         <NavbarItem>
-    //         <div className="home-container flex justify-center items-center h-screen">
-    //             <a
-    //                 className="w-10 h-10 rounded-full bg-cover bg-center cursor-pointer"
-    //                 style={{ backgroundImage: 'url(/perfil.png)' }} // Foto de perfil
-    //                 href="/perfil"
-    //             ></a>
-    //         </div>
-
-    //         </NavbarItem>
-
-    //     </NavbarContent>
-    // </Navbar>
     <header className="sticky top-0 z-50 bg-gray-800 border-gray-700 border-b-2">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="flex-shrink-0 hover:scale-105 transition-all">
+            <Link
+              href="/"
+              className="flex-shrink-0 hover:scale-105 transition-all"
+            >
               <span className="text-2xl font-bold text-white ">Moskow</span>
             </Link>
             <nav className="hidden md:ml-6 md:flex md:space-x-4">
@@ -96,36 +46,38 @@ export default function Header() {
             {/* <div className="hidden md:block">
               <input type="search" placeholder="Buscar..." className="custom-input"></input>
             </div> */}
-            <Button size="icon" className="ml-4 bg-transparent hover:bg-transparent">
-              <img
-                className="w-6 h-6 hover:scale-110"
-                src="/icons/shopping-cart.svg"
-                alt="Carrito de Compras"
-              />
-            </Button>
+            <Link href="/carrito">
+              <Button
+                size="icon"
+                className="ml-4 bg-transparent hover:bg-transparent"
+              >
+                <img
+                  className="w-6 h-6 hover:scale-110"
+                  src="/icons/shopping-cart.svg"
+                  alt="Carrito de Compras"
+                />
+              </Button>
+            </Link>
             <div className="flex justify-end">
-            
               {!session ? (
                 <Link href="/auth/login" className="text-white ml-3">
-                <Button>
-                  Log In
-                </Button>
-              </Link>
-              ):(
+                  <Button>Log In</Button>
+                </Link>
+              ) : (
                 <div className="home-container flex justify-center items-center h-screen text-white m-4">
                   <a
                     className="w-10 h-10 rounded-full bg-cover bg-center bg-white cursor-pointer border"
                     // style={} // Foto de perfil
                     href="/perfil"
                   ></a>
-                  <p className="m-2">{user.email}</p>
-                  <Button  color="danger" onClick={() => signOut()} >
+                  <p className="m-2 pr-3">{user.email}</p>
+                  <Button color="danger" onClick={() => signOut()}>
                     Log Out
                   </Button>
                 </div>
               )}
             </div>
-            
+
             <Button size="icon" className="ml-2 md:hidden">
               <img src="/icons/menu-2.svg" alt="Menú" />
             </Button>
@@ -150,7 +102,7 @@ export default function Header() {
         .custom-input:focus::placeholder {
           color: #f9fafb;
         }
-        `}</style>
+      `}</style>
     </header>
   );
 }

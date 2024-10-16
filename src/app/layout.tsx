@@ -32,10 +32,12 @@ export default async function RootLayout({
         refetchWhenOffline={false}
         >
           <NextUIProvider>
-            <Toaster richColors />          {/* el "isDashboard" chequea si la ruta actual es "/dashboard", para solucionar es posible que haya que hacer un refolding o usar la sintaxis () en las carpetas */}
-            {!isDashboard && <Header />}
-            {children}
-            {!isDashboard && <Footer />}
+            <Toaster richColors />
+            <div style={{ display: 'grid', gridTemplateRows: 'auto 1fr auto', minHeight: '100vh' }}>
+              {!isDashboard && <Header />}
+              <div>{children}</div>
+              {!isDashboard && <Footer />}
+            </div>
           </NextUIProvider>
         </SessionProvider>
       </body>
