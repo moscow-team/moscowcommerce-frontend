@@ -29,11 +29,27 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<any[]>([]);
   const [productQuantity, setProductQuantity] = useState<number>(0);
   useEffect(() => {
-    console.log(products);
+    const storedProducts = localStorage.getItem('cartProducts');
+    const storedQuantity = localStorage.getItem('cartQuantity');
+    if (storedProducts) {
+      setProducts(JSON.parse(storedProducts));
+    }
+    if (storedQuantity) {
+      setProductQuantity(JSON.parse(storedQuantity));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('cartProducts', JSON.stringify(products));
   }, [products]);
+
+  useEffect(() => {
+    localStorage.setItem('cartQuantity', JSON.stringify(productQuantity));
+  }, [productQuantity]);
   return (
     <CartContext.Provider value={{
-      products, setProducts, 
+      products, 
+      setProducts, 
       productQuantity,
       setProductQuantity
     }}>

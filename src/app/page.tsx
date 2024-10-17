@@ -57,7 +57,6 @@ export default function Home() {
 
   const handleAddProduct = (product: Producto) => {
     addProduct(product);
-    toast.success("Producto agregado al carrito");
   }
 
   return (

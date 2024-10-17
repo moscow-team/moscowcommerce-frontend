@@ -1,20 +1,21 @@
 import { useContext } from 'react';
 import { CartContext } from './CartProvider';
+import { toast } from 'sonner';
 
 interface Producto {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category: {
     id: number;
     name: string;
-    description: string;
-    price: number;
-    stock: number;
-    category: {
-      id: number;
-      name: string;
-    };
-    urlPhotos: string[];
-    archived: boolean;
-    quantity?: number;
-  }
+  };
+  urlPhotos: string[];
+  archived: boolean;
+  quantity?: number;
+}
 export const useCart = () => {
   const context = useContext(CartContext);
   if (context === undefined) {
@@ -27,16 +28,23 @@ export const useCart = () => {
     setProducts((prevProducts: Producto[]) => {
       const productIndex = prevProducts.findIndex(p => p.id === product.id);
       if (productIndex > -1) {
+        if (productQuantity + 1 > product.stock) {
+          toast.error('No hay suficiente stock para este producto');
+          return prevProducts;
+        }
         const newProducts = [...prevProducts];
         if (newProducts[productIndex].quantity !== undefined) {
           newProducts[productIndex].quantity += 1;
         } else {
           newProducts[productIndex].quantity = 1;
         }
+
         setProductQuantity(productQuantity + 1);
+        toast.success("Producto agregado al carrito");
         return newProducts;
       } else {
         setProductQuantity(productQuantity + 1);
+        toast.success("Producto agregado al carrito");
         return [...prevProducts, { ...product, quantity: 1 }];
       }
     });
@@ -44,7 +52,13 @@ export const useCart = () => {
 
   // Función para eliminar un producto por su ID
   const removeProduct = (productId: number) => {
-    setProducts((prevProducts:Producto[] ) => prevProducts.filter(p => p.id !== productId));
+    setProducts((prevProducts: Producto[]) => {
+      const product = prevProducts.findIndex(p => p.id == productId);
+      if (product !== -1) {
+        setProductQuantity(productQuantity - (prevProducts[product].quantity || 1));
+        return prevProducts.filter(p => p.id !== productId);
+      }
+    });
   };
 
   // Función para vaciar el carrito
@@ -52,11 +66,44 @@ export const useCart = () => {
     setProducts([]);
   };
 
+  const updateQuantity = (id: number, newQuantity: number) => {
+    setProducts(products.map(product => {
+      if (product.id === id) {
+        const updatedQuantity = Math.max(0, newQuantity);
+        if (updatedQuantity > product.stock
+        ) {
+          toast.error('No hay suficiente stock para este producto');
+          return product;
+        }
+        setProductQuantity(productQuantity + (updatedQuantity - (product.quantity || 0)));
+        return { ...product, quantity: updatedQuantity };
+      }
+      return product;
+    }
+    ));
+  }
+
+
+  const calculateTotal = () => {
+    return products.reduce((acc, product) => {
+      return acc + product.price * (product.quantity || 1);
+    }, 0);
+  }
+
+  const calculateQuantity = () => {
+    return products.reduce((acc, product) => {
+      return acc + product.quantity;
+    }, 0);
+  }
+
+
   return {
     products,
     addProduct,
     removeProduct,
-    clearCart, 
+    clearCart,
     productQuantity,
+    updateQuantity,
+    calculateTotal
   };
 };

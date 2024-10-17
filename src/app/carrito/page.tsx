@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCart } from '../context/useCart';
 
 interface Product {
   id: number;
@@ -17,51 +17,50 @@ interface Product {
   };
   urlPhotos: string[];
   archived: boolean;
+  quantity?: number;
 }
 
-/* Extensión de la interfaz */
-interface ProductWithQuantity extends Product {
-  quantity: number;
-}
 
 export default function CarritoPage({ initialProducts }: { initialProducts: Product[] }) {
 
   /* BLOQUE DE PRUEBA - DESCOMENTAR CUANDO SE IMPLEMENTE */
-  const testProduct: Product = {
-    id: 1,
-    name: "Test Product",
-    description: "Test product description",
-    price: 100,
-    stock: 10,
-    category: {
-      id: 1,
-      name: "Test Category"
-    },
-    urlPhotos: ["https://placehold.co/10"],
-    archived: false
-  };
-  initialProducts = [testProduct];
+  // const testProduct: Product = {
+  //   id: 1,
+  //   name: "Test Product",
+  //   description: "Test product description",
+  //   price: 100,
+  //   stock: 10,
+  //   category: {
+  //     id: 1,
+  //     name: "Test Category"
+  //   },
+  //   urlPhotos: ["https://placehold.co/10"],
+  //   archived: false
+  // };
+  // initialProducts = [testProduct];
   /* BLOQUE DE PRUEBA - DESCOMENTAR CUANDO SE IMPLEMENTE */
 
-  const [products, setProducts] = useState<ProductWithQuantity[]>(
-    initialProducts.map(product => ({ ...product, quantity: 1 }))
-  );
+  // const [products, setProducts] = useState<ProductWithQuantity[]>(
+  //   initialProducts.map(product => ({ ...product, quantity: 1 }))
+  // );
   
-  const updateQuantity = (id: number, newQuantity: number) => {
-    setProducts(products.map(product => 
-      product.id === id ? { ...product, quantity: Math.max(0, newQuantity) } : product
-    ));
-  };
+  // const updateQuantity = (id: number, newQuantity: number) => {
+  //   setProducts(products.map(product => 
+  //     product.id === id ? { ...product, quantity: Math.max(0, newQuantity) } : product
+  //   ));
+  // };
   
-  const removeProduct = (id: number) => {
-    setProducts(products.filter(product => product.id !== id));
-  };
+  // const removeProduct = (id: number) => {
+  //   setProducts(products.filter(product => product.id !== id));
+  // };
   
-  const subtotal = products.reduce((sum, product) => sum + product.price * product.quantity, 0);
+  // const subtotal = products.reduce((sum, product) => sum + product.price * product.quantity, 0);
   
-  useEffect(() => {
-    setProducts(initialProducts.map(product => ({ ...product, quantity: 1 })));
-  }, [initialProducts]);
+  // useEffect(() => {
+  //   setProducts(initialProducts.map(product => ({ ...product, quantity: 1 })));
+  // }, [initialProducts]);
+
+  const {products, removeProduct, addProduct, productQuantity, clearCart, updateQuantity, calculateTotal} = useCart()
 
   return (
     <div className="container mx-auto pt-8">
@@ -124,7 +123,7 @@ export default function CarritoPage({ initialProducts }: { initialProducts: Prod
             {/* <Separator className="my-4" /> */}
             <div className="flex justify-between font-semibold">
               <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+              <span>${calculateTotal().toFixed(2)}</span>
             </div>
             <Button className="w-full mt-6 text-white">Proceder al pago</Button>
           </div>
