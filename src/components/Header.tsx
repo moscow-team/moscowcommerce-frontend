@@ -1,16 +1,15 @@
 
-// import { Button, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/react";
-// import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { useCart } from "@/app/context/useCart";
 
 export default function Header() {
   const { data: session, status } = useSession(); // Aquí obtienes la sesión de forma segura en un Client Component
   const [user, setUser] = useState({ email: "", name: "", status: "Offline" });
-
+  const {productQuantity} = useCart();
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
       setUser({
@@ -21,58 +20,6 @@ export default function Header() {
     }
   }, [session, status]); // Escucha los cambios en session y status
   return (
-    // <Navbar className="bg-orange-400">
-    //     <Image src={"/Moscow.png"} alt={""} width={40} height={40}></Image>
-
-    //     <NavbarBrand>
-    //         <p className="font-bold text-inherit text-2xl">Moskow</p>
-    //     </NavbarBrand>
-    //     <NavbarContent className="hidden sm:flex gap-4" justify="center">
-    //         <NavbarItem>
-    //             <Link color="foreground" href="/">
-    //                 Inicio
-    //             </Link>
-    //         </NavbarItem>
-    //         <NavbarItem>
-    //             <Link color="foreground" href="/">
-    //                 Categorias
-    //             </Link>
-    //         </NavbarItem>
-    //         <NavbarItem>
-    //             <Link href="/" color="foreground">
-    //                 Productos
-    //             </Link>
-    //         </NavbarItem>
-    //         <NavbarItem>
-    //             <Link color="foreground" href="/">
-    //                 Envios
-    //             </Link>
-    //         </NavbarItem>
-    //     </NavbarContent>
-    //     <NavbarContent justify="end">
-    //         <NavbarItem>
-    //             <Button as={Link} color="secondary" href="/auth/login" variant="solid">
-    //                 Log In
-    //             </Button>
-    //         </NavbarItem>
-    //         <NavbarItem>
-    //             <Button as={Link} color="danger" href="/auth/register" variant="solid">
-    //                 Sign Up
-    //             </Button>
-    //         </NavbarItem>
-    //         <NavbarItem>
-    //         <div className="home-container flex justify-center items-center h-screen">
-    //             <a
-    //                 className="w-10 h-10 rounded-full bg-cover bg-center cursor-pointer"
-    //                 style={{ backgroundImage: 'url(/perfil.png)' }} // Foto de perfil
-    //                 href="/perfil"
-    //             ></a>
-    //         </div>
-
-    //         </NavbarItem>
-
-    //     </NavbarContent>
-    // </Navbar>
     <header className="sticky top-0 z-50 bg-gray-800 border-gray-700 border-b-2">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -103,6 +50,7 @@ export default function Header() {
                 alt="Carrito de Compras"
               />
             </Button>
+            <Badge variant={"secondary"}>{productQuantity}</Badge>
             <div className="flex justify-end">
             
               {!session ? (
