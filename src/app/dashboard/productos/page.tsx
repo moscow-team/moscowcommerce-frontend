@@ -144,6 +144,7 @@ export default function ProductList() {
         const filteredProducts = response.data.filter(
           (product: Product) => !product.archived
         );
+        console.log("Product to send: ", newFormData);
         setProducts(filteredProducts);
         toast.dismiss();
         toast.success("Producto creado correctamente");

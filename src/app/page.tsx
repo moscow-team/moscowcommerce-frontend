@@ -5,6 +5,9 @@ import { getProducts } from "@/services/dashboard/productoService";
 import { getCategorias } from "@/services/dashboard/categoriaService";
 import { useCart } from "./context/useCart";
 import { toast } from "sonner";
+import { useRouter } from "next/router";
+import { useProduct } from "./context/ProductContext";
+import Link from "next/link";
 
 export default function Home() {
   interface Categoria {
@@ -31,22 +34,27 @@ export default function Home() {
     urlPhotos: string[];
     archived: boolean;
   }
-
+  const { setSelectedProduct } = useProduct();
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [productos, setProductos] = useState<Producto[]>([]);
-  const { products, addProduct} = useCart();
+  const { products, addProduct } = useCart();
   useEffect(() => {
     async function fetchCategorias() {
       const response = await getCategorias();
-      const filtered = response.data.map((category: Categoria) => ({
-        ...category, photo: `/images/${category.name.toLowerCase()}.png`
-      })).filter((category: Categoria) => category.archived === false);
+      const filtered = response.data
+        .map((category: Categoria) => ({
+          ...category,
+          photo: `/images/${category.name.toLowerCase()}.png`,
+        }))
+        .filter((category: Categoria) => category.archived === false);
       console.log(filtered);
       setCategorias(filtered);
     }
     async function fetchProductos() {
       const response = await getProducts();
-      const filtered = response.data.filter((product: Producto) => product.archived === false);
+      const filtered = response.data.filter(
+        (product: Producto) => product.archived === false
+      );
       setProductos(filtered);
     }
     fetchCategorias();
@@ -54,10 +62,15 @@ export default function Home() {
     console.log(products);
   }, []);
 
-
   const handleAddProduct = (product: Producto) => {
     addProduct(product);
-  }
+  };
+
+  const goToProductDetail = (product: Producto) => {
+    // localStorage.setItem('selectedProduct', JSON.stringify(product));
+    // window.location.href = `/producto/${product.id}`;
+    setSelectedProduct(product);
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -80,10 +93,14 @@ export default function Home() {
                 La mayor variedad de mates y bombillas de todo el país
               </h1>
               <p className="mt-4 text-xl text-gray-300">
-                Descubrí nuestra selección de productos de calidad y disfrutá de un mate como nunca antes.
+                Descubrí nuestra selección de productos de calidad y disfrutá de
+                un mate como nunca antes.
               </p>
               <div className="mt-8">
-                <Button size="lg" className="bg-gray-200 text-gray-800 hover:text-white">
+                <Button
+                  size="lg"
+                  className="bg-gray-200 text-gray-800 hover:text-white"
+                >
                   Comprar
                 </Button>
               </div>
@@ -105,11 +122,12 @@ export default function Home() {
                   <div className="flex justify-center">
                     <img
                       src={category.photo}
-                      className="h-52 w-52 mb-32 absolute -top-20 object-contain hover:scale-125 transition-transform duration-200 cursor-pointer" alt={category.name}
+                      className="h-52 w-52 mb-32 absolute -top-20 object-contain hover:scale-125 transition-transform duration-200 cursor-pointer"
+                      alt={category.name}
                     ></img>
-                  <h3 className="absolute bottom-10 text-white text-xl font-semibold">
-                    {category.name}
-                  </h3>
+                    <h3 className="absolute bottom-10 text-white text-xl font-semibold">
+                      {category.name}
+                    </h3>
                   </div>
                 </div>
               ))}
@@ -119,9 +137,7 @@ export default function Home() {
 
         <section className="py-12 bg-gray-50">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">
-              Productos
-            </h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">Productos</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {productos.map((product) => (
                 <div
@@ -142,8 +158,24 @@ export default function Home() {
                     </p>
                     <div className="flex flex-col h-full gap-2 items-center justify-between">
                       <span className="text-xl font-bold text-primary">
-                        ${product.price.toLocaleString("es")}                      </span>
-                      <Button variant="default" className="text-white" onClick={()=>handleAddProduct(product)}>Agregar al carrito</Button>
+                        ${product.price.toLocaleString("es")}{" "}
+                      </span>
+                      <div className="flex gap-2 py-3 w-full justify-center flex-wrap">
+                        <Button
+                          variant="default"
+                          className="text-white"
+                          onClick={() => handleAddProduct(product)}
+                        >
+                          Agregar al carrito
+                        </Button>
+                        <Link href={`/producto/${product.id}`} onClick={() => goToProductDetail(product)}>
+                          <Button
+                            className="text-white bg-gray-700 font-semibold"
+                          >
+                            Ver producto
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
