@@ -158,7 +158,7 @@ function Home() {
                     </p>
                     <div className="flex flex-col h-full gap-2 items-center justify-between">
                       <span className="text-xl font-bold text-primary">
-                        ${product.price.toLocaleString("es")}{" "}
+                        ${product.price.toLocaleString("es-AR")}{" "}
                       </span>
                       <div className="flex gap-2 py-3 w-full justify-center flex-wrap">
                         <Button

@@ -169,7 +169,7 @@ export default function CategoryList() {
               <TableCell>
                 {cat.archivedDate ? <s>{cat.name}</s> : cat.name}
               </TableCell>
-              <TableCell>{cat.description}</TableCell>
+              <TableCell>{cat.description.length > 75 ? `${cat.description.substring(0, 75)}...` : cat.description}</TableCell>
               <TableCell>{cat.creationDate}</TableCell>
               <TableCell>{cat.modificationDate}</TableCell>
               <TableCell>

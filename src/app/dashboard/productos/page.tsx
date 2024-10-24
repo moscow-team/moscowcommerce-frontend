@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -95,16 +95,23 @@ export default function ProductList() {
   }, []);
 
   const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+
+  const closeModal = useCallback(() => {
+    setIsModalOpen(false);
+    setImagePreviews([]);
+  }, []);
 
   const openEditModal = (product: Product) => {
     setSelectedProduct(product);
     setIsEditModalOpen(true);
   };
-  const closeEditModal = () => {
+
+  const closeEditModal = useCallback(() => {
     setSelectedProduct(null);
     setIsEditModalOpen(false);
-  };
+    setImagePreviews([]);
+  }, []);
+
   const openArchivedModal = async () => {
     try {
       const response = await getProducts();
@@ -228,6 +235,36 @@ export default function ProductList() {
     }
   };
 
+  /* Previsualizador de Imagenes */
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const target = e.target as HTMLInputElement;
+    if (target.files && target.files.length > 5) {
+      toast.error("Solo se puede subir un máximo de 5 archivos");
+      target.value = "";
+      return;
+    }
+
+    if (target.files) {
+      const filesArray = Array.from(target.files);
+      const imageUrls = filesArray.map((file) => URL.createObjectURL(file));
+      setImagePreviews(imageUrls);
+    }
+  };
+  const handleDeleteImage = (index: number) => {
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+  
+    const input = document.getElementById('photos') as HTMLInputElement;
+    if (input && input.files) {
+      const dataTransfer = new DataTransfer();
+      Array.from(input.files)
+        .filter((_, i) => i !== index)
+        .forEach(file => dataTransfer.items.add(file));
+      input.files = dataTransfer.files;
+    }
+  };
+
   return (
     <div className="container mx-auto">
       <div className="flex justify-between items-center mb-6">
@@ -265,7 +302,11 @@ export default function ProductList() {
             <TableRow key={product.id}>
               <TableCell>{product.id}</TableCell>
               <TableCell>{product.name}</TableCell>
-              <TableCell>{product.description}</TableCell>
+              <TableCell>
+                {product.description.length > 75
+                  ? `${product.description.substring(0, 75)}...`
+                  : product.description}
+              </TableCell>
               <TableCell>{product.price}</TableCell>
               <TableCell>{product.stock}</TableCell>
               <TableCell>
@@ -273,7 +314,7 @@ export default function ProductList() {
               </TableCell>
               <TableCell>
                 <div className="h-11 w-11 aspect-square">
-                  <img src={product.urlPhotos[0]} alt={product.name}/>
+                  <img src={product.urlPhotos[0]} alt={product.name} />
                 </div>
               </TableCell>
               <TableCell>
@@ -392,7 +433,32 @@ export default function ProductList() {
             </div>
             <div>
               <Label htmlFor="photos">Fotos</Label>
-              <Input id="photos" name="photos" type="file" multiple />
+              <Input
+                id="photos"
+                name="photos"
+                type="file"
+                multiple
+                accept=".jpg,.jpeg,.png"
+                onChange={handleFileChange}
+              />
+            </div>
+            <div>
+              {/* Previsualizador de Imagenes */}
+              {imagePreviews.map((src, index) => (
+                <div key={index} className="image-preview-container">
+                  <img
+                    src={src}
+                    alt={`preview ${index}`}
+                    className="image-preview"
+                  />
+                  <button
+                    className="delete-icon"
+                    onClick={() => handleDeleteImage(index)}
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))}
             </div>
             <DialogFooter>
               <Button onClick={closeModal} variant="outline" type="button">
@@ -480,7 +546,31 @@ export default function ProductList() {
             </div>
             <div>
               <Label htmlFor="photos">Fotos</Label>
-              <Input id="photos" name="photos" type="file" multiple />
+              <Input
+                id="photos"
+                name="photos"
+                type="file"
+                multiple
+                accept=".jpg,.jpeg,.png"
+                onChange={handleFileChange}
+              />
+            </div>
+            <div>
+              {imagePreviews.map((src, index) => (
+                <div key={index} className="image-preview-container">
+                  <img
+                    src={src}
+                    alt={`preview ${index}`}
+                    className="image-preview"
+                  />
+                  <button
+                    className="delete-icon"
+                    onClick={() => handleDeleteImage(index)}
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))}
             </div>
             <DialogFooter>
               <Button onClick={closeEditModal} variant="outline" type="button">

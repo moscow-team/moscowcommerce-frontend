@@ -221,14 +221,14 @@ export default function DashboardLayout({
               {sidebarOpen ? (
                 <>
                 <Link  href="/"  >
-                <Button className="bg-slate-100 hover:bg-slate-400 mb-2 w-32">
+                <Button className="bg-slate-100 hover:bg-slate-400 mb-2 w-32 text-gray-900">
                   Inicio
                 </Button>
               
                 </Link>
                 <Button
                   onClick={() => signOut()}
-                  className="bg-slate-100 hover:bg-slate-400 w-32"
+                  className="bg-slate-100 hover:bg-slate-400 w-32 text-gray-900"
                 >
                   Cerrar Sesion
                 </Button>
