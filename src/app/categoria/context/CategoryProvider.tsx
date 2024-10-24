@@ -18,7 +18,7 @@ export const CategoryProvider = ({ children }: { children: ReactNode }) => {
   const getCategorys = async () => { 
     try {
       const response = await getCategorias();
-      console.log(response.data);
+      // console.log(response.data);
       setCategorys(response.data);
     } catch (error) {
       console.error(error);

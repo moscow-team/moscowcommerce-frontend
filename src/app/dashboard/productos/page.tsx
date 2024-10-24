@@ -103,6 +103,8 @@ export default function ProductList() {
 
   const openEditModal = (product: Product) => {
     setSelectedProduct(product);
+    console.log(product);
+    setImagePreviews(product.urlPhotos);
     setIsEditModalOpen(true);
   };
 
@@ -556,24 +558,26 @@ export default function ProductList() {
               />
             </div>
             <div>
-              {imagePreviews.map((src, index) => (
-                <div key={index} className="image-preview-container">
-                  <img
-                    src={src}
-                    alt={`preview ${index}`}
-                    className="image-preview"
-                  />
-                  <button
-                    className="delete-icon"
-                    onClick={() => handleDeleteImage(index)}
-                  >
-                    &times;
-                  </button>
-                </div>
-              ))}
+              {selectedProduct?.urlPhotos ? (
+                imagePreviews.map((src: string, index: number) => (
+                  <div key={index} className="image-preview-container">
+                    <img
+                      src={src}
+                      alt={`preview ${index}`}
+                      className="image-preview"
+                    />
+                    <button
+                      className="delete-icon"
+                      onClick={() => handleDeleteImage(index)}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))
+              ) : null}
             </div>
             <DialogFooter>
-              <Button onClick={closeEditModal} variant="outline" type="button">
+              <Button onClick={closeEditModal} variant="outline" type="submit">
                 Cancelar
               </Button>
               <Button type="submit" style={{ color: "white" }}>
