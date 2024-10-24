@@ -70,9 +70,23 @@ export const useCart = () => {
     setProducts(products.map(product => {
       if (product.id === id) {
         const updatedQuantity = Math.max(0, newQuantity);
-        if (updatedQuantity > product.stock
-        ) {
+        if (updatedQuantity > product.stock) {
           toast.error('No hay suficiente stock para este producto');
+          return product;
+        }
+        // VERIFICAR SI EL PRODUCTO SE VA A ELIMINAR CUANDO LA CANTIDAD SEA 0
+        if (updatedQuantity == 0) {
+          toast('¿Seguro que quiere eliminar este producto?', {
+            position: 'top-center',
+            action: {
+              label: 'Cerrar',
+              onClick: () => toast.dismiss(),
+            },
+            cancel: {
+              label: 'Eliminar',
+              onClick: () => removeProduct(id),
+            },
+          });
           return product;
         }
         setProductQuantity(productQuantity + (updatedQuantity - (product.quantity || 0)));
