@@ -2,17 +2,25 @@
 
 import {
   Breadcrumb,
+  BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { BreadcrumbItem } from "@nextui-org/react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getCategorias } from "@/services/dashboard/categoriaService";
 import { getProductsByFilters } from "@/services/dashboard/productoService";
+import { Input } from "@/components/ui/input";
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Checkbox } from "@radix-ui/react-checkbox";
+import { toast } from "sonner";
+import { Form, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { CheckboxReactHookFormMultiple } from "../components/CategoryFilter";
 
 interface Producto {
   id: number;
@@ -63,7 +71,6 @@ export default function Page() {
       //  'archived': 'false', <-- REVISAR PORQUE NO FUNCIONA
       });
       const filteredProducts = response.data.filter((product: any) => !product.archived);
-      console.log(categoryId, '->', filteredProducts);
       setProducts(filteredProducts);
     } catch (error) {
       console.error(error);
@@ -80,9 +87,11 @@ export default function Page() {
   }
 
   return (
-    <div className="flex h-full">
-      <aside className="w-80 h-full bg-gray-200 p-4">
-        Test - Acá podemos ir probando con el endpoint de filters
+    <div className="flex h-screen w-full">
+      <aside className="w-80 h-full bg-gray-200 p-4 flex flex-col gap-5">
+        <Input  placeholder="Buscar..."/>
+        <p className="text-center">Categorias</p>
+        <CheckboxReactHookFormMultiple/>
       </aside>
       <div className="w-full h-full px-10">
         <Breadcrumb className="my-5">

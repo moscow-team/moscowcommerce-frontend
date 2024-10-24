@@ -55,7 +55,8 @@ export const useCart = () => {
     setProducts((prevProducts: Producto[]) => {
       const product = prevProducts.findIndex(p => p.id == productId);
       if (product !== -1) {
-        setProductQuantity(productQuantity - (prevProducts[product].quantity || 1));
+        const productQuantityToRemove = prevProducts[product].quantity ?? 0;
+        setProductQuantity(productQuantity - productQuantityToRemove);
         return prevProducts.filter(p => p.id !== productId);
       }
     });
@@ -97,6 +98,20 @@ export const useCart = () => {
     ));
   }
 
+  const confirRemoveProduct = (id: number) => {
+    toast('¿Seguro que quiere eliminar este producto?', {
+      position: 'top-center',
+      action: {
+        label: 'Cerrar',
+        onClick: () => toast.dismiss(),
+      },
+      cancel: {
+        label: 'Eliminar',
+        onClick: () => removeProduct(id),
+      },
+    });
+  }
+
 
   const calculateTotal = () => {
     return products.reduce((acc, product) => {
@@ -118,6 +133,7 @@ export const useCart = () => {
     clearCart,
     productQuantity,
     updateQuantity,
-    calculateTotal
+    calculateTotal,
+    confirRemoveProduct
   };
 };

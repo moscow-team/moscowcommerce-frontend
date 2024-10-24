@@ -60,7 +60,7 @@ export default function CarritoPage({ initialProducts }: { initialProducts: Prod
   //   setProducts(initialProducts.map(product => ({ ...product, quantity: 1 })));
   // }, [initialProducts]);
 
-  const {products, removeProduct, addProduct, productQuantity, clearCart, updateQuantity, calculateTotal} = useCart()
+  const {products, removeProduct, confirRemoveProduct,addProduct, productQuantity, clearCart, updateQuantity, calculateTotal} = useCart()
 
   return (
     <div className="container mx-auto pt-8">
@@ -102,7 +102,7 @@ export default function CarritoPage({ initialProducts }: { initialProducts: Prod
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => removeProduct(product.id)}
+                    onClick={() => confirRemoveProduct(product.id)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

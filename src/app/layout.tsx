@@ -2,7 +2,6 @@
 
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { NextUIProvider } from "@nextui-org/react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { usePathname } from "next/navigation";
@@ -12,7 +11,7 @@ import { CartProvider } from "./context/CartProvider";
 import { ProductProvider } from "./context/ProductContext";
 const inter = Inter({ subsets: ["latin"] });
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -26,7 +25,6 @@ export default async function RootLayout({
           refetchOnWindowFocus={false}
           refetchWhenOffline={false}
         >
-          <NextUIProvider>
             <ProductProvider>
               <CartProvider>
                 <Toaster richColors />
@@ -43,7 +41,6 @@ export default async function RootLayout({
                 </div>
               </CartProvider>
             </ProductProvider>
-          </NextUIProvider>
         </SessionProvider>
       </body>
     </html>

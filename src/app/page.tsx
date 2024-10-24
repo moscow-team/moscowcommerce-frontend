@@ -4,37 +4,36 @@ import { Button } from "@/components/ui/button";
 import { getProducts } from "@/services/dashboard/productoService";
 import { getCategorias } from "@/services/dashboard/categoriaService";
 import { useCart } from "./context/useCart";
-import { toast } from "sonner";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useProduct } from "./context/ProductContext";
 import Link from "next/link";
+interface Categoria {
+  id: number;
+  name: string;
+  description: string;
+  creationDate: string;
+  modificationDate: string;
+  archivedDate: string;
+  archived: boolean;
+  photo: string;
+}
 
-export default function Home() {
-  interface Categoria {
+interface Producto {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category: {
     id: number;
     name: string;
-    description: string;
-    creationDate: string;
-    modificationDate: string;
-    archivedDate: string;
-    archived: boolean;
-    photo: string;
-  }
-
-  interface Producto {
-    id: number;
-    name: string;
-    description: string;
-    price: number;
-    stock: number;
-    category: {
-      id: number;
-      name: string;
-    };
-    urlPhotos: string[];
-    archived: boolean;
-  }
+  };
+  urlPhotos: string[];
+  archived: boolean;
+}
+function Home() {
   const { setSelectedProduct } = useProduct();
+  const router = useRouter();
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [productos, setProductos] = useState<Producto[]>([]);
   const { products, addProduct } = useCart();
@@ -118,6 +117,7 @@ export default function Home() {
                 <div
                   key={category.id}
                   className="relative rounded-lg shadow-md h-60 w-60 cursor-pointer bg-[#424242]"
+                  onClick={() => router.push(`/categoria/${category.id}`) }
                 >
                   <div className="flex justify-center">
                     <img
@@ -187,3 +187,4 @@ export default function Home() {
     </div>
   );
 }
+export default Home;
