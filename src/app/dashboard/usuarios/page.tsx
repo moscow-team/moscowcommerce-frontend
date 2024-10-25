@@ -6,7 +6,7 @@ import {
   updateUser,
 } from "@/services/dashboard/usuarioService";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+// import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -25,6 +25,26 @@ import {
   TableHead,
 } from "@/components/ui/table";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 export default function UsersList() {
   interface User {
@@ -102,7 +122,7 @@ export default function UsersList() {
       const dataToSend = {
         ...selectedUser,
         ...data,
-      }
+      };
       try {
         const response = await updateUser(dataToSend);
         if (response && response.status === "SUCCESS") {
@@ -123,6 +143,34 @@ export default function UsersList() {
       }
     }
   };
+
+  /* Confirmation Alert */
+  const [currentRole, setCurrentRole] = useState<string | null>(
+    selectedUser?.role ?? null
+  );
+  const [newRole, setNewRole] = useState<string | null>(null);
+  const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
+  const handleRoleChange = (role: string) => {
+    setNewRole(role);
+    setIsAlertDialogOpen(true);
+  };
+  const confirmRoleChange = () => {
+    if (selectedUser && newRole) {
+      setSelectedUser({ ...selectedUser, role: newRole });
+      setCurrentRole(newRole);
+    }
+    setIsAlertDialogOpen(false);
+  };
+  const cancelRoleChange = () => {
+    setNewRole(null);
+    setIsAlertDialogOpen(false);
+    setCurrentRole(selectedUser?.role || null);
+  };
+  useEffect(() => {
+    if (selectedUser) {
+      setCurrentRole(selectedUser.role);
+    }
+  }, [selectedUser]);
 
   return (
     <div className="container mx-auto">
@@ -228,16 +276,18 @@ export default function UsersList() {
             </div>
             <div>
               <Label htmlFor="permissions">Permisos</Label>
-              <div className="flex space-x-3 items-center text-white">
-                <Checkbox id="user" name="role" value="CUSTOMER" />
-                <Label htmlFor="user" className="text-gray-900">
-                  Usuario
-                </Label>
-                <Checkbox id="admin" name="role" value="ADMIN" />
-                <Label htmlFor="admin" className="text-gray-900">
-                  Administrador
-                </Label>
-              </div>
+              <Select name="role">
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecciona un rol" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Roles disponibles</SelectLabel>
+                    <SelectItem value="CUSTOMER">Usuario</SelectItem>
+                    <SelectItem value="ADMIN">Administrador</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="password">Contraseña</Label>
@@ -286,27 +336,47 @@ export default function UsersList() {
             </div>
             <div>
               <Label htmlFor="editPermissions">Permisos</Label>
-              <div className="flex space-x-3 items-center text-white">
-                <Checkbox
-                  id="editUser"
-                  name="role"
-                  value="CUSTOMER"
-                  defaultChecked={selectedUser?.role === "CUSTOMER"}
-                />
-                <Label htmlFor="editUser" className="text-gray-900">
-                  Usuario
-                </Label>
-                <Checkbox
-                  id="editAdmin"
-                  name="role"
-                  value="ADMIN"
-                  defaultChecked={selectedUser?.role === "ADMIN"}
-                />
-                <Label htmlFor="editAdmin" className="text-gray-900">
-                  Administrador
-                </Label>
-              </div>
+              <Select
+                name="role"
+                value={currentRole ?? ""}
+                onValueChange={handleRoleChange}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecciona un rol" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Roles disponibles</SelectLabel>
+                    <SelectItem value="CUSTOMER">Usuario</SelectItem>
+                    <SelectItem value="ADMIN">Administrador</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
+            <AlertDialog
+              open={isAlertDialogOpen}
+              onOpenChange={setIsAlertDialogOpen}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    ¿Estás seguro de cambiar el rol?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Cambiar el rol de un usuario puede afectar su acceso a
+                    ciertas funcionalidades.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel onClick={cancelRoleChange}>
+                    Cancelar
+                  </AlertDialogCancel>
+                  <AlertDialogAction onClick={confirmRoleChange}>
+                    Continuar
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <DialogFooter>
               <Button onClick={closeEditModal} variant="outline" type="button">
                 Cancelar

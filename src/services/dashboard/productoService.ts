@@ -92,33 +92,21 @@ export const unarchivedProduct = async (id: number) => {
   return response.json();
 }
 
-// export const getProductsByFilters = async (params: Record<string, string>) => {
-//   const session: any = await getSession();
-//   // const queryString = new URLSearchParams(params).toString();
-
-//   const response = await fetch(`${apiUrl}products/filters?field1=id&value1=${params.id}&operator1==`, {
-//     method: "GET",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//   });
-
-//   if (!response.ok) {
-//     throw new Error("Failed to fetch products by filters");
-//   }
-
-//   return response.json();
-// }
-
-export const getProductsByFilters = async (params: Record<string, string | number>) => {
+export const getProductsByFilters = async (
+  params: Record<string, string | number>,
+  operators: Record<string, string> = {}
+) => {
 
   const filters = Object.keys(params).map((key, index) => {
-    return `field${index + 1}=${encodeURIComponent(key)}&value${index + 1}=${encodeURIComponent(params[key])}&operator${index + 1}==`;
+    const operator = encodeURIComponent(operators[key] || '=');
+    return `field${index + 1}=${encodeURIComponent(key)}&value${index + 1}=${encodeURIComponent(params[key])}&operator${index + 1}=${operator}`;
   }).join('&');
   
   const queryString = `?${filters}`;
+  const endpoint = `${apiUrl}products/filters${queryString}`;
+  console.log("Fetching products with URL: ", endpoint);
 
-  const response = await fetch(`${apiUrl}products/filters${queryString}`, {
+  const response = await fetch(endpoint, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -130,10 +118,4 @@ export const getProductsByFilters = async (params: Record<string, string | numbe
   }
 
   return response.json();
-};
-
-
-
-export const getRelatedProducts = async (id: number) => {
-  /* Match Categories ID */
 };

@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Table,
@@ -32,9 +33,11 @@ import {
   updateProduct,
   deleteProduct,
   unarchivedProduct,
+  getProductsByFilters,
 } from "@/services/dashboard/productoService";
 import { getCategorias } from "@/services/dashboard/categoriaService";
 import { toast } from "sonner";
+import { Search } from "lucide-react";
 
 export default function ProductList() {
   interface Product {
@@ -56,6 +59,7 @@ export default function ProductList() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalFilterOpen, setIsModalFilterOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [archivedProducts, setArchivedProducts] = useState<Product[]>([]);
@@ -73,8 +77,6 @@ export default function ProductList() {
           (product: Product) => !product.archived
         );
         setProducts(filteredProducts);
-        // console.log("Products: ", response.data);
-        // console.log("Products: ", filteredProducts);
       } catch (error) {
         console.error("Error fetching products: ", error);
       }
@@ -94,7 +96,11 @@ export default function ProductList() {
     fetchProducts();
   }, []);
 
-  const openModal = () => setIsModalOpen(true);
+  // const openModal = () => setIsModalOpen(true);
+  const openModal = useCallback(() => {
+    setIsModalOpen(true);
+    setImagePreviews([]);
+  }, []);
 
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
@@ -147,6 +153,7 @@ export default function ProductList() {
         }
       });
       toast.loading("Creando producto...");
+      // console.log("Product to send: ", newFormData);
       try {
         await createProduct(newFormData);
         const response = await getProducts();
@@ -181,22 +188,31 @@ export default function ProductList() {
           newFormData.append(key, value as string);
         }
       });
-      toast.loading("Creando producto...");
-      try {
-        await updateProduct(selectedProduct.id, newFormData);
-        const response = await getProducts();
-        const filteredProducts = response.data.filter(
-          (product: Product) => !product.archived
-        );
-        setProducts(filteredProducts);
-        toast.dismiss();
-        toast.success("Producto editado correctamente");
-        closeEditModal();
-      } catch (error) {
-        toast.dismiss();
-        toast.error("Error creando el producto");
-        console.error("Error creating product: ", error);
-      }
+
+      // Añadir las imágenes recuperadas al FormData
+      selectedProduct.urlPhotos.forEach((url) => {
+        newFormData.append("photos", url);
+      });
+
+      console.log("Previous product: ", selectedProduct);
+      console.log("Product to send: ", newFormData);
+
+      // toast.loading("Creando producto...");
+      // try {
+      //   await updateProduct(selectedProduct.id, newFormData);
+      //   const response = await getProducts();
+      //   const filteredProducts = response.data.filter(
+      //     (product: Product) => !product.archived
+      //   );
+      //   setProducts(filteredProducts);
+      //   toast.dismiss();
+      //   toast.success("Producto editado correctamente");
+      //   closeEditModal();
+      // } catch (error) {
+      //   toast.dismiss();
+      //   toast.error("Error creando el producto");
+      //   console.error("Error creating product: ", error);
+      // }
     }
   };
 
@@ -251,19 +267,101 @@ export default function ProductList() {
     if (target.files) {
       const filesArray = Array.from(target.files);
       const imageUrls = filesArray.map((file) => URL.createObjectURL(file));
-      setImagePreviews(imageUrls);
+      setImagePreviews((prev) => [...prev, ...imageUrls]);
     }
   };
   const handleDeleteImage = (index: number) => {
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
-  
-    const input = document.getElementById('photos') as HTMLInputElement;
+
+    const input = document.getElementById("photos") as HTMLInputElement;
     if (input && input.files) {
       const dataTransfer = new DataTransfer();
       Array.from(input.files)
         .filter((_, i) => i !== index)
-        .forEach(file => dataTransfer.items.add(file));
+        .forEach((file) => dataTransfer.items.add(file));
       input.files = dataTransfer.files;
+    }
+  };
+
+  /* Filtros */
+  const openFilterModal = () => {
+    setIsModalFilterOpen(true);
+  };
+  const filterByName = (name: string) => {
+    const filters: any = {};
+    const operators: any = {};
+    if (name) {
+      filters.name = name;
+      operators.name = "LIKE";
+    }
+    return { filters, operators };
+  };
+  
+  /* -> Cambios: ver el console.log del servicio, no se envían los parametros
+  const filterByCategory = (categoryId: string) => {
+    const filters: any = {};
+    const operators: any = {};
+    if (categoryId) {
+      filters["category.id"] = categoryId;
+      operators["category.id"] = "==";
+    }
+    return { filters, operators };
+  };
+  */
+  
+  /* -> Cambios: no existe minPrice ni maxPrice, solo price
+  const filterByPriceRange = (minPrice: string, maxPrice: string) => {
+    const filters: any = {};
+    const operators: any = {};
+    if (minPrice) {
+      filters.minPrice = parseFloat(minPrice);
+      operators.minPrice = ">=";
+    }
+    if (maxPrice) {
+      filters.maxPrice = parseFloat(maxPrice);
+      operators.maxPrice = "<=";
+    }
+    return { filters, operators };
+  };
+  */
+  
+  const filterProducts = async () => {
+    try {
+      const nameInput = document.getElementById("search") as HTMLInputElement;
+      const categorySelect = document.querySelector("[name='filterCategory']") as HTMLSelectElement;
+      const minPriceInput = document.querySelector("#filterByPriceRange[placeholder='Precio mínimo']") as HTMLInputElement;
+      const maxPriceInput = document.querySelector("#filterByPriceRange[placeholder='Precio máximo']") as HTMLInputElement;
+  
+      let filters: any = {};
+      let operators: any = {};
+  
+      if (nameInput && nameInput.value) {
+        const { filters: nameFilters, operators: nameOperators } = filterByName(nameInput.value);
+        filters = { ...filters, ...nameFilters };
+        operators = { ...operators, ...nameOperators };
+      }
+      /*
+      if (categorySelect && categorySelect.value) {
+        const { filters: categoryFilters, operators: categoryOperators } = filterByCategory(categorySelect.value);
+        filters = { ...filters, ...categoryFilters };
+        operators = { ...operators, ...categoryOperators };
+      }
+      if (minPriceInput && minPriceInput.value || maxPriceInput && maxPriceInput.value) {
+        const { filters: priceFilters, operators: priceOperators } = filterByPriceRange(minPriceInput.value, maxPriceInput.value);
+        filters = { ...filters, ...priceFilters };
+        operators = { ...operators, ...priceOperators };
+      }
+        */
+  
+      console.log("Filtros:", filters);
+      console.log("Operadores:", operators);
+  
+      const response = await getProductsByFilters(filters, operators);
+      setProducts(response.data);
+      setIsModalFilterOpen(false);
+    } catch (error) {
+      console.error("Error filtering products: ", error);
+      toast.error("Error filtrando productos");
     }
   };
 
@@ -271,16 +369,20 @@ export default function ProductList() {
     <div className="container mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Productos</h1>
-        <div>
+        <div className="flex gap-2">
+          <Button onClick={openFilterModal} className="bg-gray-800 text-white">
+            <Search size={16} className="mr-2" />
+            Filtrar
+          </Button>
           <Button
             onClick={openArchivedModal}
-            className="bg-gray-800 mr-5 text-white"
+            className="bg-gray-800 text-white"
           >
             Ver archivados
           </Button>
           <Button
             onClick={openModal}
-            className="bg-blue-950 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-950 hover:bg-blue-800 text-white font-bold rounded"
           >
             Añadir
           </Button>
@@ -371,7 +473,7 @@ export default function ProductList() {
         </TableBody>
       </Table>
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent>
+        <DialogContent aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>Añadir Nuevo Producto</DialogTitle>
           </DialogHeader>
@@ -474,7 +576,7 @@ export default function ProductList() {
         </DialogContent>
       </Dialog>
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent>
+        <DialogContent aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>Editar Producto</DialogTitle>
           </DialogHeader>
@@ -558,23 +660,23 @@ export default function ProductList() {
               />
             </div>
             <div>
-              {selectedProduct?.urlPhotos ? (
-                imagePreviews.map((src: string, index: number) => (
-                  <div key={index} className="image-preview-container">
-                    <img
-                      src={src}
-                      alt={`preview ${index}`}
-                      className="image-preview"
-                    />
-                    <button
-                      className="delete-icon"
-                      onClick={() => handleDeleteImage(index)}
-                    >
-                      &times;
-                    </button>
-                  </div>
-                ))
-              ) : null}
+              {selectedProduct?.urlPhotos
+                ? imagePreviews.map((src: string, index: number) => (
+                    <div key={index} className="image-preview-container">
+                      <img
+                        src={src}
+                        alt={`preview ${index}`}
+                        className="image-preview"
+                      />
+                      <button
+                        className="delete-icon"
+                        onClick={() => handleDeleteImage(index)}
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  ))
+                : null}
             </div>
             <DialogFooter>
               <Button onClick={closeEditModal} variant="outline" type="submit">
@@ -591,6 +693,9 @@ export default function ProductList() {
         <DialogContent className="custom-width">
           <DialogHeader>
             <DialogTitle>Productos Archivados</DialogTitle>
+            <DialogDescription>
+              En esta vista puedes deshacer la acción de archivar un producto.
+            </DialogDescription>
           </DialogHeader>
           <Table>
             <TableHeader>
@@ -647,6 +752,79 @@ export default function ProductList() {
           </Table>
           <DialogFooter>
             <Button onClick={closeArchivedModal} variant="outline">
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isModalFilterOpen} onOpenChange={setIsModalFilterOpen}>
+        <DialogContent aria-describedby={undefined}>
+          <DialogHeader>
+            <DialogTitle>Filtros</DialogTitle>
+          </DialogHeader>
+
+          <div>
+            <Label htmlFor="search">Buscar por nombre</Label>
+            <div className="relative">
+              <Input
+                type="search"
+                id="search"
+                placeholder="Introduce el nombre del producto"
+                className="pl-10"
+              />
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <Search size={16} />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="filterCategory">Buscar por categoría</Label>
+            <Select name="filterCategory" disabled>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecciona una categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {categories.map((category) => (
+                    <SelectItem
+                      key={category.id}
+                      value={category.id.toString()}
+                    >
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="filterByPriceRange">Buscar por precio</Label>
+            <div className="flex gap-4">
+              <Input
+                id="filterByPriceRange"
+                type="number"
+                placeholder="Precio mínimo"
+                disabled
+              />
+              <Input
+                id="filterByPriceRange"
+                type="number"
+                placeholder="Precio máximo"
+                disabled
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button onClick={filterProducts} type="submit">
+              Aplicar
+            </Button>
+            <Button
+              onClick={() => setIsModalFilterOpen(false)}
+              variant="outline"
+            >
               Cerrar
             </Button>
           </DialogFooter>
