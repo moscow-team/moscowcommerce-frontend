@@ -179,40 +179,56 @@ export default function ProductList() {
     if (formRef.current && selectedProduct) {
       const formData = new FormData(formRef.current);
       const newFormData = new FormData();
+
+      // Agregar fotos existentes al nuevo FormData
+      selectedProduct.urlPhotos.forEach((url) => {
+        newFormData.append("existingPhotos", url);
+      });
+      
+      console.log("Existing photos to add: ", selectedProduct.urlPhotos); // Verifica las fotos existentes
+
+      // Agregar nuevas fotos
+      if (formData.getAll("photos").length > 0) {
+        const newPhotos = formData.getAll("photos");
+        newPhotos.forEach((photo) => {
+            newFormData.append("photos", photo);
+        });
+        console.log("New photos to add: ", newPhotos); // Verifica las nuevas fotos
+      }
+
+      // Agregar otros campos, evitando agregar "photos" nuevamente
       formData.forEach((value, key) => {
-        if (key === "photos") {
-          newFormData.append("photos", value);
-        } else if (key === "category") {
+        if (key === "category") {
           newFormData.append("categoryId", value as string);
-        } else {
+        } else if (key !== "photos") {
           newFormData.append(key, value as string);
         }
       });
 
-      // Añadir las imágenes recuperadas al FormData
-      selectedProduct.urlPhotos.forEach((url) => {
-        newFormData.append("photos", url);
-      });
-
       console.log("Previous product: ", selectedProduct);
-      console.log("Product to send: ", newFormData);
+      
+      // Muestra el contenido del nuevo FormData
+      console.log("FormData before submission: ");
+      newFormData.forEach((value, key) => {
+          console.log(key, value);
+      })
 
-      // toast.loading("Creando producto...");
-      // try {
-      //   await updateProduct(selectedProduct.id, newFormData);
-      //   const response = await getProducts();
-      //   const filteredProducts = response.data.filter(
-      //     (product: Product) => !product.archived
-      //   );
-      //   setProducts(filteredProducts);
-      //   toast.dismiss();
-      //   toast.success("Producto editado correctamente");
-      //   closeEditModal();
-      // } catch (error) {
-      //   toast.dismiss();
-      //   toast.error("Error creando el producto");
-      //   console.error("Error creating product: ", error);
-      // }
+      toast.loading("Editando producto...");
+      try {
+        await updateProduct(selectedProduct.id, newFormData);
+        const response = await getProducts();
+        const filteredProducts = response.data.filter(
+          (product: Product) => !product.archived
+        );
+        setProducts(filteredProducts);
+        toast.dismiss();
+        toast.success("Producto editado correctamente");
+        closeEditModal();
+      } catch (error) {
+        toast.dismiss();
+        toast.error("Error editando el producto");
+        console.error("Error editing product: ", error);
+      }
     }
   };
 
