@@ -1,12 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { getProducts } from "@/services/dashboard/productoService";
-import { getCategorias } from "@/services/dashboard/categoriaService";
 import { useCart } from "./context/useCart";
 import { useRouter } from "next/navigation";
-import { useProduct } from "./context/ProductContext";
-import Link from "next/link";
+import { useEcommerce } from "./context/useEcommerce";
 interface Categoria {
   id: number;
   name: string;
@@ -32,43 +28,38 @@ interface Producto {
   archived: boolean;
 }
 function Home() {
-  const { setSelectedProduct } = useProduct();
   const router = useRouter();
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
-  const [productos, setProductos] = useState<Producto[]>([]);
-  const { products, addProduct } = useCart();
-  useEffect(() => {
-    async function fetchCategorias() {
-      const response = await getCategorias();
-      const filtered = response.data
-        .map((category: Categoria) => ({
-          ...category,
-          photo: `/images/${category.name.toLowerCase()}.png`,
-        }))
-        .filter((category: Categoria) => category.archived === false);
-      console.log(filtered);
-      setCategorias(filtered);
-    }
-    async function fetchProductos() {
-      const response = await getProducts();
-      const filtered = response.data.filter(
-        (product: Producto) => product.archived === false
-      );
-      setProductos(filtered);
-    }
-    fetchCategorias();
-    fetchProductos();
-    console.log(products);
-  }, []);
+  const { categories, products} = useEcommerce();
+  const { addProduct } = useCart();
+  // useEffect(() => {
+  //   async function fetchCategorias() {
+  //     const response = await getCategorias();
+  //     const filtered = response.data
+  //       .map((category: Categoria) => ({
+  //         ...category,
+  //         photo: `/images/${category.name.toLowerCase()}.png`,
+  //       }))
+  //       .filter((category: Categoria) => category.archived === false);
+  //     console.log(filtered);
+  //     setCategorias(filtered);
+  //   }
+  //   async function fetchProductos() {
+  //     const response = await getProducts();
+  //     const filtered = response.data.filter(
+  //       (product: Producto) => product.archived === false
+  //     );
+  //     setProductos(filtered);
+  //   }
+  //   fetchCategorias();
+  //   fetchProductos();
+  // }, []);
 
   const handleAddProduct = (product: Producto) => {
     addProduct(product);
   };
 
   const goToProductDetail = (product: Producto) => {
-    // localStorage.setItem('selectedProduct', JSON.stringify(product));
-    // window.location.href = `/producto/${product.id}`;
-    setSelectedProduct(product);
+    router.push(`/producto/${product.id}`);
   };
 
   return (
@@ -106,18 +97,18 @@ function Home() {
             </div>
           </div>
         </section>
-
-        <section className="py-12">
+          <br id="category-banner"/>
+        <section className="py-12" >
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">
               Categorías
             </h2>
             <div className="flex flex-row flex-wrap gap-10 mt-28 justify-center items-center">
-              {categorias.map((category) => (
+              {categories.map((category) => (
                 <div
                   key={category.id}
                   className="relative rounded-lg shadow-md h-60 w-60 cursor-pointer bg-[#424242]"
-                  onClick={() => router.push(`/categoria/${category.id}`) }
+                  onClick={() => router.push(`/categoria/${category.id}`)}
                 >
                   <div className="flex justify-center">
                     <img
@@ -139,7 +130,7 @@ function Home() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Productos</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {productos.map((product) => (
+              {products.map((product) => (
                 <div
                   key={product.id}
                   className="bg-white rounded-lg shadow-md overflow-hidden"
@@ -148,6 +139,7 @@ function Home() {
                     src={product.urlPhotos[0]}
                     alt={`Product ${product.name}`}
                     className="w-full h-48 object-contain p-2 hover:scale-110 transition-transform duration-200 cursor-pointer"
+                    onClick={() => goToProductDetail(product)}
                   />
                   <div className="p-4">
                     <h3 className="text-lg font-semibold mb-2">
@@ -168,13 +160,12 @@ function Home() {
                         >
                           Agregar al carrito
                         </Button>
-                        <Link href={`/producto/${product.id}`} onClick={() => goToProductDetail(product)}>
-                          <Button
-                            className="text-white bg-gray-700 font-semibold"
-                          >
-                            Ver producto
-                          </Button>
-                        </Link>
+                        <Button
+                          onClick={() => goToProductDetail(product)}
+                          className="text-white bg-gray-700 font-semibold"
+                        >
+                          Ver producto
+                        </Button>
                       </div>
                     </div>
                   </div>

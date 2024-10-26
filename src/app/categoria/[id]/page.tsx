@@ -11,16 +11,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getCategorias } from "@/services/dashboard/categoriaService";
-import { getProductsByFilters } from "@/services/dashboard/productoService";
 import { Input } from "@/components/ui/input";
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Checkbox } from "@radix-ui/react-checkbox";
-import { toast } from "sonner";
-import { Form, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { CheckboxReactHookFormMultiple } from "../components/CategoryFilter";
+import { useProduct } from "@/app/context/useProduct";
+import { useCategory } from "@/app/context/useCategory";
+import { useLoader } from "@/app/context/useLoader";
+import Loading from "./loading";
+import Aside from "@/components/Aside";
+import { ProductFilter } from "../components/ProductFilter";
 
 interface Producto {
   id: number;
@@ -46,54 +43,63 @@ interface Categoria {
   archivedDate: string;
 }
 
+const categoryEmpty = {
+  id: 0,
+  name: "",
+  description: "",
+  creationDate: "",
+  modificationDate: "",
+  archivedDate: "",
+}
+
+const productEmpty = {
+  id: 0,
+  name: "",
+  description: "",
+  price: 0,
+  stock: 0,
+  category: {
+    id: 0,
+    name: "",
+  },
+  urlPhotos: [],
+  archived: false,
+}
+
 export default function Page() {
+
+  const { isLoading } = useLoader()
   const params = useParams<{ id: string }>();
-  const categoryId = parseInt(params.id, 10);
-  const [products, setProducts] = useState<Producto[]>([]);
-  const [categoria, setCategoria] = useState<Categoria | null>(null);
-
-  async function fetchCategories() {
-    try {
-      const response = await getCategorias();
-      const category = response.data.find(
-        (cat: Categoria) => cat.id === categoryId
-      );
-      setCategoria(category);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
+  const categoryId = parseInt(params.id);
+  const [products, setProducts] = useState<Producto[]>([productEmpty]);
+  const [category, setCategory] = useState<Categoria>(categoryEmpty);
+  const { getProductByCategory } = useProduct();
+  const { getCategoryById } = useCategory();
   async function fetchProducts() {
-    try {
-      const response = await getProductsByFilters({
-       'category.id': categoryId.toString(),
-      //  'archived': 'false', <-- REVISAR PORQUE NO FUNCIONA
-      });
-      const filteredProducts = response.data.filter((product: any) => !product.archived);
-      setProducts(filteredProducts);
-    } catch (error) {
-      console.error(error);
-    }
+    const products = await getProductByCategory(categoryId);
+    setProducts(products);
+  }
+  async function fetchCategory() {
+    const category = await getCategoryById(categoryId);
+    setCategory(category);
   }
 
   useEffect(() => {
-    fetchCategories();
-    fetchProducts();
-  }, [categoryId]);
-
-  if (!categoria) {
-    return <div>Cargando ...</div>;
+    if (!isLoading) {
+      fetchProducts();
+      fetchCategory();
+    }
+  }, [isLoading, categoryId]);
+  if (isLoading) {
+    return <Loading />;
   }
-
   return (
-    <div className="flex h-screen w-full">
-      <aside className="w-80 h-full bg-gray-200 p-4 flex flex-col gap-5">
-        <Input  placeholder="Buscar..."/>
-        <p className="text-center">Categorias</p>
-        <CheckboxReactHookFormMultiple/>
-      </aside>
-      <div className="w-full h-full px-10">
+    <div className="flex flex-row h-screen w-full">
+      <Aside>
+      <Input placeholder="Buscar..." />
+        <ProductFilter/>
+      </Aside>
+      <div className="px-10">
         <Breadcrumb className="my-5">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -101,12 +107,12 @@ export default function Page() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>{categoria.name}</BreadcrumbPage>
+              <BreadcrumbPage>{category.name}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <h1 className="font-semibold text-2xl">{categoria.name}</h1>
-        <p className="text-gray-700 py-2">{categoria.description}</p>
+        <h1 className="font-semibold text-2xl">{category.name}</h1>
+        <p className="text-gray-700 py-2">{category.description}</p>
         <div className="w-full h-full flex flex-row py-10">
           <section className="w-full h-full flex flex-col px-5 gap-5">
             <div className="flex flex-row flex-wrap gap-6">
@@ -118,7 +124,7 @@ export default function Page() {
                   <img
                     alt={`Product ${index + 1}`}
                     className="w-full h-48 object-contain p-2 cursor-pointer"
-                    src={product.urlPhotos[0]}
+                    src={product?.urlPhotos?.[0] ? product.urlPhotos[0] : ""}
                   />
                   <div className="p-4">
                     <h3 className="text-lg font-semibold mb-2">

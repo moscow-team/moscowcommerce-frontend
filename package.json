@@ -19,6 +19,7 @@
     "@radix-ui/react-slot": "^1.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "embla-carousel-react": "^8.3.0",
     "framer-motion": "^11.3.30",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.439.0",
@@ -32,6 +33,7 @@
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
+    "yet-another-react-lightbox": "^3.21.6",
     "zod": "^3.23.8"
   },
   "devDependencies": {

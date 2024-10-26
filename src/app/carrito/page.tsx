@@ -21,7 +21,7 @@ interface Product {
 }
 
 
-export default function CarritoPage({ initialProducts }: { initialProducts: Product[] }) {
+export default function CarritoPage() {
 
   /* BLOQUE DE PRUEBA - DESCOMENTAR CUANDO SE IMPLEMENTE */
   // const testProduct: Product = {
@@ -43,24 +43,24 @@ export default function CarritoPage({ initialProducts }: { initialProducts: Prod
   // const [products, setProducts] = useState<ProductWithQuantity[]>(
   //   initialProducts.map(product => ({ ...product, quantity: 1 }))
   // );
-  
+
   // const updateQuantity = (id: number, newQuantity: number) => {
   //   setProducts(products.map(product => 
   //     product.id === id ? { ...product, quantity: Math.max(0, newQuantity) } : product
   //   ));
   // };
-  
+
   // const removeProduct = (id: number) => {
   //   setProducts(products.filter(product => product.id !== id));
   // };
-  
+
   // const subtotal = products.reduce((sum, product) => sum + product.price * product.quantity, 0);
-  
+
   // useEffect(() => {
   //   setProducts(initialProducts.map(product => ({ ...product, quantity: 1 })));
   // }, [initialProducts]);
 
-  const {products, removeProduct, confirRemoveProduct,addProduct, productQuantity, clearCart, updateQuantity, calculateTotal} = useCart()
+  const { products, confirRemoveProduct, updateQuantity, calculateTotal } = useCart()
 
   return (
     <div className="container mx-auto pt-8">
@@ -75,7 +75,7 @@ export default function CarritoPage({ initialProducts }: { initialProducts: Prod
                 <img src={product.urlPhotos[0]} alt={product.name} className="w-20 h-20 object-cover rounded" />
                 <div className="flex-grow">
                   <h2 className="font-semibold">{product.name}</h2>
-                  <p className="text-gray-600">${product.price.toFixed(2)}</p>
+                  <p className="text-gray-600">${product.price.toLocaleString("es")}</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -104,7 +104,7 @@ export default function CarritoPage({ initialProducts }: { initialProducts: Prod
                     size="icon"
                     onClick={() => confirRemoveProduct(product.id)}
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4 text-red-500" />
                   </Button>
                 </div>
               </div>
@@ -116,14 +116,14 @@ export default function CarritoPage({ initialProducts }: { initialProducts: Prod
               {products.map((product) => (
                 <div key={product.id} className="flex justify-between text-sm">
                   <span>{product.name} x {product.quantity}</span>
-                  <span>${(product.price * product.quantity).toFixed(2)}</span>
+                  <span>${(product.price * product.quantity).toLocaleString("es")}</span>
                 </div>
               ))}
             </div>
             {/* <Separator className="my-4" /> */}
             <div className="flex justify-between font-semibold">
               <span>Subtotal</span>
-              <span>${calculateTotal().toFixed(2)}</span>
+              <span>${calculateTotal().toLocaleString("es")}</span>
             </div>
             <Button className="w-full mt-6 text-white">Proceder al pago</Button>
           </div>

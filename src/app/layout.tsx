@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 import { Toaster } from "sonner";
 import { SessionProvider } from "next-auth/react";
 import { CartProvider } from "./context/CartProvider";
-import { ProductProvider } from "./context/ProductContext";
+import { EcommerceProvider } from "./context/EcommerceProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({
@@ -25,7 +25,7 @@ export default function RootLayout({
           refetchOnWindowFocus={false}
           refetchWhenOffline={false}
         >
-            <ProductProvider>
+            <EcommerceProvider>
               <CartProvider>
                 <Toaster richColors />
                 <div
@@ -40,7 +40,7 @@ export default function RootLayout({
                   {!isDashboard && <Footer />}
                 </div>
               </CartProvider>
-            </ProductProvider>
+            </EcommerceProvider>
         </SessionProvider>
       </body>
     </html>

@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Form,
@@ -13,7 +12,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { useCategory } from "../hooks/useCategory"
+import { useCategory } from "../../context/useCategory"
 
 const FormSchema = z.object({
   items: z.array(z.string()).refine((value) => value.some((item) => item), {
@@ -32,7 +31,7 @@ export function CheckboxReactHookFormMultiple() {
   function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data)
   }
-  const {categorys} = useCategory();
+  const {categories} = useCategory();
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -41,7 +40,7 @@ export function CheckboxReactHookFormMultiple() {
           name="items"
           render={() => (
             <FormItem>
-              {categorys.map((item) => (
+              {categories.map((item) => (
                 <FormField
                   key={item.id}
                   control={form.control}

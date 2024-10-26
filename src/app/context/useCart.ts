@@ -135,5 +135,5 @@ export const useCart = () => {
     updateQuantity,
     calculateTotal,
     confirRemoveProduct
-  };
+    };
 };

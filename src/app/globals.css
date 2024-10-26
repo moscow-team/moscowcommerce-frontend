@@ -107,3 +107,7 @@
 .image-preview-container:hover .delete-icon {
   display: block;
 }
+
+html {
+  scroll-behavior: smooth;
+}

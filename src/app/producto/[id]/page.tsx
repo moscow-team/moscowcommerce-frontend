@@ -1,6 +1,7 @@
 "use client";
-import { useProduct } from "@/app/context/ProductContext";
 import { useCart } from "@/app/context/useCart";
+import { useLoader } from "@/app/context/useLoader";
+import { useProduct } from "@/app/context/useProduct";
 import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
@@ -10,10 +11,12 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { getProductsByFilters } from "@/services/dashboard/productoService";
 import { BreadcrumbItem } from "@nextui-org/react";
+import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
-
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
+import Loading from "./loading";
 interface Producto {
   id: number;
   name: string;
@@ -31,64 +34,79 @@ interface Producto {
 
 export default function Page() {
   const { addProduct } = useCart();
-  const { selectedProduct } = useProduct();
-  const [product, setProduct] = useState<Producto | null>(selectedProduct);
+  const { getProductById } = useProduct();
+  const params = useParams<{ id: string }>();
+  const productId = +params.id;
+  const [product, setProduct] = useState<Producto>();
   const [relatedProducts, setRelatedProducts] = useState<Producto[]>([]);
-
+  const [index, setIndex] = useState(-1);
+  const [photos, setPhotos] = useState<any>([]);
   const handleAddProduct = () => {
     if (product) {
       addProduct(product);
     }
   };
-
-  async function fetchRelatedProducts(categoryId: number, productId: number) {
-    try {
-      const response = await getProductsByFilters({
-        "category.id": categoryId.toString(),
-      });
-      const filteredProducts = response.data.filter(
-        (product: any) => !product.archived && product.id !== productId
-      );
-      setRelatedProducts(filteredProducts);
-    } catch (error) {
-      console.error(error);
-    }
+  const {isLoading} = useLoader(); 
+  // async function fetchRelatedProducts(categoryId: number, productId: number) {
+  //   try {
+  //     const response = await getProductsByFilters({
+  //       "category.id": categoryId.toString(),
+  //     });
+  //     const filteredProducts = response.data.filter(
+  //       (product: any) => !product.archived && product.id !== productId
+  //     );
+  //     setRelatedProducts(filteredProducts);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
+  const fecthProduct = async () => {
+    const product = await getProductById(productId)
+    setProduct(product);
+    const dataFotos = product?.urlPhotos.map((foto) => {
+      return {
+        src: foto,
+        name: foto,
+        width: 800,
+        height: 800,
+      };
+    });
+    setPhotos(dataFotos);
   }
-
   useEffect(() => {
-    if (!selectedProduct) {
-      console.log("NO hay producto seleccionado");
-      const url = window.location.pathname;
-      const id = url.substring(url.lastIndexOf("/") + 1);
-      getProductsByFilters({ id })
-        .then((response) => {
-          console.log("Producto encontrado", response.data);
-          if (response.data && response.data.length > 0) {
-            setProduct(response.data[0]);
-            fetchRelatedProducts(
-              response.data[0].category.id,
-              response.data[0].id
-            );
-          }
-        })
-        .catch((error) => {
-          console.log("Error al obtener el producto", error);
-        });
-    } else if (selectedProduct) {
-      fetchRelatedProducts(selectedProduct.category.id, selectedProduct.id);
+    fecthProduct()
+  }, []);
+  useEffect(() => {
+    if (!isLoading) {
+      fecthProduct();
     }
-  }, [selectedProduct]);
-
+  }, [isLoading, productId]);
+  if (isLoading) {
+    return <Loading />;
+  }
   return (
     <div className="w-full h-full">
       <section className="flex flex-row gap-5 py-32">
-        <div className="w-full h-full flex flex-col justify-center items-center ">
-          <div className="aspect-square object-contain w-2/5 h-2/5 p-15 shadow-lg">
+        <div className="w-full h-full flex flex-col justify-center items-center gap-5 ">
+          <div className="aspect-square object-contain w-2/5 h-2/5 p-15 shadow-lg cursor-pointer">
             <img
               src={product?.urlPhotos[0]}
               alt={product?.name}
               className="h-full w-full"
+              onClick={() => setIndex(0)}
             />
+          </div>
+          <div className="w-full flex flex-row justify-center flex-wrap h-full gap-4">
+            {product?.urlPhotos.slice(1).map((photo, index) => (
+              <div key={index} className="aspect-square object-contain w-32 h-32 shadow-lg hover:scale-110 transition-transform duration-200 cursor-pointer">
+                <img
+                  src={photo}
+                  alt={product?.name}
+                  className="h-full w-full"
+                  onClick={() => setIndex(index)}
+                />
+              </div>
+            ))}
           </div>
         </div>
         <div className="w-full h-full flex flex-col justify-center gap-3">
@@ -111,6 +129,8 @@ export default function Page() {
           </Breadcrumb>
           <h1 className="text-3xl font-semibold">{product?.name}</h1>
           <div className="flex flex-row gap-3">
+            {product?.archived ? (<Badge variant={"destructive"} className="text-xl text-white">Sin stock</Badge>
+            ) : null}
             <Badge className="text-xl text-white">${product?.price}</Badge>
             <h3 className="text-xl text-gray-500">{product?.category.name}</h3>
           </div>
@@ -123,6 +143,7 @@ export default function Page() {
             <Button
               className="text-white bg-gray-700"
               onClick={() => handleAddProduct()}
+              disabled={product?.archived}
             >
               Agregar al carrito
             </Button>
@@ -173,6 +194,13 @@ export default function Page() {
           )}
         </div>
       </section>
+      <Lightbox
+        slides={photos}
+        open={index >= 0}
+        index={index}
+        close={() => setIndex(-1)}
+      // plugins={[Fullscreen, Slideshow, Thumbnails, Zoom]}
+      />
     </div>
   );
 }

@@ -1,8 +1,5 @@
 "use client";
-// export const metadata = {
-//   title: "Catálogo - Moskow Commerce",
-//   description: "Admin Panel",
-// };
+
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {

@@ -36,10 +36,10 @@ export default function Header() {
               <Link href="/" className="text-gray-200 hover:text-orange-300">
                 Inicio
               </Link>
-              <Link href="#" className="text-gray-200 hover:text-orange-300">
+              <Link href="/categoria" className="text-gray-200 hover:text-orange-300">
                 Categorias
               </Link>
-              <Link href="#" className="text-gray-200 hover:text-orange-300">
+              <Link href="/producto" className="text-gray-200 hover:text-orange-300">
                 Productos
               </Link>
             </nav>
