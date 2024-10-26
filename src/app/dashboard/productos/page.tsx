@@ -118,6 +118,7 @@ export default function ProductList() {
     setSelectedProduct(null);
     setIsEditModalOpen(false);
     setImagePreviews([]);
+    setPhotosToDelete([]);
   }, []);
 
   const openArchivedModal = async () => {
@@ -205,6 +206,13 @@ export default function ProductList() {
         }
       });
 
+      // Agregar las fotos a eliminar al formData para enviar al backend
+      if (photosToDelete.length > 0) {
+        photosToDelete.forEach((url) => {
+            newFormData.append("photosToDelete", url);
+        });
+      }
+
       console.log("Previous product: ", selectedProduct);
       
       // Muestra el contenido del nuevo FormData
@@ -286,15 +294,32 @@ export default function ProductList() {
       setImagePreviews((prev) => [...prev, ...imageUrls]);
     }
   };
-  const handleDeleteImage = (index: number) => {
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+
+  const [photosToDelete, setPhotosToDelete] = useState<string[]>([]);
+  // Eliminar imagenes de producto
+  const handleDeleteImage = (url: string) => {
+    setImagePreviews((prev) => prev.filter((imageUrl) => imageUrl !== url));
+  
+    // Agregar la foto eliminada a la lista de fotos a eliminar
+    if (selectedProduct?.urlPhotos.includes(url)) {
+      setPhotosToDelete((prev) => [...prev, url]);
+    }
 
     const input = document.getElementById("photos") as HTMLInputElement;
     if (input && input.files) {
+      const filesArray = Array.from(input.files);
+
+      // Usar URL.createObjectURL para verificar si la URL coincide
+      const filteredFiles = filesArray.filter((file) => {
+          const fileURL = URL.createObjectURL(file);
+          return fileURL !== url; // Comparar con la URL de previsualización
+      });
+
+      // Crear un nuevo DataTransfer y agregar los archivos filtrados
       const dataTransfer = new DataTransfer();
-      Array.from(input.files)
-        .filter((_, i) => i !== index)
-        .forEach((file) => dataTransfer.items.add(file));
+      filteredFiles.forEach((file) => dataTransfer.items.add(file));
+      
+      // Asignar los archivos filtrados de nuevo al input
       input.files = dataTransfer.files;
     }
   };
@@ -572,8 +597,9 @@ export default function ProductList() {
                     className="image-preview"
                   />
                   <button
+                    type="button"
                     className="delete-icon"
-                    onClick={() => handleDeleteImage(index)}
+                    onClick={() => handleDeleteImage(src)}
                   >
                     &times;
                   </button>
@@ -685,8 +711,9 @@ export default function ProductList() {
                         className="image-preview"
                       />
                       <button
+                        type="button"
                         className="delete-icon"
-                        onClick={() => handleDeleteImage(index)}
+                        onClick={() => handleDeleteImage(src)}
                       >
                         &times;
                       </button>
