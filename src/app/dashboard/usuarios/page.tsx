@@ -4,9 +4,9 @@ import {
   getUsers,
   createUser,
   updateUser,
+  archiveUser,
 } from "@/services/dashboard/usuarioService";
 import { Button } from "@/components/ui/button";
-// import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -166,6 +166,16 @@ export default function UsersList() {
     setIsAlertDialogOpen(false);
     setCurrentRole(selectedUser?.role || null);
   };
+
+  const deleteUser = async (data: any) => {
+    const archived = await archiveUser(data);
+    if (archived.success) {
+      setUsers((prevUsers) =>
+        prevUsers.filter((user) => user.id !== data.id)
+      );
+      toast.success(archived.message);
+    }
+  };
   useEffect(() => {
     if (selectedUser) {
       setCurrentRole(selectedUser.role);
@@ -221,33 +231,44 @@ export default function UsersList() {
                     </svg>
                     <span className="sr-only">Edit</span>
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="text-destructive"
-                    disabled
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-4 w-4"
-                    >
-                      <path d="M3 6h18" />
-                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                      <line x1="10" y1="11" x2="10" y2="17" />
-                      <line x1="14" y1="11" x2="14" y2="17" />
-                    </svg>
-                    <span className="sr-only">Delete</span>
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild className="bg-red">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="text-destructive"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="h-4 w-4"
+                        >
+                          <path d="M3 6h18" />
+                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                          <line x1="10" y1="11" x2="10" y2="17" />
+                          <line x1="14" y1="11" x2="14" y2="17" />
+                        </svg>
+                        <span className="sr-only">Delete</span>
+                      </Button>     
+                      </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>¿Estás seguro que quieres archivar el usuario?</AlertDialogTitle>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={()=>deleteUser(user)}>Archivar</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
-              </TableCell>
-            </TableRow>
+              </TableCell>            </TableRow>
           ))}
         </TableBody>
       </Table>
@@ -388,6 +409,7 @@ export default function UsersList() {
           </form>
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }

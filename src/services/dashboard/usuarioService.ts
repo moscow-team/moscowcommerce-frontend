@@ -56,3 +56,17 @@ export const updateUser = async (data: any) => {
 
   return response.json();
 }
+
+export const archiveUser = async (data: any) => {
+  const session: any = await getSession();
+  const response = await fetch(`${apiUrl}users/${data.id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${session?.user?.token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  return response.json();
+}
