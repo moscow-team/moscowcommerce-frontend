@@ -188,10 +188,14 @@ export default function UsersList() {
       if (archived.success) {
         setAllUsers((prevUsers) =>
           prevUsers.map((user) =>
-            user.id === data.id ? { ...user, archivedDate: new Date().toISOString() } : user
+            user.id === data.id
+              ? { ...user, archivedDate: new Date().toISOString() }
+              : user
           )
         );
-        setUsers((prevUsers) => prevUsers.filter((user) => user.id !== data.id));
+        setUsers((prevUsers) =>
+          prevUsers.filter((user) => user.id !== data.id)
+        );
         toast.success(archived.message);
       }
     } catch (error) {
@@ -231,7 +235,7 @@ export default function UsersList() {
       }
     }
   };
-  
+
   return (
     <div className="container mx-auto">
       <div className="flex justify-between items-center mb-6">
@@ -259,75 +263,75 @@ export default function UsersList() {
         <TableBody>
           {users.map((user) => (
             <TableRow key={user.id}>
-            <TableCell>{user.id}</TableCell>
-            <TableCell>{user.email}</TableCell>
-            <TableCell>{user.fullName}</TableCell>
-            <TableCell>{user.role}</TableCell>
-            <TableCell>
-              <div className="flex space-x-4">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => openEditModal(user)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-4 w-4"
+              <TableCell>{user.id}</TableCell>
+              <TableCell>{user.email}</TableCell>
+              <TableCell>{user.fullName}</TableCell>
+              <TableCell>{user.role}</TableCell>
+              <TableCell>
+                <div className="flex space-x-4">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => openEditModal(user)}
                   >
-                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-                  </svg>
-                  <span className="sr-only">Edit</span>
-                </Button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild className="bg-red">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="text-destructive"
-                      disabled={user.email === loggedInUserEmail}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-4 w-4"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4"
+                      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                    </svg>
+                    <span className="sr-only">Edit</span>
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild className="bg-red">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="text-destructive"
+                        disabled={user.email === loggedInUserEmail}
                       >
-                        <path d="M3 6h18" />
-                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                        <line x1="10" y1="11" x2="10" y2="17" />
-                        <line x1="14" y1="11" x2="14" y2="17" />
-                      </svg>
-                      <span className="sr-only">Delete</span>
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        ¿Estás seguro que quieres archivar el usuario?
-                      </AlertDialogTitle>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => deleteUser(user)}>
-                        Archivar
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            </TableCell>
-          </TableRow>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="h-4 w-4"
+                        >
+                          <path d="M3 6h18" />
+                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                          <line x1="10" y1="11" x2="10" y2="17" />
+                          <line x1="14" y1="11" x2="14" y2="17" />
+                        </svg>
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          ¿Estás seguro que quieres archivar el usuario?
+                        </AlertDialogTitle>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => deleteUser(user)}>
+                          Archivar
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </TableCell>
+            </TableRow>
           ))}
         </TableBody>
       </Table>
@@ -500,7 +504,23 @@ export default function UsersList() {
                         variant="outline"
                         onClick={() => unarchiveUser(user)}
                       >
-                        Revertir
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="15"
+                          height="15"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="icon icon-tabler icons-tabler-outline icon-tabler-refresh"
+                        >
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                          <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
+                          <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
+                        </svg>
+                        <span className="sr-only">Revertir</span>
                       </Button>
                     </TableCell>
                   </TableRow>

@@ -3,12 +3,14 @@ import {
   createProduct,
   deleteProduct,
   getProducts,
+  getProductsByFilters,
   unarchivedProduct,
   updateProduct,
 } from "@/services/dashboard/productoService";
 import { useContext, useState } from "react";
 import { toast } from "sonner";
 import { DashboardContext } from "../context/DashboardProvider";
+import { Product } from "@/interfaces/Product";
 
 export const useDashboard = () => {
   const [photosToDelete, setPhotosToDelete] = useState<string[]>([]);
@@ -21,7 +23,14 @@ export const useDashboard = () => {
     throw new Error("useDashboard must be used within a DashboardContext");
   }
   const { categories, products, setProducts } = context;
-  const { archivedProducts, setArchivedProducts, selectedProduct, setSelectedProduct } = dashboardContext;
+  const {
+    archivedProducts,
+    setArchivedProducts,
+    selectedProduct,
+    setSelectedProduct,
+  } = dashboardContext;
+
+  const [filteredProducts, setFilteredProducts] = useState<any>(products);
 
   const saveProduct = async (product: any) => {
     toast.loading("Creando producto...");
@@ -38,14 +47,16 @@ export const useDashboard = () => {
     }
   };
 
-  const editProduct = async (id: number, form:any) => {
+  const editProduct = async (id: number, form: any) => {
     toast.loading("Editando producto...");
     try {
       const response = await updateProduct(id, form);
       if (response.success) {
         toast.dismiss();
         toast.success("Producto editado correctamente");
-        const updatedProducts = products.filter( (product: any) => product.id !== id);
+        const updatedProducts = products.filter(
+          (product: any) => product.id !== id
+        );
         console.log("Updated products: ", updatedProducts);
         setProducts([...updatedProducts, response.data]);
       } else {
@@ -58,15 +69,15 @@ export const useDashboard = () => {
       console.error("Error editing product: ", error);
     }
   };
-  const filterByName = (name: string) => {
-    const filters: any = {};
-    const operators: any = {};
-    if (name) {
-      filters.name = name;
-      operators.name = "LIKE";
-    }
-    return { filters, operators };
-  };
+  // const filterByName = (name: string) => {
+  //   const filters: any = {};
+  //   const operators: any = {};
+  //   if (name) {
+  //     filters.name = name;
+  //     operators.name = "LIKE";
+  //   }
+  //   return { filters, operators };
+  // };
 
   const removeProduct = async (id: number) => {
     toast.loading("Eliminando producto...");
@@ -87,51 +98,82 @@ export const useDashboard = () => {
     }
   };
 
+  const [form, setForm] = useState({
+    nameInput: "",
+    categorySelect: "",
+    minPriceInput: "",
+    maxPriceInput: "",
+  });
+
+  const handleFormChange = (id: string, e: any) => {
+    setForm({ ...form, [id]: e.target ? e.target.value : e });
+  };
+
   const filterProducts = async () => {
-    try {
-      const nameInput = document.getElementById("search") as HTMLInputElement;
-      const categorySelect = document.querySelector(
-        "[name='filterCategory']"
-      ) as HTMLSelectElement;
-      const minPriceInput = document.querySelector(
-        "#filterByPriceRange[placeholder='Precio mínimo']"
-      ) as HTMLInputElement;
-      const maxPriceInput = document.querySelector(
-        "#filterByPriceRange[placeholder='Precio máximo']"
-      ) as HTMLInputElement;
+    console.log(form);
+    // try {
+    //   const nameInput = document.getElementById("search") as HTMLInputElement;
+    //   const categorySelect = document.querySelector(
+    //     "[name='filterCategory']"
+    //   ) as HTMLSelectElement;
+    //   const minPriceInput = document.querySelector(
+    //     "#filterByPriceRange[placeholder='Precio mínimo']"
+    //   ) as HTMLInputElement;
+    //   const maxPriceInput = document.querySelector(
+    //     "#filterByPriceRange[placeholder='Precio máximo']"
+    //   ) as HTMLInputElement;
 
-      let filters: any = {};
-      let operators: any = {};
+    //   let filters: any = {};
+    //   let operators: any = {};
 
-      if (nameInput && nameInput.value) {
-        const { filters: nameFilters, operators: nameOperators } = filterByName(
-          nameInput.value
-        );
-        filters = { ...filters, ...nameFilters };
-        operators = { ...operators, ...nameOperators };
-      }
-      /*
-          if (categorySelect && categorySelect.value) {
-            const { filters: categoryFilters, operators: categoryOperators } = filterByCategory(categorySelect.value);
-            filters = { ...filters, ...categoryFilters };
-            operators = { ...operators, ...categoryOperators };
-          }
-          if (minPriceInput && minPriceInput.value || maxPriceInput && maxPriceInput.value) {
-            const { filters: priceFilters, operators: priceOperators } = filterByPriceRange(minPriceInput.value, maxPriceInput.value);
-            filters = { ...filters, ...priceFilters };
-            operators = { ...operators, ...priceOperators };
-          }
-            */
+    //   if (nameInput && nameInput.value) {
+    //     const { filters: nameFilters, operators: nameOperators } = filterByName(
+    //       nameInput.value
+    //     );
+    //     filters = { ...filters, ...nameFilters };
+    //     operators = { ...operators, ...nameOperators };
+    //   }
 
-      console.log("Filtros:", filters);
-      console.log("Operadores:", operators);
+    //   // if (categorySelect && categorySelect.value) {
+    //   //   const { filters: categoryFilters, operators: categoryOperators } =
+    //   //     filterByCategory(categorySelect.value);
+    //   //   filters = { ...filters, ...categoryFilters };
+    //   //   operators = { ...operators, ...categoryOperators };
+    //   // }
 
-      const response = await getProductsByFilters(filters, operators);
-      setProducts(response.data);
-    } catch (error) {
-      console.error("Error filtering products: ", error);
-      toast.error("Error filtrando productos");
-    }
+    //   /*
+    //       if (minPriceInput && minPriceInput.value || maxPriceInput && maxPriceInput.value) {
+    //         const { filters: priceFilters, operators: priceOperators } = filterByPriceRange(minPriceInput.value, maxPriceInput.value);
+    //         filters = { ...filters, ...priceFilters };
+    //         operators = { ...operators, ...priceOperators };
+    //       }
+    //         */
+
+    //   console.log("Filtros:", filters);
+    //   console.log("Operadores:", operators);
+
+    //   const response = await getProductsByFilters(filters, operators);
+    //   setProducts(response.data);
+    // } catch (error) {
+    //   console.error("Error filtering products: ", error);
+    //   toast.error("Error filtrando productos");
+    // }
+    const filteredProducts = products.filter((product: any) => {
+      const nameMatch = form.nameInput
+        ? product.name.toLowerCase().includes(form.nameInput.toLowerCase())
+        : true;
+      const categoryMatch = form.categorySelect
+        ? product.category.id === parseInt(form.categorySelect)
+        : true;
+      const minPriceMatch = form.minPriceInput
+        ? product.price >= form.minPriceInput
+        : true;
+      const maxPriceMatch = form.maxPriceInput
+        ? product.price <= form.maxPriceInput
+        : true;
+      return nameMatch && categoryMatch && minPriceMatch && maxPriceMatch;
+    });
+    setFilteredProducts(filteredProducts);
   };
 
   const fetchArchivedProducts = async () => {
@@ -152,6 +194,10 @@ export const useDashboard = () => {
     }
   };
 
+  const filterProductsCriteria = (filters: any, operators: any) => {
+    console.log(form);
+  };
+
   const handleRestore = async (id: number) => {
     try {
       const response = await unarchivedProduct(id);
@@ -161,13 +207,14 @@ export const useDashboard = () => {
         );
         setProducts([...products, response.data]);
         setArchivedProducts(updatedProducts);
-        toast.success(response.message);        
+        toast.success(response.message);
       }
     } catch (error) {
       console.error("Error restoring product: ", error);
       toast.error("Error restaurando el producto");
     }
   };
+
   return {
     categories,
     products,
@@ -181,6 +228,9 @@ export const useDashboard = () => {
     removeProduct,
     fetchArchivedProducts,
     archivedProducts,
-    handleRestore
+    handleRestore,
+    form,
+    handleFormChange,
+    filteredProducts,
   };
 };

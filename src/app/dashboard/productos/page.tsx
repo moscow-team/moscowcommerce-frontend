@@ -8,21 +8,9 @@ import { EditProductModal } from "./modals/EditProductModal";
 import { FilterModal } from "./modals/FilterModal";
 import { ArchivedProductModal } from "./modals/ArchivedProductModal";
 import ProductTable from "./tables/ProductTable";
+import { Product } from "@/interfaces/Product";
 
 export default function ProductList() {
-  interface Product {
-    id: number;
-    name: string;
-    description: string;
-    price: number;
-    stock: number;
-    category: {
-      id: number;
-      name: string;
-    };
-    urlPhotos: string[];
-    archived: boolean;
-  }
   const { setSelectedProduct, setPhotosToDelete, fetchArchivedProducts } = useDashboard()
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalFilterOpen, setIsModalFilterOpen] = useState(false);
