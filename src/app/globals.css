@@ -69,6 +69,10 @@
   min-width: 75vw;
 }
 
+.custom-width-user {
+  min-width: 50vw;
+}
+
 .image-preview-container {
   position: relative;
   display: inline-block;

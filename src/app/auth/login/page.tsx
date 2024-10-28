@@ -22,39 +22,38 @@ function LoginPage() {
     //Enviar peticon al NextAuth o Servidor para realizar la autenticacion (Hacerlo Hook)
 
     if (isInvalidEmail) {
-      toast.error("Por favor, ingrese un email correcto"); 
+      toast.error("Por favor, ingrese un email correcto");
       return;
     }
     try {
-      const session  = await signIn("credentials", {
+      const session = await signIn("credentials", {
         username: data.email,
         password: data.password,
         redirect: false,
       });
       console.log(session);
       if (session?.ok) {
+        localStorage.setItem("loggedInUserEmail", data.email);
+
         router.push("/dashboard");
         toast.success("Sesión iniciada ");
-      }else{
+      } else {
         toast.error(session?.error || "Credenciales incorrectas");
       }
-    } catch (error:any) {
+    } catch (error: any) {
       toast.error(error.message || error.error || "Credenciales incorrectas");
-
     }
-
-
   });
 
-  
   const [valueEmail, setValueEmail] = useState("");
 
-  const validateEmail = (value: string) => value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
+  const validateEmail = (value: string) =>
+    value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
 
   const isInvalidEmail = useMemo(() => {
-      if (valueEmail === "") return false;
+    if (valueEmail === "") return false;
 
-      return validateEmail(valueEmail) ? false : true;
+    return validateEmail(valueEmail) ? false : true;
   }, [valueEmail]);
 
   return (
@@ -73,11 +72,16 @@ function LoginPage() {
               label="Email"
               value={valueEmail}
               isRequired
-
               isInvalid={isInvalidEmail}
               color={isInvalidEmail ? "danger" : "success"}
-              onValueChange={setValueEmail}              variant="underlined"
-              {...register("email", { required: { value: true, message: "Debe ingresar un email valido" } })}
+              onValueChange={setValueEmail}
+              variant="underlined"
+              {...register("email", {
+                required: {
+                  value: true,
+                  message: "Debe ingresar un email valido",
+                },
+              })}
             />
             {errors.email && (
               // validacion de errores
@@ -93,7 +97,12 @@ function LoginPage() {
               label="Contraseña"
               type="password"
               variant="underlined"
-              {...register("password", { required: { value: true, message: "Debe ingresar una contrasseña" } })}
+              {...register("password", {
+                required: {
+                  value: true,
+                  message: "Debe ingresar una contrasseña",
+                },
+              })}
             />
 
             {errors.password && (
@@ -113,14 +122,16 @@ function LoginPage() {
           </Button>
 
           <Button
-            onClick={()=>router.push("/auth/register")}
+            onClick={() => router.push("/auth/register")}
             color="secondary"
             className="w-full"
           >
             Registrarse
           </Button>
           <div className="">
-            <Link href="/auth/register" className="text-blue-500">¿Olvidaste tu contraseña?</Link>
+            <Link href="/auth/register" className="text-blue-500">
+              ¿Olvidaste tu contraseña?
+            </Link>
           </div>
         </form>
       </Card>

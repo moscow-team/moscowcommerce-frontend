@@ -70,3 +70,17 @@ export const archiveUser = async (data: any) => {
 
   return response.json();
 }
+
+export const unarchiveUserService = async (data: any) => {
+  const session: any = await getSession();
+  const response = await fetch(`${apiUrl}users/${data.id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${session?.user?.token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  return response.json();
+}

@@ -37,8 +37,8 @@ export default function ProductTable({openEditModal}: {openEditModal: any}) {
               <TableCell>{product.id}</TableCell>
               <TableCell>{product.name}</TableCell>
               <TableCell>
-                {product.description.length > 75
-                  ? `${product.description.substring(0, 75)}...`
+                {product.description.length > 35
+                  ? `${product.description.substring(0, 35)}...`
                   : product.description}
               </TableCell>
               <TableCell>${product.price.toLocaleString("es")}</TableCell>
