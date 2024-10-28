@@ -29,7 +29,11 @@ export function FilterModal({
   onOpenChange: any;
   closeModal: any;
 }) {
-  const { saveProduct, categories, filterProducts, form, handleFormChange } = useDashboard();
+  const { categories, filterProducts, form, handleFormChange } = useDashboard();
+  const handleFilterProducts = async () =>{
+    await filterProducts()
+    closeModal()
+  }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent aria-describedby={undefined}>
@@ -59,7 +63,6 @@ export function FilterModal({
         <div>
           <Label htmlFor="filterCategory">Buscar por categoría</Label>
           <Select name="filterCategory" defaultValue={form.categorySelect} onValueChange={(e) => {
-            console.log(e);
             handleFormChange('categorySelect', e);
           }}>
             <SelectTrigger className="w-full">
@@ -103,7 +106,7 @@ export function FilterModal({
 
         <DialogFooter>
           <Button
-            onClick={filterProducts}
+            onClick={handleFilterProducts}
             type="submit"
           >
             Aplicar

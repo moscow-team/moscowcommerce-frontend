@@ -1,13 +1,13 @@
+"use client";
 import { EcommerceContext } from "@/app/context/EcommerceProvider";
 import {
   createProduct,
   deleteProduct,
   getProducts,
-  getProductsByFilters,
   unarchivedProduct,
   updateProduct,
 } from "@/services/dashboard/productoService";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DashboardContext } from "../context/DashboardProvider";
 import { Product } from "@/interfaces/Product";
@@ -16,6 +16,9 @@ export const useDashboard = () => {
   const [photosToDelete, setPhotosToDelete] = useState<string[]>([]);
   const context = useContext(EcommerceContext);
   const dashboardContext = useContext(DashboardContext);
+
+  // Sincroniza filteredProducts solo la primera vez que se cargan los productos
+
   if (context === undefined) {
     throw new Error("useDashboard must be used within a EcommerceContext");
   }
@@ -28,9 +31,12 @@ export const useDashboard = () => {
     setArchivedProducts,
     selectedProduct,
     setSelectedProduct,
+    setFilteredProducts,
+    filteredProducts,
   } = dashboardContext;
-
-  const [filteredProducts, setFilteredProducts] = useState<any>(products);
+  useEffect(() => {
+    setFilteredProducts(products);
+  }, [products]);
 
   const saveProduct = async (product: any) => {
     toast.loading("Creando producto...");
@@ -40,6 +46,7 @@ export const useDashboard = () => {
         toast.dismiss();
         toast.success("Producto creado correctamente");
         setProducts([...products, response.data]);
+        setFilteredProducts([...filteredProducts, response.data]);
       }
     } catch (error) {
       toast.dismiss();
@@ -57,8 +64,11 @@ export const useDashboard = () => {
         const updatedProducts = products.filter(
           (product: any) => product.id !== id
         );
-        console.log("Updated products: ", updatedProducts);
+        const updatedFilteredProducts = products.filter(
+          (product: any) => product.id !== id
+        );
         setProducts([...updatedProducts, response.data]);
+        setFilteredProducts([...updatedFilteredProducts, response.data]);
       } else {
         toast.dismiss();
         toast.error(response.message);
@@ -87,7 +97,11 @@ export const useDashboard = () => {
         const updatedProducts = products.filter(
           (product: any) => product.id !== id
         );
+        const updatedFilteredProducts = filteredProducts.filter(
+          (product: any) => product.id !== id
+        );
         setProducts(updatedProducts);
+        setFilteredProducts([...updatedFilteredProducts]);
         toast.dismiss();
         toast.success(response.message);
       }
@@ -158,7 +172,7 @@ export const useDashboard = () => {
     //   console.error("Error filtering products: ", error);
     //   toast.error("Error filtrando productos");
     // }
-    const filteredProducts = products.filter((product: any) => {
+    const filtered = filteredProducts.filter((product: any) => {
       const nameMatch = form.nameInput
         ? product.name.toLowerCase().includes(form.nameInput.toLowerCase())
         : true;
@@ -173,7 +187,9 @@ export const useDashboard = () => {
         : true;
       return nameMatch && categoryMatch && minPriceMatch && maxPriceMatch;
     });
-    setFilteredProducts(filteredProducts);
+    console.log("Filtrados: ", filtered);
+    toast.success("Productos filtrados");
+    setFilteredProducts(filtered);
   };
 
   const fetchArchivedProducts = async () => {
