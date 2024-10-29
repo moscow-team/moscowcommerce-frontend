@@ -8,6 +8,11 @@ import { use, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useDashboard } from "../../hooks/useDashboard";
 
+interface SelectedFile {
+  file: File;
+  previewUrl: string;
+}
+
 export function EditProductModal({ open, onOpenChange, closeModal }: {
   open: boolean, onOpenChange: any, closeModal: any
 }) {
@@ -15,6 +20,7 @@ export function EditProductModal({ open, onOpenChange, closeModal }: {
   const { categories } = useCategory();
   const { selectedProduct, setPhotosToDelete, photosToDelete, editProduct } = useDashboard();
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,18 +29,14 @@ export function EditProductModal({ open, onOpenChange, closeModal }: {
       const newFormData = new FormData();
 
       // Agregar fotos existentes al nuevo FormData
-      selectedProduct.urlPhotos.forEach((url) => {
+      selectedProduct.urlPhotos.forEach((url: string) => {
         newFormData.append("existingPhotos", url);
       });
 
-
-      // Agregar nuevas fotos
-      if (formData.getAll("photos").length > 0) {
-        const newPhotos = formData.getAll("photos");
-        newPhotos.forEach((photo) => {
-          newFormData.append("photos", photo);
-        });
-      }
+      // Añadir todas las fotos del estado `selectedFiles` al FormData
+      selectedFiles.forEach(({ file }) => {
+        newFormData.append("photos", file);
+      });
 
       // Agregar otros campos, evitando agregar "photos" nuevamente
       formData.forEach((value, key) => {
@@ -60,20 +62,21 @@ export function EditProductModal({ open, onOpenChange, closeModal }: {
   const handleDeleteImage = (url: string) => {
     setImagePreviews((prev) => prev.filter((imageUrl) => imageUrl !== url));
 
-    // Agregar la foto eliminada a la lista de fotos a eliminar
+    // Si es una foto existente, agregar la foto a la lista de fotos a eliminar
     if (selectedProduct?.urlPhotos.includes(url)) {
       setPhotosToDelete((prev) => [...prev, url]);
+    } else {
+      // Si es una foto nueva, localizar el archivo correspondiente y eliminarlo de `selectedFiles`
+      setSelectedFiles((prevFiles) => prevFiles.filter((item) => item.previewUrl !== url));
     }
 
     const input = document.getElementById("photos") as HTMLInputElement;
     if (input && input.files) {
-      const filesArray = Array.from(input.files);
 
       // Usar URL.createObjectURL para verificar si la URL coincide
-      const filteredFiles = filesArray.filter((file) => {
-        const fileURL = URL.createObjectURL(file);
-        return fileURL !== url; // Comparar con la URL de previsualización
-      });
+      const filteredFiles = Array.from(input.files).filter(
+        (file) => URL.createObjectURL(file) !== url
+      );
 
       // Crear un nuevo DataTransfer y agregar los archivos filtrados
       const dataTransfer = new DataTransfer();
@@ -86,16 +89,27 @@ export function EditProductModal({ open, onOpenChange, closeModal }: {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const target = e.target as HTMLInputElement;
-    if (target.files && target.files.length > 5) {
-      toast.error("Solo se puede subir un máximo de 5 archivos");
-      target.value = "";
-      return;
-    }
 
     if (target.files) {
-      const filesArray = Array.from(target.files);
-      const imageUrls = filesArray.map((file) => URL.createObjectURL(file));
-      setImagePreviews((prev) => [...prev, ...imageUrls]);
+      // Comprobar el total de imágenes actuales más las nuevas
+      const totalImages = imagePreviews.length + target.files.length;
+      if (totalImages > 5) {
+        toast.error("Solo puedes subir un máximo de 5 imágenes en total");
+        target.value = ""; // Limpiar el input de archivo si se excede el límite
+        return;
+      }
+
+      // Convertir los archivos a objetos SelectedFile
+      const newFiles = Array.from(target.files).map((file) => ({
+        file,
+        previewUrl: URL.createObjectURL(file),
+      }));
+
+      setSelectedFiles((prevFiles) => [...prevFiles, ...newFiles]);
+
+      // Actualizar las URLs de previsualización
+      const newPreviews = newFiles.map((item) => item.previewUrl);
+      setImagePreviews((prevPreviews) => [...prevPreviews, ...newPreviews]);
     }
   };
 
@@ -167,7 +181,7 @@ export function EditProductModal({ open, onOpenChange, closeModal }: {
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  {categories.map((category) => (
+                  {categories.map((category: { id: number; name: string }) => (
                     <SelectItem
                       key={category.id}
                       value={category.id.toString()}

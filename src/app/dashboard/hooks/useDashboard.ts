@@ -239,7 +239,7 @@ export const useDashboard = () => {
     setSelectedProduct,
     selectedProduct,
     photosToDelete,
-    setPhotosToDelete,
+    setPhotosToDelete, 
     filterProducts,
     removeProduct,
     fetchArchivedProducts,

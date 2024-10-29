@@ -10,34 +10,44 @@ import { ArchivedProductModal } from "./modals/ArchivedProductModal";
 import ProductTable from "./tables/ProductTable";
 import { Product } from "@/interfaces/Product";
 
+interface SelectedFile {
+  file: File;
+  previewUrl: string;
+}
+
 export default function ProductList() {
   const { setSelectedProduct, setPhotosToDelete, fetchArchivedProducts } = useDashboard()
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalFilterOpen, setIsModalFilterOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isArchivedModalOpen, setIsArchivedModalOpen] = useState(false);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
   const openModal = useCallback(() => {
     setIsModalOpen(true);
-    // setImagePreviews([]);
+    setImagePreviews([]);
   }, []);
 
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
-    // setImagePreviews([]);
+    setImagePreviews([]);
+    setPhotosToDelete([]);
+    setSelectedFiles([]);
   }, []);
 
   const openEditModal = (product: Product) => {
     console.log(product);
     setSelectedProduct(product);
-    // setImagePreviews(product.urlPhotos);
+    setImagePreviews(product.urlPhotos);
     setIsEditModalOpen(true);
   };
 
   const closeEditModal = useCallback(() => {
     setSelectedProduct(null);
     setIsEditModalOpen(false);
-    // setImagePreviews([]);
+    setImagePreviews([]);
     setPhotosToDelete([]);
+    setSelectedFiles([]);
   }, []);
 
   const openArchivedModal = async () => {
