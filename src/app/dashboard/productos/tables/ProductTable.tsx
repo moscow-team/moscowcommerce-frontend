@@ -74,7 +74,7 @@ export default function ProductTable({
                     {product.urlPhotos.map((image: any, index: any) => (
                       <CarouselItem key={index}>
                         <Card>
-                          <img src={image} alt={product.name} />
+                          <img src={image} alt={product.name} className="aspect-square object-contain"/>
                         </Card>
                       </CarouselItem>
                     ))}

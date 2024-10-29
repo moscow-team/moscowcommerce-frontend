@@ -16,13 +16,11 @@ interface SelectedFile {
 }
 
 export default function ProductList() {
-  const { setSelectedProduct, setPhotosToDelete, fetchArchivedProducts } = useDashboard()
+  const { setSelectedProduct, setPhotosToDelete, fetchArchivedProducts, setImagePreviews, setSelectedFiles, resetFilter, resetForm  } = useDashboard()
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalFilterOpen, setIsModalFilterOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isArchivedModalOpen, setIsArchivedModalOpen] = useState(false);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
   const openModal = useCallback(() => {
     setIsModalOpen(true);
     setImagePreviews([]);
@@ -36,7 +34,6 @@ export default function ProductList() {
   }, []);
 
   const openEditModal = (product: Product) => {
-    console.log(product);
     setSelectedProduct(product);
     setImagePreviews(product.urlPhotos);
     setIsEditModalOpen(true);
@@ -63,6 +60,8 @@ export default function ProductList() {
 
   /* Filtros */
   const openFilterModal = () => {
+    resetForm();
+    resetFilter();
     setIsModalFilterOpen(true);
   };
 
@@ -94,13 +93,16 @@ export default function ProductList() {
   };
   */
 
-;
+  ;
 
   return (
     <div className="container mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Productos</h1>
         <div className="flex gap-2">
+          {/* <Button onClick={resetFilter} className="bg-red-800 text-white">
+            Resetear Filtros
+          </Button> */}
           <Button onClick={openFilterModal} className="bg-gray-800 text-white">
             <Search size={16} className="mr-2" />
             Filtrar

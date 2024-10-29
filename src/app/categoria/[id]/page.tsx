@@ -94,12 +94,12 @@ export default function Page() {
     return <Loading />;
   }
   return (
-    <div className="flex flex-row h-screen w-full">
+    <div className="flex flex-row h-full w-full">
       <Aside>
       <Input placeholder="Buscar..." />
         <ProductFilter/>
       </Aside>
-      <div className="px-10">
+      <div className="px-10 mb-5">
         <Breadcrumb className="my-5">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -114,38 +114,38 @@ export default function Page() {
         <h1 className="font-semibold text-2xl">{category.name}</h1>
         <p className="text-gray-700 py-2">{category.description}</p>
         <div className="w-full h-full flex flex-row py-10">
-          <section className="w-full h-full flex flex-col px-5 gap-5">
-            <div className="flex flex-row flex-wrap gap-6">
-              {products.map((product, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-lg shadow-md overflow-hidden w-72"
-                >
-                  <img
-                    alt={`Product ${index + 1}`}
-                    className="w-full h-48 object-contain p-2 cursor-pointer"
-                    src={product?.urlPhotos?.[0] ? product.urlPhotos[0] : ""}
-                  />
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold mb-2">
-                      {product.name}
-                    </h3>
-                    <p className="text-gray-600 mb-4 h-14">
-                      {product.description}
-                    </p>
-                    <div className="flex flex-col h-full gap-2 items-center justify-between">
-                      <span className="text-xl font-bold text-primary">
-                        ${product.price.toLocaleString("es")}
-                      </span>
-                      <Button variant="default" className="text-white">
-                        Agregar al carrito
-                      </Button>
-                    </div>
+        <section className="w-full h-full flex flex-col px-5 gap-5 items-center">
+          <div className="flex flex-row flex-wrap gap-6">
+            {products.map((product, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-lg shadow-md overflow-hidden w-72"
+              >
+                <img
+                  alt={`Product ${index + 1}`}
+                  className="w-full h-48 object-contain p-2 cursor-pointer"
+                  src={product?.urlPhotos?.[0] ? product.urlPhotos[0] : ""}
+                />
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold mb-2">
+                    {product.name}
+                  </h3>
+                  <p className="text-gray-600 mb-4 h-14">
+                    {product.description}
+                  </p>
+                  <div className="flex flex-col h-full gap-2 items-center justify-between">
+                    <span className="text-xl font-bold text-primary">
+                      ${product.price.toLocaleString("es")}
+                    </span>
+                    <Button variant="default" className="text-white">
+                      Agregar al carrito
+                    </Button>
                   </div>
                 </div>
-              ))}
-            </div>
-          </section>
+              </div>
+            ))}
+          </div>
+        </section>
         </div>
       </div>
     </div>

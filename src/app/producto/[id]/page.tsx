@@ -88,11 +88,11 @@ export default function Page() {
     <div className="w-full h-full">
       <section className="flex flex-row gap-5 py-32">
         <div className="w-full h-full flex flex-col justify-center items-center gap-5 ">
-          <div className="aspect-square object-contain w-2/5 h-2/5 p-15 shadow-lg cursor-pointer">
+          <div className=" w-2/5 h-2/5 p-15 shadow-lg cursor-pointer">
             <img
               src={product?.urlPhotos[0]}
               alt={product?.name}
-              className="h-full w-full"
+              className="h-full w-full aspect-square object-contain "
               onClick={() => setIndex(0)}
             />
           </div>
@@ -102,7 +102,7 @@ export default function Page() {
                 <img
                   src={photo}
                   alt={product?.name}
-                  className="h-full w-full"
+                  className="h-full w-full aspect-square object-contain"
                   onClick={() => setIndex(index)}
                 />
               </div>

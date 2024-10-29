@@ -13,7 +13,6 @@ import { DashboardContext } from "../context/DashboardProvider";
 import { Product } from "@/interfaces/Product";
 
 export const useDashboard = () => {
-  const [photosToDelete, setPhotosToDelete] = useState<string[]>([]);
   const context = useContext(EcommerceContext);
   const dashboardContext = useContext(DashboardContext);
 
@@ -33,6 +32,12 @@ export const useDashboard = () => {
     setSelectedProduct,
     setFilteredProducts,
     filteredProducts,
+    photosToDelete,
+    setPhotosToDelete,
+    imagePreviews,
+    setImagePreviews,
+    selectedFiles,
+    setSelectedFiles
   } = dashboardContext;
   useEffect(() => {
     setFilteredProducts(products);
@@ -124,7 +129,6 @@ export const useDashboard = () => {
   };
 
   const filterProducts = async () => {
-    console.log(form);
     // try {
     //   const nameInput = document.getElementById("search") as HTMLInputElement;
     //   const categorySelect = document.querySelector(
@@ -172,6 +176,7 @@ export const useDashboard = () => {
     //   console.error("Error filtering products: ", error);
     //   toast.error("Error filtrando productos");
     // }
+
     const filtered = filteredProducts.filter((product: any) => {
       const nameMatch = form.nameInput
         ? product.name.toLowerCase().includes(form.nameInput.toLowerCase())
@@ -187,7 +192,6 @@ export const useDashboard = () => {
         : true;
       return nameMatch && categoryMatch && minPriceMatch && maxPriceMatch;
     });
-    console.log("Filtrados: ", filtered);
     toast.success("Productos filtrados");
     setFilteredProducts(filtered);
   };
@@ -231,6 +235,14 @@ export const useDashboard = () => {
     }
   };
 
+
+  const resetForm = () => {
+    setForm({ nameInput: "", categorySelect: "", minPriceInput: "", maxPriceInput: "" });
+  }
+  const resetFilter = () => {
+    setFilteredProducts(products);
+  }
+
   return {
     categories,
     products,
@@ -239,7 +251,7 @@ export const useDashboard = () => {
     setSelectedProduct,
     selectedProduct,
     photosToDelete,
-    setPhotosToDelete, 
+    setPhotosToDelete,
     filterProducts,
     removeProduct,
     fetchArchivedProducts,
@@ -248,5 +260,11 @@ export const useDashboard = () => {
     form,
     handleFormChange,
     filteredProducts,
+    imagePreviews,
+    setImagePreviews,
+    selectedFiles,
+    setSelectedFiles,
+    resetFilter,
+    resetForm
   };
 };

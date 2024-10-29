@@ -4,30 +4,25 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { useDashboard } from "../../hooks/useDashboard";
 
-interface SelectedFile {
-    file: File;
-    previewUrl: string;
-}
+
 
 export function NewProductModal({ open, onOpenChange, closeModal }: {
     open: boolean, onOpenChange: any, closeModal: any
 }) {
     const formRef = useRef<HTMLFormElement>(null);
     const { categories } = useCategory();
-    const { saveProduct } = useDashboard();
-    const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-    const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
+    const { saveProduct, imagePreviews, setImagePreviews, setSelectedFiles, selectedFiles } = useDashboard();
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (formRef.current) {
             const formData = new FormData(formRef.current);
             const newFormData = new FormData();
             // Añadir todas las fotos del estado 'selectedFiles' al nuevo FormData
-            selectedFiles.forEach(({ file }) => {
+            selectedFiles.forEach(({file}: any) => {
                 newFormData.append("photos", file);
             });
             formData.forEach((value, key) => {
@@ -45,7 +40,7 @@ export function NewProductModal({ open, onOpenChange, closeModal }: {
     const handleDeleteImage = (url: string) => {
         setImagePreviews((prev) => prev.filter((imageUrl) => imageUrl !== url));
 
-        setSelectedFiles((prevFiles) => prevFiles.filter((item) => item.previewUrl !== url));
+        setSelectedFiles((prevFiles) => prevFiles.filter((item) => item.previewUrl as string !== url));
 
         const input = document.getElementById("photos") as HTMLInputElement;
         if (input && input.files) {
@@ -89,6 +84,11 @@ export function NewProductModal({ open, onOpenChange, closeModal }: {
         }
     };
 
+
+    useEffect(() => {
+        setSelectedFiles([]);
+        setImagePreviews([]);
+    }, []);
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent aria-describedby={undefined}>

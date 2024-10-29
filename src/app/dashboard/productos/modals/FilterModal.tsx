@@ -29,9 +29,10 @@ export function FilterModal({
   onOpenChange: any;
   closeModal: any;
 }) {
-  const { categories, filterProducts, form, handleFormChange } = useDashboard();
+  const { categories, filterProducts, form, handleFormChange, resetForm } = useDashboard();
   const handleFilterProducts = async () =>{
     await filterProducts()
+    resetForm()
     closeModal()
   }
   return (
@@ -49,7 +50,7 @@ export function FilterModal({
               id="search"
               placeholder="Introduce el nombre del producto"
               className="pl-10"
-              // value={form.nameInput}
+              value={form.nameInput}
               onChange={(e) => {
                 handleFormChange('nameInput', e);
               }}
@@ -87,7 +88,7 @@ export function FilterModal({
               id="filterByPriceRange"
               type="number"
               placeholder="Precio mínimo"
-              // value={form.minPriceInput}
+              value={form.minPriceInput}
               onChange={(e) => {
                 handleFormChange('minPriceInput', e);
               }}
@@ -96,7 +97,7 @@ export function FilterModal({
               id="filterByPriceRange"
               type="number"
               placeholder="Precio máximo"
-              // value={form.maxPriceInput}
+              value={form.maxPriceInput}
               onChange={(e) => {
                 handleFormChange('maxPriceInput', e);
               }}

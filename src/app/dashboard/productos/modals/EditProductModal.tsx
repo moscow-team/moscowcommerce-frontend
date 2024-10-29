@@ -54,7 +54,8 @@ export function EditProductModal({ open, onOpenChange, closeModal }: {
         });
       }
       await editProduct(selectedProduct.id, newFormData);
-
+    // DEUDA TECNICA: No se recarga la página al cerrar el modal de edición (no se actualiza la tabla)
+      window.location.reload();
       closeModal();
     }
   };
@@ -119,6 +120,11 @@ export function EditProductModal({ open, onOpenChange, closeModal }: {
     }
   }, [selectedProduct]);
 
+
+  useEffect(() => {
+    setSelectedFiles([]);
+    setImagePreviews([]);
+}, []);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent aria-describedby={undefined}>
@@ -225,7 +231,7 @@ export function EditProductModal({ open, onOpenChange, closeModal }: {
               : null}
           </div>
           <DialogFooter>
-            <Button onClick={closeModal} variant="outline" type="submit">
+            <Button onClick={closeModal} variant="outline" type="button">
               Cancelar
             </Button>
             <Button type="submit" style={{ color: "white" }}>
