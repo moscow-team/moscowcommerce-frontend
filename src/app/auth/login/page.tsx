@@ -129,7 +129,7 @@ function LoginPage() {
             Registrarse
           </Button>
           <div className="">
-            <Link href="/auth/register" className="text-blue-500">
+            <Link href="/auth/recovery-password" className="text-blue-500">
               ¿Olvidaste tu contraseña?
             </Link>
           </div>
