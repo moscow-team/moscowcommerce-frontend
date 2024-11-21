@@ -3,12 +3,13 @@ import { Categoria } from "@/interfaces/Categoria";
 import { Product } from "@/interfaces/Product";
 import { getCategorias } from "@/services/dashboard/categoriaService";
 import { getProducts } from "@/services/dashboard/productoService";
+import { IProduct } from "@/services/interfaces/IProduct";
 import { createContext, useState, ReactNode, useEffect } from "react";
 
 interface EcommerceContextType {
   categories: any;
   setCategories: React.Dispatch<React.SetStateAction<any>>;
-  products: any;
+  products: IProduct[];
   setProducts: React.Dispatch<React.SetStateAction<any>>;
   isLoading: boolean;
 }
@@ -19,7 +20,7 @@ export const EcommerceContext = createContext<EcommerceContextType | undefined>(
 
 export const EcommerceProvider = ({ children }: { children: ReactNode }) => {
   const [categories, setCategories] = useState<any>([]);
-  const [products, setProducts] = useState<any>([]);
+  const [products, setProducts] = useState<IProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const fetchCategories = async () => {
     try {
@@ -42,6 +43,7 @@ export const EcommerceProvider = ({ children }: { children: ReactNode }) => {
       const filtered = response.data.filter(
         (product: Product) => product.archived === false
       );
+      console.log(filtered);
       setProducts(filtered);
     } catch (error) {
       console.error(error);

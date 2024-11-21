@@ -11,6 +11,7 @@ import { useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DashboardContext } from "../context/DashboardProvider";
 import { Product } from "@/interfaces/Product";
+import { PDFService } from "@/services/PDFService";
 
 export const useDashboard = () => {
   const context = useContext(EcommerceContext);
@@ -235,12 +236,15 @@ export const useDashboard = () => {
     }
   };
 
-
   const resetForm = () => {
     setForm({ nameInput: "", categorySelect: "", minPriceInput: "", maxPriceInput: "" });
   }
   const resetFilter = () => {
     setFilteredProducts(products);
+  }
+
+  const printInventoryReport = async () => {
+    await PDFService.printStockProduct(products);
   }
 
   return {
@@ -265,6 +269,7 @@ export const useDashboard = () => {
     selectedFiles,
     setSelectedFiles,
     resetFilter,
-    resetForm
+    resetForm,
+    printInventoryReport
   };
 };

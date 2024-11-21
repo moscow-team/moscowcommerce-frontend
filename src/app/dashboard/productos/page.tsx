@@ -16,7 +16,7 @@ interface SelectedFile {
 }
 
 export default function ProductList() {
-  const { setSelectedProduct, setPhotosToDelete, fetchArchivedProducts, setImagePreviews, setSelectedFiles, resetFilter, resetForm  } = useDashboard()
+  const { setSelectedProduct, setPhotosToDelete, fetchArchivedProducts, setImagePreviews, setSelectedFiles, resetFilter, resetForm, printInventoryReport  } = useDashboard()
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalFilterOpen, setIsModalFilterOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -103,6 +103,9 @@ export default function ProductList() {
           {/* <Button onClick={resetFilter} className="bg-red-800 text-white">
             Resetear Filtros
           </Button> */}
+                 <Button onClick={printInventoryReport} className="bg-gray-800 text-white">
+            Imprimir
+          </Button>
           <Button onClick={openFilterModal} className="bg-gray-800 text-white">
             <Search size={16} className="mr-2" />
             Filtrar
