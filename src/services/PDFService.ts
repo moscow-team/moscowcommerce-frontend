@@ -3,9 +3,10 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import { IProduct } from "./interfaces/IProduct";
 import { PriceFormatter } from "@/utils/PriceFormatter";
 import { DateFormatterWithHour } from "@/utils/DateFormatter";
+
 export const PDFService = {
- 
   async printStockProduct(products: IProduct[], title: string) {
+
     const negocio = {
       name: "Moscow Ecommerce",
     };

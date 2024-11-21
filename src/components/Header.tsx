@@ -11,8 +11,9 @@ import { useCart } from "@/app/context/useCart";
 export default function Header() {
   const { data: session, status } = useSession(); // Aquí obtienes la sesión de forma segura en un Client Component
   const [user, setUser] = useState({ email: "", name: "", status: "Offline" });
-  const {productQuantity} = useCart();
+  const { productQuantity } = useCart();
   useEffect(() => {
+    console.log("session", session);
     if (status === "authenticated" && session?.user) {
       setUser({
         email: session.user.email ?? "moskow@admin.com",
@@ -33,6 +34,11 @@ export default function Header() {
               <span className="text-2xl font-bold text-white ">Moskow</span>
             </Link>
             <nav className="hidden md:ml-6 md:flex md:space-x-4">
+              {session?.user && session.user.role === "ADMIN" ? (
+                <Link href="/dashboard" className="text-gray-200 hover:text-orange-300">
+                  Dashboard
+                </Link>
+              ) : null}
               <Link href="/" className="text-gray-200 hover:text-orange-300">
                 Inicio
               </Link>

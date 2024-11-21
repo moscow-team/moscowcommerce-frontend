@@ -9,6 +9,8 @@ import { useEcommerce } from "../context/useEcommerce";
 import Aside from "@/components/Aside";
 import { useLoader } from "../context/useLoader";
 import Loading from "./loading";
+import { Breadcrumb, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { BreadcrumbItem } from "@nextui-org/react";
 
 interface Producto {
     id: number;
@@ -47,19 +49,30 @@ export default function Page() {
     }
 
     return (
-        <div className="flex h-screen w-full">
+        <div className="flex h-full min-h-screen w-full">
             <Aside>
                 <Input placeholder="Buscar..." />
                 <p className="text-center">Categorias</p>
                 <CheckboxReactHookFormMultiple />
             </Aside>
-            <div>
+            <div className="flex flex-col gap-5 p-5">
+            <Breadcrumb className="my-5">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Productos</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
                 <h2 className="text-3xl font-bold text-gray-900 mb-8">Productos</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {products.map((product) => (
                         <div
                             key={product.id}
-                            className="bg-white rounded-lg shadow-md overflow-hidden"
+                            className="bg-white rounded-lg shadow-md overflow-hidden h-full"
                         >
                             <img
                                 src={product.urlPhotos[0]}
@@ -68,10 +81,10 @@ export default function Page() {
                                 onClick={() => goToProductDetail(product)}
                             />
                             <div className="p-4">
-                                <h3 className="text-lg font-semibold mb-2">
+                                <h3 className="text-lg font-semibold mb-2 text-ellipsis overflow-hidden whitespace-nowrap">
                                     {product.name}
                                 </h3>
-                                <p className="text-gray-600 mb-4 h-14">
+                                <p className="text-gray-600 mb-4 h-14 text-ellipsis overflow-hidden whitespace-nowrap">
                                     {product.description}
                                 </p>
                                 <div className="flex flex-col h-full gap-2 items-center justify-between">
