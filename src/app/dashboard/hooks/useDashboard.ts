@@ -244,7 +244,11 @@ export const useDashboard = () => {
   }
 
   const printInventoryReport = async () => {
-    await PDFService.printStockProduct(products);
+    await PDFService.printStockProduct(products, "Lista de Productos");	
+  }
+  const printLowStockReport = async () => {
+    const lowStock = products.filter((product: any) => product.stock < 5);
+    await PDFService.printStockProduct(lowStock, "Lista de Productos con poco stock");	
   }
 
   return {
@@ -270,6 +274,7 @@ export const useDashboard = () => {
     setSelectedFiles,
     resetFilter,
     resetForm,
-    printInventoryReport
+    printInventoryReport,
+    printLowStockReport
   };
 };

@@ -1,22 +1,18 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { IProduct } from "./interfaces/IProduct";
-
+import { PriceFormatter } from "@/utils/PriceFormatter";
+import { DateFormatterWithHour } from "@/utils/DateFormatter";
 export const PDFService = {
  
-  async printStockProduct(products: IProduct[]) {
-    console.log(products);
+  async printStockProduct(products: IProduct[], title: string) {
     const negocio = {
-      nombre: "Moscow Ecommerce",
+      name: "Moscow Ecommerce",
     };
-    const fechaFormateada = new Date().toLocaleDateString("es-AR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-    const defaultFileName = `Listado de Productos ${fechaFormateada}`;
+    const fechaFormateada = DateFormatterWithHour(new Date());
+    const defaultFileName = `${title} ${fechaFormateada}`;
 
-    let tablaPdf = [
+    let table = [
       [
         {
           text: "NRO",
@@ -64,25 +60,25 @@ export const PDFService = {
     ];
 
     for (const fila of products) {
-      tablaPdf.push([
+      table.push([
         { text: `${fila.id}`, fontSize: 11 },
         { text: `${fila.name}`, fontSize: 11 },
         { text: `${fila.description}`, fontSize: 11 },
         { text: `${fila.category.name}`, fontSize: 11 },
         { text: `${fila.stock}`, fontSize: 11 },
-        { text: `${fila.price}`, fontSize: 11 },
+        { text: `${PriceFormatter(fila.price)}`, fontSize: 11 },
       ]);
     }
     const data = {
       info: {
         title: defaultFileName,
-        creator: `${negocio.nombre}`,
-        author: `${negocio.nombre}`,
+        creator: `${negocio.name}`,
+        author: `${negocio.name}`,
         subject: defaultFileName,
       },
       header: {
         table: {
-          widths: ["auto", "auto", "*"],
+          widths: ["*", "*"],
           body: [
             [
               //   {
@@ -92,7 +88,7 @@ export const PDFService = {
               {
                 stack: [
                   {
-                    text: `${negocio.nombre}`,
+                    text: `${negocio.name}`,
                     style: "template2",
                     bold: true,
                     alignment: "left",
@@ -111,6 +107,7 @@ export const PDFService = {
               {
                 stack: [
                   { text: `LISTADO DE PRODUCTOS`, style: "template1" },
+                  { text: ``, style: "template2" },
                   { text: `${fechaFormateada}`, style: "template2" },
                   {
                     text: `TOTAL: ${products.length} productos`,
@@ -139,19 +136,14 @@ export const PDFService = {
         {
           table: {
             widths: [
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
+              "*",
+              "*",
+              "*",
+              "*",
+              "*",
+              "*",
             ],
-            body: tablaPdf,
+            body: table,
           },
           alignment: "center",
         },
@@ -200,6 +192,6 @@ export const PDFService = {
       pageOrientation: "landscape",
       pageMargins: [30, 130, 30, 50],
     };
-    const pdfReparacion = pdfMake.createPdf(data).open();
+    pdfMake.createPdf(data).open();
   },
 };
