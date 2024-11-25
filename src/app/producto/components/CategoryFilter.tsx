@@ -40,7 +40,7 @@ export function CheckboxReactHookFormMultiple() {
           name="items"
           render={() => (
             <FormItem>
-              {categories.map((item) => (
+              {categories.map((item: { id: string; name: string }) => (
                 <FormField
                   key={item.id}
                   control={form.control}

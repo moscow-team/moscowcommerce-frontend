@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useDashboard } from "../../hooks/useDashboard";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { IProduct } from "@/services/interfaces/IProduct";
 
 export function ArchivedProductModal({ open, onOpenChange, closeModal }: {
     open: boolean, onOpenChange: any, closeModal: any
@@ -31,7 +32,7 @@ export function ArchivedProductModal({ open, onOpenChange, closeModal }: {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {archivedProducts.map((product) => (
+              {archivedProducts.map((product: IProduct) => (
                 <TableRow key={product.id}>
                   <TableCell>{product.id}</TableCell>
                   <TableCell>{product.name}</TableCell>

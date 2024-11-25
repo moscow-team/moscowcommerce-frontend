@@ -104,7 +104,7 @@ function Home() {
               Categorías
             </h2>
             <div className="flex flex-row flex-wrap gap-10 mt-28 justify-center items-center">
-              {categories.map((category) => (
+              {categories.map((category: Categoria) => (
                 <div
                   key={category.id}
                   className="relative rounded-lg shadow-md h-60 w-60 cursor-pointer bg-[#424242]"

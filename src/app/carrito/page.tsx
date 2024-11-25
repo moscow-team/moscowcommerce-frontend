@@ -70,7 +70,7 @@ export default function CarritoPage() {
       ) : (
         <div className="grid gap-8 md:grid-cols-3">
           <div className="md:col-span-2 space-y-4">
-            {products.map((product) => (
+            {products.map((product: Product) => (
               <div key={product.id} className="flex items-center space-x-4 bg-white p-4 rounded-lg shadow">
                 <img src={product.urlPhotos[0]} alt={product.name} className="w-20 h-20 object-cover rounded" />
                 <div className="flex-grow">
@@ -81,7 +81,7 @@ export default function CarritoPage() {
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => updateQuantity(product.id, product.quantity - 1)}
+                    onClick={() => updateQuantity(product.id, product.quantity as number - 1)}
                   >
                     <Minus className="h-4 w-4" />
                   </Button>
@@ -95,7 +95,7 @@ export default function CarritoPage() {
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => updateQuantity(product.id, product.quantity + 1)}
+                    onClick={() => updateQuantity(product.id, product.quantity as number + 1)}
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
@@ -116,7 +116,7 @@ export default function CarritoPage() {
               {products.map((product) => (
                 <div key={product.id} className="flex justify-between text-sm">
                   <span>{product.name} x {product.quantity}</span>
-                  <span>${(product.price * product.quantity).toLocaleString("es")}</span>
+                  <span>${(product.price * (product.quantity as number)).toLocaleString("es")}</span>
                 </div>
               ))}
             </div>

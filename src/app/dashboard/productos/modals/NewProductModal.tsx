@@ -38,9 +38,9 @@ export function NewProductModal({ open, onOpenChange, closeModal }: {
         }
     };
     const handleDeleteImage = (url: string) => {
-        setImagePreviews((prev) => prev.filter((imageUrl) => imageUrl !== url));
+        setImagePreviews((prev: string[]) => prev.filter((imageUrl: string) => imageUrl !== url));
 
-        setSelectedFiles((prevFiles) => prevFiles.filter((item) => item.previewUrl as string !== url));
+        setSelectedFiles((prevFiles: { file: File; previewUrl: string }[]) => prevFiles.filter((item: { file: File; previewUrl: string }) => item.previewUrl !== url));
 
         const input = document.getElementById("photos") as HTMLInputElement;
         if (input && input.files) {
@@ -76,11 +76,11 @@ export function NewProductModal({ open, onOpenChange, closeModal }: {
                 previewUrl: URL.createObjectURL(file),
             }));
 
-            setSelectedFiles((prevFiles) => [...prevFiles, ...newFiles]);
+            setSelectedFiles((prevFiles: { file: File; previewUrl: string }[]) => [...prevFiles, ...newFiles]);
 
             // Actualizar las URLs de previsualización
             const newPreviews = newFiles.map((item) => item.previewUrl);
-            setImagePreviews((prevPreviews) => [...prevPreviews, ...newPreviews]);
+            setImagePreviews((prevPreviews: string[]) => [...prevPreviews, ...newPreviews]);
         }
     };
 
@@ -166,7 +166,7 @@ export function NewProductModal({ open, onOpenChange, closeModal }: {
                     </div>
                     <div>
                         {/* Previsualizador de Imagenes */}
-                        {imagePreviews.map((src, index) => (
+                        {imagePreviews.map((src: string, index: number) => (
                             <div key={index} className="image-preview-container">
                                 <img
                                     src={src}

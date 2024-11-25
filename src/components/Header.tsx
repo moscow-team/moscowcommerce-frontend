@@ -3,13 +3,22 @@
 // import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { signOut, useSession } from "next-auth/react";
+import { Session } from "next-auth";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/app/context/useCart";
+interface ExtendedSession extends Session {
+  user: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    role?: string | null;
+  };
+}
 
 export default function Header() {
-  const { data: session, status } = useSession(); // Aquí obtienes la sesión de forma segura en un Client Component
+  const { data: session, status } = useSession() as { data: ExtendedSession | null; status: string }; // Aquí obtienes la sesión de forma segura en un Client Component
   const [user, setUser] = useState({ email: "", name: "", status: "Offline" });
   const { productQuantity } = useCart();
   useEffect(() => {

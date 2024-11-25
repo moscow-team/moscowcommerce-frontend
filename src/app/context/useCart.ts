@@ -21,7 +21,12 @@ export const useCart = () => {
   if (context === undefined) {
     throw new Error('useUser must be used within a UserProvider');
   }
-  const { products, setProducts, setProductQuantity, productQuantity } = context;
+  const { products, setProducts, setProductQuantity, productQuantity } = context as {
+    products: Producto[];
+    setProducts: React.Dispatch<React.SetStateAction<Producto[]>>;
+    setProductQuantity: React.Dispatch<React.SetStateAction<number>>;
+    productQuantity: number;
+  };
 
   // Función para agregar un producto
   const addProduct = (product: Producto) => {
@@ -59,6 +64,7 @@ export const useCart = () => {
         setProductQuantity(productQuantity - productQuantityToRemove);
         return prevProducts.filter(p => p.id !== productId);
       }
+      return prevProducts;
     });
   };
 
@@ -119,11 +125,11 @@ export const useCart = () => {
     }, 0);
   }
 
-  const calculateQuantity = () => {
-    return products.reduce((acc, product) => {
-      return acc + product.quantity;
-    }, 0);
-  }
+  // const calculateQuantity = () => {
+  //   return products.reduce((acc, product) => {
+  //     return acc + product.quantity;
+  //   }, 0);
+  // }
 
 
   return {

@@ -49,7 +49,7 @@ export function EditProductModal({ open, onOpenChange, closeModal }: {
 
       // Agregar las fotos a eliminar al formData para enviar al backend
       if (photosToDelete.length > 0) {
-        photosToDelete.forEach((url) => {
+        photosToDelete.forEach((url: string) => {
           newFormData.append("photosToDelete", url);
         });
       }
@@ -65,7 +65,7 @@ export function EditProductModal({ open, onOpenChange, closeModal }: {
 
     // Si es una foto existente, agregar la foto a la lista de fotos a eliminar
     if (selectedProduct?.urlPhotos.includes(url)) {
-      setPhotosToDelete((prev) => [...prev, url]);
+      setPhotosToDelete((prev: string[]) => [...prev, url]);
     } else {
       // Si es una foto nueva, localizar el archivo correspondiente y eliminarlo de `selectedFiles`
       setSelectedFiles((prevFiles) => prevFiles.filter((item) => item.previewUrl !== url));

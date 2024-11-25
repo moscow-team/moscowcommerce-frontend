@@ -11,6 +11,7 @@ pdfMake.fonts = {
 import { IProduct } from "./interfaces/IProduct";
 import { PriceFormatter } from "@/utils/PriceFormatter";
 import { DateFormatterWithHour } from "@/utils/DateFormatter";
+import { Alignment, Content } from "pdfmake/interfaces";
 
 export const PDFService = {
   async printStockProduct(products: IProduct[], title: string) {
@@ -70,12 +71,12 @@ export const PDFService = {
 
     for (const fila of products) {
       table.push([
-        { text: `${fila.id}`, fontSize: 11 },
-        { text: `${fila.name}`, fontSize: 11 },
-        { text: `${fila.description}`, fontSize: 11 },
-        { text: `${fila.category.name}`, fontSize: 11 },
-        { text: `${fila.stock}`, fontSize: 11 },
-        { text: `${PriceFormatter(fila.price)}`, fontSize: 11 },
+        { text: `${fila.id}`, fontSize: 11, style: "tableBody", bold: false, fillColor: "#ffffff" },
+        { text: `${fila.name}`, fontSize: 11, style: "tableBody", bold: false, fillColor: "#ffffff" },
+        { text: `${fila.description}`, fontSize: 11, style: "tableBody", bold: false, fillColor: "#ffffff" },
+        { text: `${fila.category.name}`, fontSize: 11, style: "tableBody", bold: false, fillColor: "#ffffff" },
+        { text: `${fila.stock}`, fontSize: 11, style: "tableBody", bold: false, fillColor: "#ffffff" },
+        { text: `${PriceFormatter(fila.price)}`, fontSize: 11, style: "tableBody", bold: false, fillColor: "#ffffff" },
       ]);
     }
     const data = {
@@ -124,7 +125,7 @@ export const PDFService = {
                   },
                 ],
 
-                alignment: "right",
+                alignment: "right" as Alignment,
               },
             ],
           ],
@@ -134,7 +135,7 @@ export const PDFService = {
         alignment: "right",
         margin: [20, 20, 20, 20],
       },
-      footer: function (currentPage, pageCount) {
+      footer: function (currentPage: number, pageCount: number): Content {
         return {
           text: currentPage.toString() + " de " + pageCount,
           margin: [30, 0, 30, 0],
@@ -154,7 +155,7 @@ export const PDFService = {
             ],
             body: table,
           },
-          alignment: "center",
+          alignment: "center" as Alignment,
         },
       ],
       styles: {

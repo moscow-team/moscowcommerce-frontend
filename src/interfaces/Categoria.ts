@@ -6,4 +6,5 @@ export interface Categoria {
   modificationDate: string;
   archivedDate: string;
   archived: boolean;
+  photo?: string;
 }

@@ -20,13 +20,13 @@ interface Producto {
   };
   urlPhotos: string[];
   archived: boolean;
-  quantity: number;
+  quantity?: number;
 }
 export const CartContext = createContext<CartContextType | undefined>(undefined);
 
 // Crea el proveedor
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Producto[]>([]);
   const [productQuantity, setProductQuantity] = useState<number>(0);
   useEffect(() => {
     const storedProducts = localStorage.getItem('cartProducts');

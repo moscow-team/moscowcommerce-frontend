@@ -211,7 +211,7 @@ export default function UsersList() {
     }
   }, [selectedUser]);
 
-  const loggedInUserEmail = localStorage.getItem("loggedInUserEmail");
+  const loggedInUserEmail = typeof window !== "undefined" ? localStorage.getItem("loggedInUserEmail") : null;
 
   const unarchiveUser = async (user: User) => {
     try {

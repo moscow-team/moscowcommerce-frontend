@@ -22,7 +22,7 @@ export default function PrintReport({ title, print, open, onOpenChange }: { titl
     };
 
     const handleSelectAll = () => {
-        const allCategoryIds = categories.map((category) => category.id);
+        const allCategoryIds = categories.map((category: { id: string }) => category.id);
         setSelectedItems(allCategoryIds);
     };
 
@@ -38,11 +38,11 @@ export default function PrintReport({ title, print, open, onOpenChange }: { titl
                     <DialogTitle>{title}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={onSubmit} className="space-y-4">
-                        {categories.map((item) => (
+                        {categories.map((item: { id: string, name: string }) => (
                             <div key={item.id} className="flex flex-row items-start gap-3">
                                 <Checkbox
                                     checked={selectedItems.includes(item.id)}
-                                    onCheckedChange={(checked) => handleCheckboxChange(item.id, checked)}
+                                    onCheckedChange={(checked) => handleCheckboxChange(item.id, !!checked)}
                                 />
                                 <label className="text-sm font-normal">{item.name}</label>
                             </div>
