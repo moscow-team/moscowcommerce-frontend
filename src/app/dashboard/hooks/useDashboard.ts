@@ -243,11 +243,13 @@ export const useDashboard = () => {
     setFilteredProducts(products);
   }
 
-  const printInventoryReport = async () => {
-    await PDFService.printStockProduct(products, "Lista de Productos");	
+  const printInventoryReport = async (filters:number[]) => {
+    console.log("Filters", filters);
+    const filteredProducts = products.filter((product: any) => filters.includes(product.category.id));
+    await PDFService.printStockProduct(filteredProducts, "Lista de Productos");	
   }
-  const printLowStockReport = async () => {
-    const lowStock = products.filter((product: any) => product.stock < 5);
+  const printLowStockReport = async (filters: number[]) => {
+    const lowStock = products.filter((product: any) => product.stock < 5 && filters.indexOf(product.category.id) !== -1);
     await PDFService.printStockProduct(lowStock, "Lista de Productos con poco stock");	
   }
 

@@ -1,5 +1,13 @@
 import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
+// import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.fonts = {
+    Roboto: {
+      normal: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf',
+      bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf',
+      italics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf',
+      bolditalics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf'
+    }
+ }
 import { IProduct } from "./interfaces/IProduct";
 import { PriceFormatter } from "@/utils/PriceFormatter";
 import { DateFormatterWithHour } from "@/utils/DateFormatter";
@@ -193,6 +201,6 @@ export const PDFService = {
       pageOrientation: "landscape",
       pageMargins: [30, 130, 30, 50],
     };
-    pdfMake.createPdf(data).open();
+    pdfMake.createPdf(data).open();  
   },
 };

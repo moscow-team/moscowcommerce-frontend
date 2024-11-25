@@ -9,6 +9,7 @@ import { FilterModal } from "./modals/FilterModal";
 import { ArchivedProductModal } from "./modals/ArchivedProductModal";
 import ProductTable from "./tables/ProductTable";
 import { Product } from "@/interfaces/Product";
+import PrintReport from "./modals/PrintReport";
 
 interface SelectedFile {
   file: File;
@@ -16,11 +17,13 @@ interface SelectedFile {
 }
 
 export default function ProductList() {
-  const { setSelectedProduct, setPhotosToDelete, fetchArchivedProducts, setImagePreviews, setSelectedFiles, resetFilter, resetForm, printInventoryReport, printLowStockReport  } = useDashboard()
+  const { setSelectedProduct, setPhotosToDelete, fetchArchivedProducts, setImagePreviews, setSelectedFiles, resetFilter, resetForm, printInventoryReport, printLowStockReport } = useDashboard()
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalFilterOpen, setIsModalFilterOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isArchivedModalOpen, setIsArchivedModalOpen] = useState(false);
+  const [isPrintReportModalOpen, setIsPrintReportModalOpen] = useState(false);
+  const [isPrintReportLowStockModalOpen, setIsPrintReportLowStockModalOpen] = useState(false);
   const openModal = useCallback(() => {
     setIsModalOpen(true);
     setImagePreviews([]);
@@ -57,7 +60,21 @@ export default function ProductList() {
   const closefilterModal = () => {
     setIsModalFilterOpen(false);
   };
+  const closeReportModal = () => {
+    setIsPrintReportModalOpen(false);
+  };
+  const closeReportLowStockModal = () => {
+    setIsPrintReportLowStockModalOpen(false);
+  };
+  const openReportModal = () => {
+    setIsPrintReportModalOpen(true);
 
+  };
+
+  const openReportLowStockModal = () => {
+    setIsPrintReportLowStockModalOpen(true);
+
+  };
   /* Filtros */
   const openFilterModal = () => {
     resetForm();
@@ -103,10 +120,10 @@ export default function ProductList() {
           {/* <Button onClick={resetFilter} className="bg-red-800 text-white">
             Resetear Filtros
           </Button> */}
-                 <Button onClick={printInventoryReport} className="bg-gray-800 text-white">
+          <Button onClick={openReportModal} className="bg-gray-800 text-white">
             Imprimir
           </Button>
-                 <Button onClick={printLowStockReport} className="bg-red-500 text-white">
+          <Button onClick={openReportLowStockModal} className="bg-red-500 text-white">
             Imprimir poco stock
           </Button>
           <Button onClick={openFilterModal} className="bg-gray-800 text-white">
@@ -127,6 +144,8 @@ export default function ProductList() {
           </Button>
         </div>
       </div>
+      <PrintReport onOpenChange={closeReportModal} print={printInventoryReport} title="Listado Inventario" open={isPrintReportModalOpen} />
+      <PrintReport onOpenChange={closeReportLowStockModal} print={printLowStockReport} title="Listado poco stock" open={isPrintReportLowStockModalOpen} />
       <ProductTable openEditModal={openEditModal}></ProductTable>
       <NewProductModal open={isModalOpen} onOpenChange={setIsModalOpen} closeModal={closeModal}></NewProductModal>
       <EditProductModal open={isEditModalOpen} onOpenChange={setIsEditModalOpen} closeModal={closeEditModal}></EditProductModal>
