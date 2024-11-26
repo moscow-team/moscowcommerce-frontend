@@ -2,12 +2,12 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Minus, Plus, Trash2 } from 'lucide-react';
-import Link from 'next/link';
 import { useCart } from '../context/useCart';
 import { Dialog, DialogTrigger } from '@radix-ui/react-dialog';
 import { DialogContent } from '@/components/ui/dialog';
 import { useEffect, useState } from 'react';
 import { Progress } from '@/components/ui/progress';
+import Link from 'next/link';
 
 interface Product {
   id: number;
@@ -64,7 +64,7 @@ export default function CarritoPage() {
   //   setProducts(initialProducts.map(product => ({ ...product, quantity: 1 })));
   // }, [initialProducts]);
 
-  const { products, confirRemoveProduct, updateQuantity, calculateTotal } = useCart()
+  const { products, confirRemoveProduct, updateQuantity, calculateTotal, saleCart } = useCart()
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
@@ -84,6 +84,9 @@ export default function CarritoPage() {
     setTimeout(() => {
       setPayed(true)
     }, 4000)
+    setTimeout(() => {
+      saleCart()
+    }, 7000)
   }
 
   return (
@@ -92,8 +95,8 @@ export default function CarritoPage() {
       {products.length === 0 ? (
         <p className="text-center text-gray-500">Carrito vacío. Vuelva al <Link href="/" className='text-orange-400 font-semibold'>inicio</Link> para añadir productos.</p>
       ) : (
-        <div className="grid gap-8 md:grid-cols-3">
-          <div className="md:col-span-2 space-y-4">
+        <div className="flex flex-row gap-8 md:grid-cols-2">
+          <div className="w-full h-full">
             {products.map((product: Product) => (
               <div key={product.id} className="flex items-center space-x-4 bg-white p-4 rounded-lg shadow">
                 <img src={product.urlPhotos[0]} alt={product.name} className="w-20 h-20 object-cover rounded" />
@@ -134,7 +137,7 @@ export default function CarritoPage() {
               </div>
             ))}
           </div>
-          <div className="bg-white p-6 rounded-lg shadow h-fit">
+          <div className="bg-white p-6 rounded-lg shadow h-max w-full">
             <h2 className="text-xl font-semibold mb-4">Resumen del pedido</h2>
             <div className="space-y-2">
               {products.map((product) => (

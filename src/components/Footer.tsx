@@ -1,6 +1,8 @@
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 export default function Footer() {
+  const { session } = useSession();
     return (
         <footer className="bg-gray-800 text-white py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -39,21 +41,24 @@ export default function Footer() {
             <div>
               <h3 className="text-lg font-semibold mb-4">Links</h3>
               <ul className="space-y-2">
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
+              {session?.user && session.user.role === "ADMIN" ? (
+                <Link href="/dashboard" className="text-gray-200 hover:text-orange-300">
+                  Dashboard
+                </Link>
+              ) : null}
+              {!session || session.user.role === "CUSTOMER" ? (
+                <div className="flex flex-col gap-3">
+                  <Link href="/inicio" className="text-gray-200 hover:text-orange-300">
                     Inicio
                   </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
+                  <Link href="/categoria" className="text-gray-200 hover:text-orange-300">
                     Categorias
                   </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
+                  <Link href="/producto" className="text-gray-200 hover:text-orange-300">
                     Productos
                   </Link>
-                </li>
+                </div>
+              ) : null}
               </ul>
             </div>
           </div>

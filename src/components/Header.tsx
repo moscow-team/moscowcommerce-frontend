@@ -22,7 +22,6 @@ export default function Header() {
   const [user, setUser] = useState({ email: "", name: "", status: "Offline" });
   const { productQuantity } = useCart();
   useEffect(() => {
-    console.log("session", session);
     if (status === "authenticated" && session?.user) {
       setUser({
         email: session.user.email ?? "moskow@admin.com",
@@ -48,34 +47,40 @@ export default function Header() {
                   Dashboard
                 </Link>
               ) : null}
-              <Link href="/" className="text-gray-200 hover:text-orange-300">
-                Inicio
-              </Link>
-              <Link href="/categoria" className="text-gray-200 hover:text-orange-300">
-                Categorias
-              </Link>
-              <Link href="/producto" className="text-gray-200 hover:text-orange-300">
-                Productos
-              </Link>
+                <>
+                  <Link href="/inicio" className="text-gray-200 hover:text-orange-300">
+                    Inicio
+                  </Link>
+                  <Link href="/categoria" className="text-gray-200 hover:text-orange-300">
+                    Categorias
+                  </Link>
+                  <Link href="/producto" className="text-gray-200 hover:text-orange-300">
+                    Productos
+                  </Link>
+                </>
             </nav>
           </div>
           <div className="flex items-center">
             {/* <div className="hidden md:block">
               <input type="search" placeholder="Buscar..." className="custom-input"></input>
             </div> */}
-            <Link href="/carrito">
-              <Button
-                size="icon"
-                className="ml-4 bg-transparent hover:bg-transparent"
-              >
-                <img
-                  className="w-6 h-6 hover:scale-110"
-                  src="/icons/shopping-cart.svg"
-                  alt="Carrito de Compras"
-                />
-              </Button>
-            </Link>
-            <Badge variant={"secondary"}>{productQuantity}</Badge>
+            {!session || session.user.role === "CUSTOMER" ? (
+              <>
+                <Link href="/carrito">
+                  <Button
+                    size="icon"
+                    className="ml-4 bg-transparent hover:bg-transparent"
+                  >
+                    <img
+                      className="w-6 h-6 hover:scale-110"
+                      src="/icons/shopping-cart.svg"
+                      alt="Carrito de Compras"
+                    />
+                  </Button>
+                </Link>
+                <Badge variant={"secondary"}>{productQuantity}</Badge></>
+            ) : null}
+
             <div className="flex justify-end">
               {!session ? (
                 <Link href="/auth/login" className="text-white ml-3">

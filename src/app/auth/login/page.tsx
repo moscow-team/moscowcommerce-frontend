@@ -3,8 +3,8 @@
 import { Button, Card, Link } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -17,6 +17,8 @@ function LoginPage() {
   } = useForm();
   //Remplazmos el useState de credenciales, por el el hook que nos otorga useForm
   // const [credientials, setCredientials] = useState<Crediantials>({ email: "", password: "" });
+  const [params, setParams] = useState<string | null>(null);
+  const searchParams = useSearchParams();
 
   const onSubmit = handleSubmit(async (data) => {
     //Enviar peticon al NextAuth o Servidor para realizar la autenticacion (Hacerlo Hook)
@@ -31,12 +33,14 @@ function LoginPage() {
         password: data.password,
         redirect: false,
       });
-      console.log(session);
       if (session?.ok) {
         localStorage.setItem("loggedInUserEmail", data.email);
-
-        router.push("/dashboard");
-        toast.success("Sesión iniciada ");
+        // setTimeout(() => {
+        console.log(params);
+          toast.success("Sesión iniciada ");
+        // }, 1000);
+        window.location.href = params ? params : "/dashboard";
+        // router.push();
       } else {
         toast.error(session?.error || "Credenciales incorrectas");
       }
@@ -44,6 +48,13 @@ function LoginPage() {
       toast.error(error.message || error.error || "Credenciales incorrectas");
     }
   });
+  const dataSession = async () => {
+    const route = searchParams.get("callbackUrl");
+    if (route) {
+      const url = new URL(route);
+      setParams(url.pathname);
+    }
+  };
 
   const [valueEmail, setValueEmail] = useState("");
 
@@ -55,7 +66,9 @@ function LoginPage() {
 
     return validateEmail(valueEmail) ? false : true;
   }, [valueEmail]);
-
+  useEffect(() => {
+    dataSession();
+  }, [searchParams]);
   return (
     <div className="flex justify-center items-center w-full h-full min-h-screen">
       <Card className="w-max flex flex-col h-max items-center justify-center mb-32 p-10">

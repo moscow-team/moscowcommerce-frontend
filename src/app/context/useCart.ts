@@ -1,6 +1,10 @@
-import { useContext } from 'react';
-import { CartContext } from './CartProvider';
-import { toast } from 'sonner';
+"use client";
+import { useContext } from "react";
+import { CartContext } from "./CartProvider";
+import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import { clear } from "console";
+import { useRouter } from "next/navigation";
 
 interface Producto {
   id: number;
@@ -18,23 +22,30 @@ interface Producto {
 }
 export const useCart = () => {
   const context = useContext(CartContext);
+  const router = useRouter();
   if (context === undefined) {
-    throw new Error('useUser must be used within a UserProvider');
+    throw new Error("useUser must be used within a UserProvider");
   }
-  const { products, setProducts, setProductQuantity, productQuantity } = context as {
-    products: Producto[];
-    setProducts: React.Dispatch<React.SetStateAction<Producto[]>>;
-    setProductQuantity: React.Dispatch<React.SetStateAction<number>>;
-    productQuantity: number;
-  };
+  const { data: session } = useSession();
+  const { products, setProducts, setProductQuantity, productQuantity } =
+    context as {
+      products: Producto[];
+      setProducts: React.Dispatch<React.SetStateAction<Producto[]>>;
+      setProductQuantity: React.Dispatch<React.SetStateAction<number>>;
+      productQuantity: number;
+    };
 
   // Función para agregar un producto
   const addProduct = (product: Producto) => {
+    if (session?.user?.role === "ADMIN") {
+      toast.info("El administrador no puede comprar productos");
+      return;
+    }
     setProducts((prevProducts: Producto[]) => {
-      const productIndex = prevProducts.findIndex(p => p.id === product.id);
+      const productIndex = prevProducts.findIndex((p) => p.id === product.id);
       if (productIndex > -1) {
         if (productQuantity + 1 > product.stock) {
-          toast.error('No hay suficiente stock para este producto');
+          toast.error("No hay suficiente stock para este producto");
           return prevProducts;
         }
         const newProducts = [...prevProducts];
@@ -57,12 +68,16 @@ export const useCart = () => {
 
   // Función para eliminar un producto por su ID
   const removeProduct = (productId: number) => {
+    if (session?.user?.role === "ADMIN") {
+      toast.info("El administrador no puede comprar productos");
+      return;
+    }
     setProducts((prevProducts: Producto[]) => {
-      const product = prevProducts.findIndex(p => p.id == productId);
+      const product = prevProducts.findIndex((p) => p.id == productId);
       if (product !== -1) {
         const productQuantityToRemove = prevProducts[product].quantity ?? 0;
         setProductQuantity(productQuantity - productQuantityToRemove);
-        return prevProducts.filter(p => p.id !== productId);
+        return prevProducts.filter((p) => p.id !== productId);
       }
       return prevProducts;
     });
@@ -70,60 +85,71 @@ export const useCart = () => {
 
   // Función para vaciar el carrito
   const clearCart = () => {
+    setProductQuantity(0);
     setProducts([]);
   };
 
   const updateQuantity = (id: number, newQuantity: number) => {
-    setProducts(products.map(product => {
-      if (product.id === id) {
-        const updatedQuantity = Math.max(0, newQuantity);
-        if (updatedQuantity > product.stock) {
-          toast.error('No hay suficiente stock para este producto');
-          return product;
-        }
-        // VERIFICAR SI EL PRODUCTO SE VA A ELIMINAR CUANDO LA CANTIDAD SEA 0
-        if (updatedQuantity == 0) {
-          toast('¿Seguro que quiere eliminar este producto?', {
-            position: 'top-center',
-            action: {
-              label: 'Cerrar',
-              onClick: () => toast.dismiss(),
-            },
-            cancel: {
-              label: 'Eliminar',
-              onClick: () => removeProduct(id),
-            },
-          });
-          return product;
-        }
-        setProductQuantity(productQuantity + (updatedQuantity - (product.quantity || 0)));
-        return { ...product, quantity: updatedQuantity };
-      }
-      return product;
+    if (session?.user?.role === "ADMIN") {
+      toast.info("El administrador no puede comprar productos");
+      return;
     }
-    ));
-  }
+    setProducts(
+      products.map((product) => {
+        if (product.id === id) {
+          const updatedQuantity = Math.max(0, newQuantity);
+          if (updatedQuantity > product.stock) {
+            toast.error("No hay suficiente stock para este producto");
+            return product;
+          }
+          // VERIFICAR SI EL PRODUCTO SE VA A ELIMINAR CUANDO LA CANTIDAD SEA 0
+          if (updatedQuantity == 0) {
+            toast("¿Seguro que quiere eliminar este producto?", {
+              position: "top-center",
+              action: {
+                label: "Cerrar",
+                onClick: () => toast.dismiss(),
+              },
+              cancel: {
+                label: "Eliminar",
+                onClick: () => removeProduct(id),
+              },
+            });
+            return product;
+          }
+          setProductQuantity(
+            productQuantity + (updatedQuantity - (product.quantity || 0))
+          );
+          return { ...product, quantity: updatedQuantity };
+        }
+        return product;
+      })
+    );
+  };
 
   const confirRemoveProduct = (id: number) => {
-    toast('¿Seguro que quiere eliminar este producto?', {
-      position: 'top-center',
+    if (session?.user?.role === "ADMIN") {
+      toast.info("El administrador no puede comprar productos");
+      return;
+    }
+    toast("¿Seguro que quiere eliminar este producto?", {
+      position: "top-center",
       action: {
-        label: 'Cerrar',
+        label: "Cerrar",
         onClick: () => toast.dismiss(),
       },
       cancel: {
-        label: 'Eliminar',
+        label: "Eliminar",
         onClick: () => removeProduct(id),
       },
     });
-  }
-
+  };
 
   const calculateTotal = () => {
     return products.reduce((acc, product) => {
       return acc + product.price * (product.quantity || 1);
     }, 0);
-  }
+  };
 
   // const calculateQuantity = () => {
   //   return products.reduce((acc, product) => {
@@ -131,7 +157,14 @@ export const useCart = () => {
   //   }, 0);
   // }
 
-
+  const saleCart = () => {
+    if (session?.user?.role === 'ADMIN') {
+      toast.info('El administrador no puede comprar productos');
+      return;
+    }
+    clearCart();
+    router.push("/inicio");
+  };
   return {
     products,
     addProduct,
@@ -140,6 +173,7 @@ export const useCart = () => {
     productQuantity,
     updateQuantity,
     calculateTotal,
-    confirRemoveProduct
-    };
+    confirRemoveProduct,
+    saleCart,
+  };
 };
