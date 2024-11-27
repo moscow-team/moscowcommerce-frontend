@@ -134,41 +134,42 @@ function Home() {
               {products.map((product) => (
                 <div
                   key={product.id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden"
+                  className={`bg-white rounded-lg shadow-md overflow-hidden ${product.stock === 0 ? 'opacity-50' : ''}`}
                 >
                   <img
-                    src={product.urlPhotos[0]}
-                    alt={`Product ${product.name}`}
-                    className="w-full h-48 object-contain p-2 hover:scale-110 transition-transform duration-200 cursor-pointer"
-                    onClick={() => goToProductDetail(product)}
+                  src={product.urlPhotos[0]}
+                  alt={`Product ${product.name}`}
+                  className="w-full h-48 object-contain p-2 hover:scale-110 transition-transform duration-200 cursor-pointer"
+                  onClick={() => goToProductDetail(product)}
                   />
                   <div className="p-4">
-                    <h3 className="text-lg font-semibold mb-2">
-                      {product.name}
-                    </h3>
-                    <p className="text-gray-600 mb-4 h-14">
-                      {product.description}
-                    </p>
-                    <div className="flex flex-col h-full gap-2 items-center justify-between">
-                      <span className="text-xl font-bold text-primary">
-                        ${product.price.toLocaleString("es-AR")}{" "}
-                      </span>
-                      <div className="flex gap-2 py-3 w-full justify-center flex-wrap">
-                        <Button
-                          variant="default"
-                          className="text-white"
-                          onClick={() => handleAddProduct(product)}
-                        >
-                          Agregar al carrito
-                        </Button>
-                        <Button
-                          onClick={() => goToProductDetail(product)}
-                          className="text-white bg-gray-700 font-semibold"
-                        >
-                          Ver producto
-                        </Button>
-                      </div>
+                  <h3 className="text-lg font-semibold mb-2">
+                    {product.name}
+                  </h3>
+                  <p className="text-gray-600 mb-4 h-14">
+                    {product.description}
+                  </p>
+                  <div className="flex flex-col h-full gap-2 items-center justify-between">
+                    <span className="text-xl font-bold text-primary">
+                    ${product.price.toLocaleString("es-AR")}{" "}
+                    </span>
+                    <div className="flex gap-2 py-3 w-full justify-center flex-wrap">
+                    <Button
+                      variant="default"
+                      className="text-white"
+                      onClick={() => handleAddProduct(product)}
+                      disabled={product.stock === 0}
+                    >
+                      {product.stock === 0 ? 'Sin stock' : 'Agregar al carrito'}
+                    </Button>
+                    <Button
+                      onClick={() => goToProductDetail(product)}
+                      className="text-white bg-gray-700 font-semibold"
+                    >
+                      Ver producto
+                    </Button>
                     </div>
+                  </div>
                   </div>
                 </div>
               ))}

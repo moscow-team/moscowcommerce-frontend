@@ -96,9 +96,9 @@ export default function CarritoPage() {
         <p className="text-center text-gray-500">Carrito vacío. Vuelva al <Link href="/" className='text-orange-400 font-semibold'>inicio</Link> para añadir productos.</p>
       ) : (
         <div className="flex flex-row gap-8 md:grid-cols-2">
-          <div className="w-full h-full">
+          <div className="w-full h-full py-5">
             {products.map((product: Product) => (
-              <div key={product.id} className="flex items-center space-x-4 bg-white p-4 rounded-lg shadow">
+              <div key={product.id} className="flex items-center space-x-4 bg-white p-4 rounded-lg shadow w-full">
                 <img src={product.urlPhotos[0]} alt={product.name} className="w-20 h-20 object-cover rounded" />
                 <div className="flex-grow">
                   <h2 className="font-semibold">{product.name}</h2>

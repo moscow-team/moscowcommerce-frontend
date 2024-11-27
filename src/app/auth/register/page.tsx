@@ -1,226 +1,143 @@
-"use client"
+"use client";
 
-import { registerUser } from "@/services/Register";
-import { Button, Card, Input } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-export default function Register() {
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm();
-    const router = useRouter();
-    const onSubmit = handleSubmit(async (data) => {
-        //Enviar peticion al NextAuth o Servidor para realizar la autenticacion (Hacerlo Hook)
-        if (isInvalidPassword || isInvalidConfirmPassword) {
-            toast.error("Debe ingresar una contraseña valida (1 letra miniscula, 1 letra mayusucula, 1 numero minimo)");
-            return;
-        }
-        if (data.password !== data.confirmPassword) {
-            toast.error("Las contraseñas no coinciden");
-            return;
-        }
+import { Button } from "@/components/ui/button"; // Asegúrate de ajustar el path si es necesario
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-        if (isInvalidEmail || isInvalidName || isInvalidLastName) {
-            toast.error("Por favor, ingrese todos los campos correctamente");
-            return;
-        }
-        //Funcion para registrarnos
-        const newUser = await registerUser(data as any);
-        if (newUser?.success) {
-            router.push("/auth/login");
-            toast.success(newUser.message);
-        } else {
-            if (newUser.data != null) {
-                const errorKey = Object.keys(newUser.data)[0];
-                toast.error((newUser.data as Record<string, any>)[errorKey] as string);
-            }else{
-                toast.error(newUser.message);
-            }
-        }
-    });
+export default function RegisterPage() {
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm();
 
-    const [valueEmail, setValueEmail] = useState("");
+  const password = watch("password");
 
-    const validateEmail = (value: string) => value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
+  const onSubmit = async (data: any) => {
+    try {
+      if (data.password !== data.confirmPassword) {
+        toast.error("Las contraseñas no coinciden");
+        return;
+      }
 
-    const isInvalidEmail = useMemo(() => {
-        if (valueEmail === "") return false;
+      // Simula una petición al backend (reemplaza con tu lógica real)
+      const response = await new Promise((resolve) =>
+        setTimeout(() => resolve({ success: true, message: "Usuario registrado con éxito" }), 1000)
+      );
 
-        return validateEmail(valueEmail) ? false : true;
-    }, [valueEmail]);
+      if (response?.success) {
+        toast.success(response.message as string);
+        router.push("/auth/login");
+      } else {
+        toast.error("Error al registrar usuario");
+      }
+    } catch (error) {
+      console.error("Error en el registro:", error);
+      toast.error("Ocurrió un error inesperado");
+    }
+  };
 
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="w-full max-w-md bg-white shadow-md rounded px-8 py-6">
+        <h1 className="text-2xl font-bold mb-4 text-center">Crear cuenta</h1>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Nombre */}
+          <div>
+            <Label htmlFor="name">Nombre</Label>
+            <Input
+              id="name"
+              placeholder="Tu nombre"
+              {...register("name", { required: "El nombre es obligatorio" })}
+            />
+            {errors.name && (
+              <p className="text-sm text-red-500">{errors.name.message}</p>
+            )}
+          </div>
 
-    const [valueName, setValueName] = useState("");
+          {/* Apellido */}
+          <div>
+            <Label htmlFor="lastName">Apellido</Label>
+            <Input
+              id="lastName"
+              placeholder="Tu apellido"
+              {...register("lastName", { required: "El apellido es obligatorio" })}
+            />
+            {errors.lastName && (
+              <p className="text-sm text-red-500">{errors.lastName.message}</p>
+            )}
+          </div>
 
-    const validateName = (value: string) => value.match(/^[A-Z._%+-]{2,15}(?:\s[A-Z._%+-]{2,15})*$/i
-    );
+          {/* Email */}
+          <div>
+            <Label htmlFor="email">Correo electrónico</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Tu correo"
+              {...register("email", {
+                required: "El correo electrónico es obligatorio",
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Correo electrónico inválido",
+                },
+              })}
+            />
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email.message}</p>
+            )}
+          </div>
 
-    const isInvalidName = useMemo(() => {
-        if (valueName === "") return false;
+          {/* Contraseña */}
+          <div>
+            <Label htmlFor="password">Contraseña</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Tu contraseña"
+              {...register("password", {
+                required: "La contraseña es obligatoria",
+                minLength: { value: 8, message: "Debe tener al menos 8 caracteres" },
+              })}
+            />
+            {errors.password && (
+              <p className="text-sm text-red-500">{errors.password.message}</p>
+            )}
+          </div>
 
-        return validateName(valueName) ? false : true;
-    }, [valueName]);
+          {/* Confirmar Contraseña */}
+          <div>
+            <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              placeholder="Repite tu contraseña"
+              {...register("confirmPassword", {
+                required: "Debe confirmar la contraseña",
+                validate: (value) =>
+                  value === password || "Las contraseñas no coinciden",
+              })}
+            />
+            {errors.confirmPassword && (
+              <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
+            )}
+          </div>
 
-
-    const [valueLastName, setValueLastName] = useState("");
-
-    const validateLastName = (value: string) => value.match(/^[A-Z._%+-]{2,15}(?:\s[A-Z._%+-]{2,15})*$/i
-    );
-
-    const isInvalidLastName = useMemo(() => {
-        if (valueEmail === "") return false;
-
-        return validateLastName(valueLastName) ? false : true;
-    }, [valueLastName]);
-
-
-
-    const [valuePassword, setValuePassword] = useState("");
-
-    const validatePassword = (value: string) =>
-        value.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,20}$/);
-
-    const isInvalidPassword = useMemo(() => {
-        if (valuePassword === "") return false;
-
-        return validatePassword(valuePassword) ? false : true;
-    }, [valuePassword]);
-
-
-
-
-    const [valueConfirmPassword, setValueConfirmPassword] = useState("");
-
-    const validateConfirmPassword = (value: string) =>
-        value.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,20}$/);
-
-    const isInvalidConfirmPassword = useMemo(() => {
-        if (valueConfirmPassword === "") return false;
-
-        return validateConfirmPassword(valueConfirmPassword) ? false : true;
-    }, [valueConfirmPassword]);
-
-    return (
-        <div className="flex justify-center items-center w-full h-full min-h-screen">
-            <Card className="w-max flex flex-col h-max items-center justify-center mb-32 p-10">
-                <div className="flex flex-col justify-center items-center h-full w-full py-5">
-                    <h1 className="font-semibold text-4xl mb-4">Registro de Usuario</h1>
-                </div>
-                <form
-                    onSubmit={onSubmit}
-                    className="w-80 flex flex-col h-max items-center justify-center px-10 gap-5">
-                    <div className="h-20 w-full">
-                        <Input
-                            label="Nombre"
-                            type="text"
-                            variant="underlined"
-                            value={valueName}
-                            isRequired
-                            isInvalid={isInvalidName}
-                            color={isInvalidName ? "danger" : "success"}
-                            onValueChange={setValueName}
-                            // onChange={(e) => handleChange("name", e.target.value)}
-                            {...register("name", { required: { value: true, message: "Debe ingresar un nombre" } })}
-                        ></Input>
-                        {errors.name && (
-                            // validacion de errores
-                            <span className="text-red-500 text-xs">
-                                {String(errors.name.message)}
-                            </span>
-                        )}
-                    </div>
-                    <div className="h-20 w-full">
-                        <Input
-                            label="Apellido"
-                            type="text"
-                            variant="underlined"
-                            value={valueLastName}
-                            isRequired
-
-                            isInvalid={isInvalidLastName}
-                            color={isInvalidLastName ? "danger" : "success"}
-                            onValueChange={setValueLastName}
-                            {...register("lastName", { required: { value: true, message: "Debe ingresar un apellido" } })}
-                        // onChange={(e) => handleChange("lastName", e.target.value)}
-                        ></Input>
-                        {errors.lastName && (
-                            // validacion de errores
-                            <span className="text-red-500 text-xs">
-                                {String(errors.lastName.message)}
-                            </span>
-                        )}
-                    </div>
-                    <div className="h-20 w-full">
-                        <Input
-                            label="Email"
-                            type="text"
-                            variant="underlined"
-                            value={valueEmail}
-                            isRequired
-
-                            isInvalid={isInvalidEmail}
-                            color={isInvalidEmail ? "danger" : "success"}
-                            onValueChange={setValueEmail}
-                            // onChange={(e) => handleChange("email", e.target.value)}
-                            {...register("email", { required: { value: true, message: "Debe ingresar un email valido" } })}
-
-                        ></Input>
-                        {errors.email && (
-                            // validacion de errores
-                            <span className="text-red-500 text-xs">
-                                {String(errors.email.message)}
-                            </span>
-                        )}
-                    </div>
-                    <div className="h-20 w-full">
-                        <Input
-                            label="Contraseña"
-                            type="password"
-                            variant="underlined"
-                            value={valuePassword}
-                            isRequired
-                            isInvalid={isInvalidPassword}
-                            color={isInvalidPassword ? "danger" : "success"}
-                            onValueChange={setValuePassword}
-                            // onChange={(e) => handleChange("password", e.target.value)}
-                            {...register("password", { required: { value: true, message: "Debe ingresar una contraseña" } })}
-
-                        ></Input>
-                        {errors.password && (
-                            // validacion de errores
-                            <span className="text-red-500 text-xs">
-                                {String(errors.password.message)}
-                            </span>
-                        )}
-                    </div>
-                    <div className="h-20 w-full">
-                        <Input
-                            label="Confirmar Contraseña"
-                            type="password"
-                            variant="underlined"
-                            value={valueConfirmPassword}
-                            isRequired
-                            isInvalid={isInvalidConfirmPassword}
-                            color={isInvalidConfirmPassword ? "danger" : "success"}
-                            onValueChange={setValueConfirmPassword}
-                            // onChange={(e) => handleChange("confirmPassword", e.target.value)}
-                            {...register("confirmPassword", { required: { value: true, message: "Debe ingresar una contraseña" } })}
-
-                        ></Input>
-                        {errors.confirmPassword && (
-                            // validacion de errores
-                            <span className="text-red-500 text-xs">
-                                {String(errors.confirmPassword.message)}
-                            </span>
-                        )}
-                    </div>
-                    <Button color="primary" className="w-full text-white" onClick={onSubmit}>Registrar</Button>
-                </form>
-            </Card>
-        </div>
-    )
+          {/* Botón de enviar */}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Registrando..." : "Registrarse"}
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
 }

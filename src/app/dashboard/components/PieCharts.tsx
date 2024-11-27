@@ -21,7 +21,7 @@ import {
 import { useCharts } from "../hooks/useChart"
 
 export function PieCharts() {
-  const { chartConfig2, pieChartData, pieChartData2 } = useCharts()
+  const { chartConfig2, pieChartData, pieChartData2, chartData } = useCharts()
   const [totalVisitors, setTotalVisitors] = React.useState(0)
   const [totalVisitors2, setTotalVisitors2] = React.useState(0)
   React.useEffect(() => {
@@ -30,13 +30,12 @@ export function PieCharts() {
   React.useEffect(() => {
     setTotalVisitors2(pieChartData2.reduce((acc, curr) => acc + curr.sales, 0))
   }, [pieChartData2])
-
   return (
     <div className="flex w-full flex-row gap-3">
       <Card className="flex flex-col w-full">
         <CardHeader className="items-center pb-0">
-          <CardTitle>Cantidad de ventas por categoria</CardTitle>
-          <CardDescription>Diciembre 2024</CardDescription>
+          <CardTitle>Cantidad de ventas por categoría</CardTitle>
+          <CardDescription>{chartData[chartData.length - 1]?.month || "No data available"}</CardDescription>
         </CardHeader>
         <CardContent className="flex-1 pb-0">
           <ChartContainer
@@ -77,7 +76,7 @@ export function PieCharts() {
                             y={(viewBox.cy || 0) + 24}
                             className="fill-muted-foreground"
                           >
-                            Visitors
+                            Productos
                           </tspan>
                         </text>
                       )
@@ -96,7 +95,7 @@ export function PieCharts() {
       </Card>
       <Card className="flex flex-col w-full">
         <CardHeader className="items-center pb-0">
-          <CardTitle>Cantidad de ventas por categoria</CardTitle>
+          <CardTitle>Cantidad de ventas por categoría</CardTitle>
           <CardDescription>Año 2024</CardDescription>
         </CardHeader>
         <CardContent className="flex-1 pb-0">
@@ -138,7 +137,7 @@ export function PieCharts() {
                             y={(viewBox.cy || 0) + 24}
                             className="fill-muted-foreground"
                           >
-                            Visitors
+                            Productos
                           </tspan>
                         </text>
                       )

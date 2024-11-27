@@ -38,7 +38,8 @@ export const useDashboard = () => {
     imagePreviews,
     setImagePreviews,
     selectedFiles,
-    setSelectedFiles
+    setSelectedFiles,
+    orders
   } = dashboardContext;
   useEffect(() => {
     setFilteredProducts(products);
@@ -253,6 +254,13 @@ export const useDashboard = () => {
     await PDFService.printStockProduct(lowStock, "Lista de Productos con poco stock");	
   }
 
+  const printSalesMonthly = async () => {
+    await PDFService.printSalesMonthly(orders)
+  }
+  const printSales = async () => {
+    await PDFService.printSales(orders)
+  }
+
   return {
     categories,
     products,
@@ -277,6 +285,8 @@ export const useDashboard = () => {
     resetFilter,
     resetForm,
     printInventoryReport,
-    printLowStockReport
+    printLowStockReport,
+    printSales,
+    printSalesMonthly
   };
 };

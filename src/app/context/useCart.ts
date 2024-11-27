@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { clear } from "console";
 import { useRouter } from "next/navigation";
+import { saveOrder } from "@/services/OrderService";
 
 interface Producto {
   id: number;
@@ -43,7 +44,7 @@ export const useCart = () => {
     }
     setProducts((prevProducts: Producto[]) => {
       const productIndex = prevProducts.findIndex((p) => p.id === product.id);
-      if (productIndex > -1) {
+      if (productIndex > -1 && product.quantity != 0) {
         if (productQuantity + 1 > product.stock) {
           toast.error("No hay suficiente stock para este producto");
           return prevProducts;
@@ -157,11 +158,18 @@ export const useCart = () => {
   //   }, 0);
   // }
 
-  const saleCart = () => {
+  const saleCart = async () => {
     if (session?.user?.role === 'ADMIN') {
       toast.info('El administrador no puede comprar productos');
       return;
     }
+    const orderProducts = products.map((product) => {
+      return{
+        productId: product.id,
+        quantity: product.quantity || 1
+      }
+    })
+    await saveOrder(orderProducts);
     clearCart();
     router.push("/inicio");
   };

@@ -17,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathName = usePathname();
-  const isDashboard = pathName.startsWith("/dashboard");
+  const isDashboard = ["/dashboard", "/auth/login","/auth/register", "/perfil"].some(route => pathName.startsWith(route));
   return (
     <html lang="en">
       <body className={inter.className}>
