@@ -3,11 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { useCart } from '../context/useCart';
-import { Dialog, DialogTrigger } from '@radix-ui/react-dialog';
-import { DialogContent } from '@/components/ui/dialog';
-import { useEffect, useState } from 'react';
-import { Progress } from '@/components/ui/progress';
 import Link from 'next/link';
+import { PaymentDialog } from './PaymentDialog';
 
 interface Product {
   id: number;
@@ -65,29 +62,7 @@ export default function CarritoPage() {
   // }, [initialProducts]);
 
   const { products, confirRemoveProduct, updateQuantity, calculateTotal, saleCart } = useCart()
-  const [progress, setProgress] = useState(0)
 
-  useEffect(() => {
-  }, [])
-
-  const [payed, setPayed] = useState(false)
-  const pay = () => {
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return prev + 33;
-      });
-    }, 1000);
-    setTimeout(() => {
-      setPayed(true)
-    }, 4000)
-    setTimeout(() => {
-      saleCart()
-    }, 7000)
-  }
 
   return (
     <div className="container mx-auto pt-8">
@@ -113,10 +88,11 @@ export default function CarritoPage() {
                     <Minus className="h-4 w-4" />
                   </Button>
                   <Input
-                    type="number"
+                    type="text"
+                    readOnly
                     min="0"
                     value={product.quantity}
-                    onChange={(e) => updateQuantity(product.id, parseInt(e.target.value))}
+                    // onChange={(e) => updateQuantity(product.id, parseInt(e.target.value))}
                     className="w-16 text-center"
                   />
                   <Button
@@ -152,26 +128,7 @@ export default function CarritoPage() {
               <span>Subtotal</span>
               <span>${calculateTotal().toLocaleString("es")}</span>
             </div>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="w-full mt-6 text-white" onClick={() => pay()}>Proceder al pago</Button>
-              </DialogTrigger>
-              <DialogContent className={`sm:max-w-[425px] ${payed ? 'bg-green-500 w-1/2 h-1/2 transition-all duration-500 ease-in-out' : ''}`}>
-                <div className="grid gap-4 py-4">
-                  {!payed ? (
-                    <div>
-                      <p className="text-center text-xl">Pagando...</p>
-                      <Progress value={progress} className="w-full" />
-                    </div>
-                  ) : (
-                    <div>
-                      <h2 className='text-4xl text-center'>¡Pago exitoso!</h2>
-                      <p className="text-xl">Muchas gracias por tu compra!</p>
-                    </div>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
+            <PaymentDialog amount={calculateTotal()} onPaymentComplete={() => saleCart()} />
           </div>
         </div>
       )}

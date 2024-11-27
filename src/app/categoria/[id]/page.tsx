@@ -1,173 +1,120 @@
-"use client";
+"use client"
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCategory } from "../../context/useCategory";
+import { useEcommerce } from "../../context/useEcommerce";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { useProduct } from "@/app/context/useProduct";
-import { useCategory } from "@/app/context/useCategory";
-import { useLoader } from "@/app/context/useLoader";
-import Loading from "./loading";
+import { PriceRangeFilter } from "@/components/PriceRangeFilter";
+import { Button } from "@/components/ui/button";
+import { useCart } from "../../context/useCart";
 import Aside from "@/components/Aside";
-import { ProductFilter } from "../components/ProductFilter";
-import { useCart } from "@/app/context/useCart";
+import { IProduct } from "@/services/interfaces/IProduct";
+import { PriceFormatter } from "@/utils/PriceFormatter";
 
-interface Producto {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  category: {
-    id: number;
-    name: string;
-  };
-  urlPhotos: string[];
-  archived: boolean;
-  quantity?: number;
-}
+export default function CategoryPage({ params }: { params: { id: string } }) {
+    const router = useRouter();
+    const { categories } = useCategory();
+    const { products } = useEcommerce();
+    const { addProduct } = useCart();
+    const [filteredProducts, setFilteredProducts] = useState<IProduct[]>([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [minPrice, setMinPrice] = useState(0);
+    const [maxPrice, setMaxPrice] = useState(Infinity);
+    const [isAsideOpen, setIsAsideOpen] = useState(false);
 
-interface Categoria {
-  id: number;
-  name: string;
-  description: string;
-  creationDate: string;
-  modificationDate: string;
-  archivedDate: string;
-}
+    const category = categories.find(cat => cat.id === parseInt(params.id));
 
-const categoryEmpty = {
-  id: 0,
-  name: "",
-  description: "",
-  creationDate: "",
-  modificationDate: "",
-  archivedDate: "",
-}
+    useEffect(() => {
+        if (category) {
+            const categoryProducts = products.filter(product => product.category.id === category.id);
+            const filtered = categoryProducts.filter((product) => {
+                const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+                const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
+                return matchesSearch && matchesPrice;
+            });
+            setFilteredProducts(filtered);
+        }
+    }, [category, products, searchTerm, minPrice, maxPrice]);
 
-const productEmpty = {
-  id: 0,
-  name: "",
-  description: "",
-  price: 0,
-  stock: 0,
-  category: {
-    id: 0,
-    name: "",
-  },
-  urlPhotos: [],
-  archived: false,
-}
+    const handleAddProduct = (e: React.MouseEvent, product: IProduct) => {
+        e.stopPropagation();
+        addProduct(product);
+    };
 
-export default function Page() {
-  const { addProduct } = useCart();
-  const router = useRouter();
-  const { isLoading } = useLoader()
-  const params = useParams<{ id: string }>();
-  const categoryId = parseInt(params.id);
-  const [products, setProducts] = useState<Producto[]>([productEmpty]);
-  const [category, setCategory] = useState<Categoria>(categoryEmpty);
-  const { getProductByCategory } = useProduct();
-  const { getCategoryById } = useCategory();
-  async function fetchProducts() {
-    const products = await getProductByCategory(categoryId);
-    setProducts(products);
-  }
-  const handleAddProduct = (product: Producto) => {
-    addProduct(product);
-  };
-  async function fetchCategory() {
-    const category = await getCategoryById(categoryId);
-    setCategory(category);
-  }
+    const goToProductDetail = (product: IProduct) => {
+        router.push(`/producto/${product.id}`);
+    };
 
-  useEffect(() => {
-    if (!isLoading) {
-      fetchProducts();
-      fetchCategory();
+    if (!category) {
+        return <div>Categoría no encontrada</div>;
     }
-  }, [isLoading, categoryId]);
-  if (isLoading) {
-    return <Loading />;
-  }
-  const goToProductDetail = (product: Producto) => {
-    router.push(`/producto/${product.id}`);
-  };
-  return (
-    <div className="flex flex-row h-full w-full">
-      <Aside>
-        <Input placeholder="Buscar..." />
-        <ProductFilter />
-      </Aside>
-      <div className="px-10 mb-5">
-        <Breadcrumb className="my-5">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{category.name}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        <h1 className="font-semibold text-2xl">{category.name}</h1>
-        <p className="text-gray-700 py-2">{category.description}</p>
-        <div className="w-full h-full flex flex-row py-10">
-          <section className="w-full h-full flex flex-col px-5 gap-5 items-center">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {products.map((product, index) => (
-                <div
-                  key={index}
-                  className={`bg-white rounded-lg shadow-md overflow-hidden ${product.stock === 0 ? 'opacity-50' : ''}`}              >
-                  <img
-                    alt={`Product ${index + 1}`}
-                    className="w-full h-48 object-contain p-2 cursor-pointer"
-                    src={product?.urlPhotos?.[0] ? product.urlPhotos[0] : ""}
-                  />
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold mb-2">
-                      {product.name}
-                    </h3>
-                    <p className="text-gray-600 mb-4 h-14">
-                      {product.description}
-                    </p>
-                    <div className="flex flex-col h-full gap-2 items-center justify-between">
-                      <span className="text-xl font-bold text-primary">
-                        ${product.price.toLocaleString("es")}
-                      </span>
-                      <div className="flex gap-2 py-3 w-full justify-center flex-wrap">
-                        <Button
-                          variant="default"
-                          className="text-white"
-                          onClick={() => handleAddProduct(product)}
-                          disabled={product.stock === 0}
-                        >
-                          {product.stock === 0 ? 'Sin stock' : 'Agregar al carrito'}
-                        </Button>
-                        <Button
-                          onClick={() => goToProductDetail(product)}
-                          className="text-white bg-gray-700 font-semibold"
-                        >
-                          Ver producto
-                        </Button>
-                      </div>
+
+    return (
+        <div className="flex flex-col lg:flex-row min-h-screen">
+            <Button
+                className="lg:hidden mb-4 self-start"
+                onClick={() => setIsAsideOpen(true)}
+            >
+                Filtros
+            </Button>
+            <Aside isOpen={isAsideOpen} onClose={() => setIsAsideOpen(false)}>
+                <div className="space-y-6">
+                    <div>
+                        <h3 className="text-lg font-semibold mb-2">Buscar</h3>
+                        <Input
+                            placeholder="Buscar..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </div>
-                  </div>
+                    <div>
+                        <h3 className="text-lg font-semibold mb-2">Rango de Precio</h3>
+                        <PriceRangeFilter
+                            onPriceChange={(min, max) => {
+                                setMinPrice(min);
+                                setMaxPrice(max);
+                            }}
+                        />
+                    </div>
                 </div>
-              ))}
+            </Aside>
+            <div className="flex-grow p-6">
+                <h2 className="text-3xl font-bold text-gray-900 mb-8">
+                    {category.name}
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {filteredProducts.map((product) => (
+                        <div
+                            key={product.id}
+                            onClick={() => goToProductDetail(product)}
+                            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                        >
+                            <div className="relative pb-[100%]">
+                                <img
+                                    src={product.urlPhotos[0]}
+                                    alt={product.name}
+                                    className="absolute top-0 left-0 w-full h-full object-cover"
+                                />
+                            </div>
+                            <div className="p-4">
+                                <h3 className="text-lg font-semibold mb-2 truncate">{product.name}</h3>
+                                <p className="text-gray-600 mb-4 h-12 overflow-hidden">{product.description}</p>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-xl font-bold text-gray-900">{PriceFormatter(product.price)}</span>
+                                    <Button
+                                        onClick={(e) => handleAddProduct(e, product)}
+                                        disabled={product.stock === 0}
+                                    >
+                                        {product.stock === 0 ? 'Sin stock' : 'Agregar al carrito'}
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
-          </section>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
+
