@@ -134,16 +134,21 @@ export default function Page() {
             <Badge className="text-xl text-white">${product?.price}</Badge>
             <h3 className="text-xl text-gray-500">{product?.category.name}</h3>
           </div>
-          <h3 className="text-gray-600">
+          {product?.stock > 0 ? (          <h3 className="text-gray-600">
             Cantidad disponible:{" "}
             <span className=" font-semibold">{product?.stock}</span>
-          </h3>
+          </h3>):(
+            <div>
+              <Badge className="text-xl" variant={"destructive"}>Sin stock</Badge>
+            </div>
+          )}
+
           <p>{product?.description}</p>
           <div>
             <Button
               className="text-white bg-gray-700"
               onClick={() => handleAddProduct()}
-              disabled={product?.archived}
+              disabled={product?.archived || product?.stock === 0}
             >
               Agregar al carrito
             </Button>

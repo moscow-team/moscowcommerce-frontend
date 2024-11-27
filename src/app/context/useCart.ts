@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { clear } from "console";
 import { useRouter } from "next/navigation";
 import { saveOrder } from "@/services/OrderService";
+import { EcommerceContext } from "./EcommerceProvider";
 
 interface Producto {
   id: number;
@@ -23,6 +24,7 @@ interface Producto {
 }
 export const useCart = () => {
   const context = useContext(CartContext);
+  const ecommerceContext = useContext(EcommerceContext);
   const router = useRouter();
   if (context === undefined) {
     throw new Error("useUser must be used within a UserProvider");
@@ -170,6 +172,7 @@ export const useCart = () => {
       }
     })
     await saveOrder(orderProducts);
+    ecommerceContext?.fetchProducts();
     clearCart();
     router.push("/inicio");
   };

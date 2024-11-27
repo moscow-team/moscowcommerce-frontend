@@ -49,30 +49,30 @@ export default function Page() {
     }
 
     return (
-        <div className="flex h-full min-h-screen w-full">
+        <div className="flex flex-row h-full w-full">
             <Aside>
                 <Input placeholder="Buscar..." />
                 <p className="text-center">Categorias</p>
                 <CheckboxReactHookFormMultiple />
             </Aside>
-            <div className="flex flex-col gap-5 p-5">
-            <Breadcrumb className="my-5">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Productos</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+            <div className="px-10 mb-5">
+                <Breadcrumb className="my-5">
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbPage>Productos</BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
                 <h2 className="text-3xl font-bold text-gray-900 mb-8">Productos</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {products.map((product) => (
                         <div
                             key={product.id}
-                            className="bg-white rounded-lg shadow-md overflow-hidden h-full"
+                            className={`bg-white rounded-lg shadow-md overflow-hidden ${product.stock === 0 ? 'opacity-50' : ''}`}
                         >
                             <img
                                 src={product.urlPhotos[0]}
@@ -96,8 +96,9 @@ export default function Page() {
                                             variant="default"
                                             className="text-white"
                                             onClick={() => handleAddProduct(product)}
+                                            disabled={product.stock === 0}
                                         >
-                                            Agregar al carrito
+                                            {product.stock === 0 ? 'Sin stock' : 'Agregar al carrito'}
                                         </Button>
                                         <Button
                                             onClick={() => goToProductDetail(product)}

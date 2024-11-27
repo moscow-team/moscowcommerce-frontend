@@ -12,6 +12,7 @@ interface EcommerceContextType {
   products: IProduct[];
   setProducts: React.Dispatch<React.SetStateAction<any>>;
   isLoading: boolean;
+  fetchProducts: () => Promise<void>;
 }
 
 export const EcommerceContext = createContext<EcommerceContextType | undefined>(
@@ -40,9 +41,9 @@ export const EcommerceProvider = ({ children }: { children: ReactNode }) => {
   const fetchProducts = async () => {
     try {
       const response = await getProducts();
-      const filtered = response.data.filter(
-        (product: Product) => product.archived === false
-      );
+      const filtered = response.data
+        .filter((product: Product) => product.archived === false)
+        .sort((a: Product, b: Product) => a.stock === 0 ? 1 : b.stock === 0 ? -1 : 0);
       console.log(filtered);
       setProducts(filtered);
     } catch (error) {
@@ -61,7 +62,7 @@ export const EcommerceProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <EcommerceContext.Provider
-      value={{ categories, setCategories, products, setProducts, isLoading }}
+      value={{ categories, setCategories, products, setProducts, isLoading, fetchProducts }}
     >
       {children}
     </EcommerceContext.Provider>
