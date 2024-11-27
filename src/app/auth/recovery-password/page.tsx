@@ -55,6 +55,7 @@ function RecoveryPasswordPage() {
                     <div className="h-max w-full">
                         <Input
                             type="email"
+                            placeholder="Email"
                             value={valueEmail}
                             color={isInvalidEmail ? "danger" : "success"}
                             onChange={(e)=> setValueEmail(e.target.value)}

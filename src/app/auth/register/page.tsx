@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button"; // Asegúrate de ajustar el path si es necesario
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { registerUser } from "@/services/Register";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -26,10 +27,7 @@ export default function RegisterPage() {
       }
 
       // Simula una petición al backend (reemplaza con tu lógica real)
-      const response = await new Promise((resolve) =>
-        setTimeout(() => resolve({ success: true, message: "Usuario registrado con éxito" }), 1000)
-      );
-
+      const response = await registerUser(data);
       if (response?.success) {
         toast.success(response.message as string);
         router.push("/auth/login");
