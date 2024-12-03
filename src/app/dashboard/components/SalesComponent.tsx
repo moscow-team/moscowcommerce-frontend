@@ -16,7 +16,6 @@ export default function SalesComponent() {
             <Card>
                 <CardHeader>
                     <CardTitle>Ventas Mensuales</CardTitle>
-
                 </CardHeader>
                 <CardContent className="flex flex-row justify-between">
                     <h3 className="text-3xl font-bold">{PriceFormatter(salesAmount.monthlyAmount)}</h3>
