@@ -10,7 +10,7 @@ export const useCharts = () => {
     throw new Error("useCharts must be used within a EcommerceContext");
   }
 
-  const { chartData, chartConfig, salesAmount, chartConfig2,pieChartData, pieChartData2} = context;
+  const { chartData, chartConfig, salesAmount, chartConfig2,pieChartData, pieChartData2, barsConfig} = context;
 
   return {
     chartData,
@@ -18,6 +18,7 @@ export const useCharts = () => {
     salesAmount,
     chartConfig2,
     pieChartData,
-    pieChartData2
+    pieChartData2,
+    barsConfig
   };
 };

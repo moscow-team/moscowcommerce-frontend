@@ -23,11 +23,14 @@ export function Charts() {
                     tickFormatter={(value) => value.slice(0, 3)}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="yerbas" fill="var(--color-yerbas)" radius={4} />
-                <Bar dataKey="mates" fill="var(--color-mates)" radius={4} />
-                <Bar dataKey="termos" fill="var(--color-termos)" radius={4} />
-                <Bar dataKey="materas" fill="var(--color-materas)" radius={4} />
-                <Bar dataKey="bombillas" fill="var(--color-bombillas)" radius={4} />
+                {Object.keys(chartConfig).map((category) => (
+                <Bar 
+                    key={category} 
+                    dataKey={category} 
+                    fill={chartConfig[category].color} 
+                    radius={4} 
+                />
+            ))}
             </BarChart>
         </ChartContainer>
     )

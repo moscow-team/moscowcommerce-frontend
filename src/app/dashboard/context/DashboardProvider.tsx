@@ -24,6 +24,7 @@ interface DashboardContextType {
     pieChartData: any;
     pieChartData2: any;
     orders: any;
+    barsConfig: any;
 }
 const categoryColors = {
     Mates: "var(--color-mates)",
@@ -51,207 +52,138 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     const [photosToDelete, setPhotosToDelete] = useState<string[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
     const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
-    const [salesAmount, setSalesAmount] = useState<Sales>({
+    const [salesAmount, setSalesAmount] = useState({
         amount: 0,
-        monthlyAmount: 0
+        monthlyAmount: 0,
     });
     const [chartData, setChartData] = useState<any>([]);
     const [pieChartData, setPieChartData] = useState<any>([]);
     const [pieChartData2, setPieChartData2] = useState<any>([]);
     const [orders, setOrders] = useState<any>([]);
-    const chartConfig = {
-        yerbas: {
-            label: "Yerbas",
-            color: "hsl(var(--chart-1))",
-        },
-        mates: {
-            label: "Mates",
-            color: "hsl(var(--chart-2))",
-        },
-        termos: {
-            label: "Termos",
-            color: "hsl(var(--chart-3))",
-        },
-        materas: {
-            label: "Materas",
-            color: "hsl(var(--chart-4))",
-        },
-        bombillas: {
-            label: "Bombillas",
-            color: "hsl(var(--chart-5))",
-        },
-    } satisfies ChartConfig
-    const chartConfig2 = {
-        sales: {
-            label: "Ventas",
-        },
-        yerbas: {
-            label: "Yerbas",
-            color: "hsl(var(--chart-1))",
-        },
-        mates: {
-            label: "Mates",
-            color: "hsl(var(--chart-2))",
-        },
-        termos: {
-            label: "Termos",
-            color: "hsl(var(--chart-3))",
-        },
-        materas: {
-            label: "Materas",
-            color: "hsl(var(--chart-4))",
-        },
-        bombillas: {
-            label: "Bombillas",
-            color: "hsl(var(--chart-5))",
-        },
-        // other: {
-        //     label: "Other",
-        //     color: "hsl(var(--chart-6))",
-        // },
-    } satisfies ChartConfig
+    const [chartConfig, setChartConfig] = useState<any>({}); // Inicializar como estado
+    const [chartConfig2, setChartConfig2] = useState<any>({}); // Inicializar como estado
+    const [barsConfig, setBarsConfig] = useState([]);
 
     const fetchSales = async () => {
         const response = await getOrders();
-        const orders: any = response.data;
-        setOrders(response.data);
-        console.log(orders);
-        // const chartData2 = [
-        //     { category: "mates", sales: Math.floor(Math.random() * 100), fill: "var(--color-mates)" },
-        //     { category: "yerbas", sales: Math.floor(Math.random() * 100), fill: "var(--color-yerbas)" },
-        //     { category: "bombillas", sales: Math.floor(Math.random() * 100), fill: "var(--color-bombillas)" },
-        //     { category: "materas", sales: Math.floor(Math.random() * 100), fill: "var(--color-materas)" },
-        //     { category: "termos", sales: Math.floor(Math.random() * 100), fill: "var(--color-termos)" },
-        // ]
-
-        // const chartData = [
-        //     { month: "February", yerbas: Math.floor(Math.random() * 400), mates: Math.floor(Math.random() * 400), termos: Math.floor(Math.random() * 400), materas: Math.floor(Math.random() * 400), bombillas: Math.floor(Math.random() * 400) },
-
-        //     { month: "March", yerbas: Math.floor(Math.random() * 400), mates: Math.floor(Math.random() * 400), termos: Math.floor(Math.random() * 400), materas: Math.floor(Math.random() * 400), bombillas: Math.floor(Math.random() * 400) },
-
-        //     { month: "April", yerbas: Math.floor(Math.random() * 400), mates: Math.floor(Math.random() * 400), termos: Math.floor(Math.random() * 400), materas: Math.floor(Math.random() * 400), bombillas: Math.floor(Math.random() * 400) },
-
-        //     { month: "May", yerbas: Math.floor(Math.random() * 400), mates: Math.floor(Math.random() * 400), termos: Math.floor(Math.random() * 400), materas: Math.floor(Math.random() * 400), bombillas: Math.floor(Math.random() * 400) },
-
-        //     { month: "June", yerbas: Math.floor(Math.random() * 400), mates: Math.floor(Math.random() * 400), termos: Math.floor(Math.random() * 400), materas: Math.floor(Math.random() * 400), bombillas: Math.floor(Math.random() * 400) },
-
-        //     { month: "July", yerbas: Math.floor(Math.random() * 400), mates: Math.floor(Math.random() * 400), termos: Math.floor(Math.random() * 400), materas: Math.floor(Math.random() * 400), bombillas: Math.floor(Math.random() * 400) },
-
-        //     { month: "August", yerbas: Math.floor(Math.random() * 400), mates: Math.floor(Math.random() * 400), termos: Math.floor(Math.random() * 400), materas: Math.floor(Math.random() * 400), bombillas: Math.floor(Math.random() * 400) },
-
-        //     { month: "September", yerbas: Math.floor(Math.random() * 400), mates: Math.floor(Math.random() * 400), termos: Math.floor(Math.random() * 400), materas: Math.floor(Math.random() * 400), bombillas: Math.floor(Math.random() * 400) },
-
-        //     { month: "October", yerbas: Math.floor(Math.random() * 400), mates: Math.floor(Math.random() * 400), termos: Math.floor(Math.random() * 400), materas: Math.floor(Math.random() * 400), bombillas: Math.floor(Math.random() * 400) },
-
-        //     { month: "November", yerbas: Math.floor(Math.random() * 400), mates: Math.floor(Math.random() * 400), termos: Math.floor(Math.random() * 400), materas: Math.floor(Math.random() * 400), bombillas: Math.floor(Math.random() * 400) },
-
-        //     { month: "December", yerbas: chartData2.find(data => data.category === "yerbas")?.sales || 0, mates: chartData2.find(data => data.category === "mates")?.sales || 0, termos: chartData2.find(data => data.category === "termos")?.sales || 0, materas: chartData2.find(data => data.category === "materas")?.sales || 0, bombillas: chartData2.find(data => data.category === "bombillas")?.sales || 0 },
-
-        // ];
-
-        // Inicializar los meses
-
-        // Procesar los datos para calcular las ventas mensuales por categoría
-
-        // Convertir el objeto a un array
-
-        // Calculate sales totals for each category
-        // const calculateCategorySales = (category) => {
-        //     return chartData.reduce((total, month) => total + (month[category] || 0), 0);
-        // };
-
-        // // Populate chartData3
-        // const chartData3 = [
-        //     { category: "mates", sales: calculateCategorySales("mates"), fill: "var(--color-mates)" },
-        //     { category: "yerbas", sales: calculateCategorySales("yerbas"), fill: "var(--color-yerbas)" },
-        //     { category: "bombillas", sales: calculateCategorySales("bombillas"), fill: "var(--color-bombillas)" },
-        //     { category: "materas", sales: calculateCategorySales("materas"), fill: "var(--color-materas)" },
-        //     { category: "termos", sales: calculateCategorySales("termos"), fill: "var(--color-termos)" },
-        // ];
-
-        
-        // Generar chartData3
-        const chartData2 = Object.values(
-            orders.reduce((acc, sale) => {
-                sale.products.forEach((product) => {
-                    const categoryName = product.category.name; // Nombre de la categoría
-                    if (!acc[categoryName]) {
-                        acc[categoryName] = {
-                            category: categoryName,
-                            sales: 0, // Ventas en cantidad
-                            fill: categoryColors[categoryName] || "var(--color-default)",
-                        };
-                    }
-                    acc[categoryName].sales += 1; // Incrementar por cada producto vendido
-                });
-                return acc;
-            }, {})
-        );
-        
+        const orders = response.data;
+        setOrders(orders);
+    
+        // Obtener las categorías dinámicamente desde las órdenes
+        const getCategories = () => {
+            const allCategories = new Set();
+            orders.forEach((sale) =>
+                sale.products.forEach((product) => allCategories.add(product.category.name.toLowerCase()))
+            );
+            return Array.from(allCategories);
+        };
+    
+        // Inicialización de los meses
         const months = [
             "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
             "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
         ];
-        
+    
+        // Función para calcular ventas por categoría
+        const calculateCategorySales = (categoryName) => {
+            return orders.reduce((total, sale) => {
+                const categorySales = sale.products
+                    .filter((product) => product.category.name.toLowerCase() === categoryName.toLowerCase())
+                    .reduce((categoryTotal, product) => categoryTotal + product.price, 0);
+    
+                return total + categorySales;
+            }, 0);
+        };
+    
+        // Generar las ventas mensuales por categoría
         const monthlySales = orders.reduce((acc, sale) => {
             const saleDate = new Date(sale.createtime);
             const month = months[saleDate.getMonth()]; // Obtener el nombre del mes
-        
+    
             // Inicializar el mes si no existe
             if (!acc[month]) {
                 acc[month] = { month };
-                months.forEach((category) => {
-                    acc[month][category.toLowerCase()] = 0;
+                // Inicializar las categorías con valor 0
+                getCategories().forEach((category) => {
+                    acc[month][category] = 0;
                 });
             }
-        
+    
             // Sumar las cantidades por categoría
             sale.products.forEach((product) => {
                 const category = product.category.name.toLowerCase(); // Nombre de la categoría
                 acc[month][category] = (acc[month][category] || 0) + 1; // Incrementar por cada producto vendido
             });
-        
+    
             return acc;
         }, {});
-        
+    
+        // Transformar la información a la estructura necesaria para el gráfico
         const chartData = Object.values(monthlySales);
-        
-        function calculateCategorySales(categoryName) {
-            const currentDate = new Date();
-            const currentMonth = currentDate.getMonth();
-            const currentYear = currentDate.getFullYear();
-        
-            return orders
-                .filter((sale) => {
-                    const saleDate = new Date(sale.createtime);
-                    return (
-                        saleDate.getMonth() === currentMonth &&
-                        saleDate.getFullYear() === currentYear
-                    );
-                })
-                .reduce((total, sale) => {
-                    const categorySales = sale.products
-                        .filter((product) => product.category.name.toLowerCase() === categoryName.toLowerCase())
-                        .reduce((categoryTotal) => categoryTotal + 1, 0);
-        
-                    return total + categorySales;
-                }, 0);
+        console.log("Chart Data:", chartData); // Verifica los datos generados
+    
+        // Verificar si los datos tienen el formato correcto antes de actualizarlos
+        if (Array.isArray(chartData) && chartData.length > 0) {
+            setChartData(chartData); // Actualiza el estado con los datos
+        } else {
+            console.error("chartData tiene un formato incorrecto o está vacío");
         }
-        
-        // Generar chartData3
-        const chartData3 = [
-            { category: "mates", sales: calculateCategorySales("mates"), fill: "var(--color-mates)" },
-            { category: "yerbas", sales: calculateCategorySales("yerbas"), fill: "var(--color-yerbas)" },
-            { category: "bombillas", sales: calculateCategorySales("bombillas"), fill: "var(--color-bombillas)" },
-            { category: "materas", sales: calculateCategorySales("materas"), fill: "var(--color-materas)" },
-            { category: "termos", sales: calculateCategorySales("termos"), fill: "var(--color-termos)" },
-        ];
-        
-        // Cálculo del monto total del último mes
+    
+        // Generar la configuración dinámica para el gráfico principal
+        const generateChartConfig = (categories) => {
+            return categories.reduce((config, category, index) => {
+                config[category] = {
+                    label: category.charAt(0).toUpperCase() + category.slice(1),
+                    color: `hsl(var(--chart-${index + 1}))`, // Genera un color dinámico
+                };
+                return config;
+            }, {});
+        };
+    
+        // Generar la configuración extendida con "Ventas"
+        const generateChartConfig2 = (categories) => {
+            const baseConfig = {
+                sales: {
+                    label: "Ventas",
+                },
+            };
+            const dynamicConfig = generateChartConfig(categories);
+            return { ...baseConfig, ...dynamicConfig };
+        };
+    
+        const categories = getCategories();
+    
+        // Configuración de los estados dinámicos
+        const dynamicChartConfig = generateChartConfig(categories);
+        const dynamicChartConfig2 = generateChartConfig2(categories);
+    
+        setChartConfig(dynamicChartConfig);
+    
+        // Generar datos para el gráfico de torta
+        const chartData3 = categories.map((category) => {
+            const salesCount = calculateCategorySales(category);
+            console.log(`Sales count for category ${category}:`, salesCount); // Verifica los datos calculados
+            return {
+                category,
+                sales: salesCount,
+                fill: dynamicChartConfig[category].color,
+            };
+        });
+    
+        console.log("Chart Data 3:", chartData3); // Verifica los datos generados
+    
+        // Verifica si los datos tienen el formato correcto antes de actualizarlos
+        if (Array.isArray(chartData3) && chartData3.length > 0) {
+            setPieChartData(chartData3); // Actualiza el estado con los datos
+        } else {
+            console.error("chartData3 tiene un formato incorrecto o está vacío");
+        }
+    
+        // Calcular monto total de ventas del mes actual y anual
         const currentDate = new Date();
         const currentMonth = currentDate.getMonth();
         const currentYear = currentDate.getFullYear();
-        
+    
         const totalSalesLastMonth = orders
             .filter((sale) => {
                 const saleDate = new Date(sale.createtime);
@@ -261,11 +193,10 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
                 );
             })
             .reduce((total, sale) => {
-                const saleTotal = sale.products.reduce((saleSum, product) => saleSum + product.price, 0); // Usar precio directamente
+                const saleTotal = sale.products.reduce((saleSum, product) => saleSum + product.price, 0);
                 return total + saleTotal;
             }, 0);
-        
-        // Cálculo del monto total anual
+    
         const totalSalesAnnual = orders
             .filter((sale) => {
                 const saleDate = new Date(sale.createtime);
@@ -275,60 +206,68 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
                 const saleTotal = sale.products.reduce((saleSum, product) => saleSum + product.price, 0);
                 return total + saleTotal;
             }, 0);
-                
-        setChartData(chartData.reverse());
-        setPieChartData(chartData3);
-        setPieChartData2(chartData2);
-        console.log(chartData);
-        console.log(chartData2);
-        console.log(chartData3);
-        // Guarda los totales en el estado o donde lo necesites
+    
+        // Generar datos anuales para el gráfico de torta
+        const calculateAnnualCategorySales = (categoryName) => {
+            return orders
+                .filter((sale) => {
+                    const saleDate = new Date(sale.createtime);
+                    return saleDate.getFullYear() === currentYear;
+                })
+                .reduce((total, sale) => {
+                    const categorySales = sale.products
+                        .filter((product) => product.category.name.toLowerCase() === categoryName.toLowerCase())
+                        .reduce((categoryTotal) => categoryTotal + 1, 0);
+    
+                    return total + categorySales;
+                }, 0);
+        };
+    
+        const annualChartData = categories.map((category) => ({
+            category,
+            sales: calculateAnnualCategorySales(category),
+            fill: dynamicChartConfig[category].color,
+        }));
+    
+        // Actualizar estados
+        setChartConfig2(dynamicChartConfig2);
+        setPieChartData2(annualChartData);
         setSalesAmount({
             amount: totalSalesAnnual,
             monthlyAmount: totalSalesLastMonth,
         });
+    };
+    
+        useEffect(() => {
+            fetchSales();
+        }, []);
+
         
-        
-    }
-    useEffect(() => {
-        fetchSales();
-    }, []);
-
-
-    // const fetchSales = async () => {
-    //     try {
-
-    //       console.log(response);
-    //       // setProducts(filtered);
-    //     } catch (error) {
-    //       console.error(error);
-    //     }
-    //   };
-
-    return (
-        <DashboardContext.Provider
-            value={{
-                archivedProducts,
-                setArchivedProducts,
-                selectedProduct,
-                setSelectedProduct,
-                filteredProducts,
-                setFilteredProducts,
-                photosToDelete,
-                setPhotosToDelete,
-                imagePreviews,
-                setImagePreviews,
-                selectedFiles,
-                setSelectedFiles,
-                chartData,
-                chartConfig,
-                salesAmount,
-                chartConfig2,
-                pieChartData,
-                pieChartData2,
-                orders
-            }}>
-            {children}
-        </DashboardContext.Provider>
-    );
-};
+        return (
+            <DashboardContext.Provider
+                value={{
+                    archivedProducts,
+                    setArchivedProducts,
+                    selectedProduct,
+                    setSelectedProduct,
+                    filteredProducts,
+                    setFilteredProducts,
+                    photosToDelete,
+                    setPhotosToDelete,
+                    imagePreviews,
+                    setImagePreviews,
+                    selectedFiles,
+                    setSelectedFiles,
+                    chartData,
+                    chartConfig,
+                    salesAmount,
+                    chartConfig2,
+                    pieChartData,
+                    pieChartData2,
+                    orders,
+                    barsConfig
+                }}>
+                {children}
+            </DashboardContext.Provider>
+        );
+    };
