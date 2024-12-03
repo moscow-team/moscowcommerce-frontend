@@ -37,10 +37,6 @@ export const config = {
     "/dashboard/(.*)",
     "/perfil",
     "/perfil/(.*)",
-    "/categoria",
-    "/categoria/(.*)",
-    "/producto",
-    "/producto/(.*)",
     "/carrito",
   ],
 };

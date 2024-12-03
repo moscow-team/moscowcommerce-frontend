@@ -35,7 +35,6 @@ export default function LoginForm({ params }: LoginFormProps) {
         password: data.password,
         redirect: false,
       });
-
       if (session?.ok) {
         localStorage.setItem("loggedInUserEmail", data.email);
         toast.success("Sesión iniciada");
@@ -44,6 +43,7 @@ export default function LoginForm({ params }: LoginFormProps) {
         toast.error(session?.error || "Credenciales incorrectas");
       }
     } catch (error: any) {
+      console.log(error);
       toast.error(error.message || error.error || "Credenciales incorrectas");
     }
   };

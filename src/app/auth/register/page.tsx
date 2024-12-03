@@ -25,14 +25,18 @@ export default function RegisterPage() {
         toast.error("Las contraseñas no coinciden");
         return;
       }
-
-      // Simula una petición al backend (reemplaza con tu lógica real)
       const response = await registerUser(data);
       if (response?.success) {
         toast.success(response.message as string);
         router.push("/auth/login");
       } else {
-        toast.error("Error al registrar usuario");
+        if (response?.data) {
+          Object.values(response.data).forEach((error: any) => {
+            toast.error(error);
+          });
+        } else {
+          toast.error(response.message || "Error al registrar usuario");
+        }
       }
     } catch (error) {
       console.error("Error en el registro:", error);

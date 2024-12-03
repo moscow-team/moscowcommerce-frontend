@@ -84,25 +84,33 @@ export default function CategoryPage({ params }: { params: { id: string } }) {
                     {category.name}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredProducts.map((product) => (
+                {filteredProducts.map((product) => (
                         <div
                             key={product.id}
                             onClick={() => goToProductDetail(product)}
-                            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                            className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-2xl hover:scale-105 transition-all duration-200 cursor-pointer ${product.stock === 0 ? 'opacity-50' : ''}`}
                         >
                             <div className="relative pb-[100%]">
                                 <img
                                     src={product.urlPhotos[0]}
-                                    alt={product.name}
-                                    className="absolute top-0 left-0 w-full h-full object-cover"
+                                    alt={`Product ${product.name}`}
+                                    className="absolute top-0 left-0 w-full h-full object-contain p-2"
                                 />
                             </div>
                             <div className="p-4">
-                                <h3 className="text-lg font-semibold mb-2 truncate">{product.name}</h3>
-                                <p className="text-gray-600 mb-4 h-12 overflow-hidden">{product.description}</p>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-xl font-bold text-gray-900">{PriceFormatter(product.price)}</span>
+                                <h3 className="text-lg font-semibold mb-2 truncate">
+                                    {product.name}
+                                </h3>
+                                <p className="text-gray-600 mb-4 h-12 overflow-hidden text-ellipsis">
+                                    {product.description}
+                                </p>
+                                <div className="flex flex-col items-center justify-between">
+                                    <span className="text-xl font-bold text-primary mb-2">
+                                        ${product.price.toLocaleString("es-AR")}
+                                    </span>
                                     <Button
+                                        variant="default"
+                                        className="w-full text-white z-10"
                                         onClick={(e) => handleAddProduct(e, product)}
                                         disabled={product.stock === 0}
                                     >
